@@ -1,0 +1,30 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="DIA (DIA)">
+<circle id="DIA (DIA)_2" cx="12" cy="12" r="12" fill="var(--fill-0, #EDF0F4)"/>
+<g id="DIA (DIA)_3">
+<path id="DIA (DIA)_4" d="M6.61025 5.67557L8.8441 4.2V16.0251C11.037 15.8919 14.3263 15.2565 14.6644 12.0185C14.6644 12.0185 15.1768 14.0064 13.9984 15.5947C12.738 17.2957 9.81757 18.4434 6.6 18.4434V5.67557H6.61025Z" fill="url(#paint0_linear_0_673)"/>
+<path id="DIA (DIA)_5" d="M11.1086 6.96675V8.93418C12.0206 9.18011 14.1212 9.98962 14.6848 12.039C14.6848 12.039 14.6951 12.0698 14.7053 12.1313C14.7053 12.1517 14.7156 12.162 14.7156 12.1825C14.8078 12.6539 15.0127 14.2524 14.0188 15.605C12.7994 17.2855 9.79699 18.4537 6.62041 18.4537L9.38711 19.6628C9.38711 19.6628 15.2792 19.5808 17.0724 14.3958C17.2363 13.945 17.3286 13.4736 17.3491 12.992C17.1749 9.32357 14.1725 7.29465 11.1086 6.96675V6.96675Z" fill="url(#paint1_linear_0_673)"/>
+<path id="DIA (DIA)_6" d="M16.058 7.14095C14.7976 5.49117 12.0001 4.20005 8.8543 4.20005V16.0251C9.25393 16.0046 9.69455 15.9636 10.1557 15.8919C10.3709 15.8612 10.586 15.8202 10.8012 15.7689C10.9037 15.7485 11.0164 15.7177 11.1086 15.6972V6.96675C14.1725 7.29465 17.2056 9.33381 17.3388 13.0125C17.3388 13.0125 18.0664 9.78468 16.058 7.14095V7.14095Z" fill="url(#paint2_linear_0_673)"/>
+</g>
+</g>
+<defs>
+<linearGradient id="paint0_linear_0_673" x1="6.61267" y1="18.4551" x2="14.7839" y2="18.4551" gradientUnits="userSpaceOnUse">
+<stop stop-color="#665AFE"/>
+<stop offset="1" stop-color="#F1B184"/>
+</linearGradient>
+<linearGradient id="paint1_linear_0_673" x1="11.376" y1="5.61961" x2="3.95698" y2="13.4759" gradientUnits="userSpaceOnUse">
+<stop stop-color="#5C3598"/>
+<stop offset="0.995" stop-color="#CCE0F4"/>
+</linearGradient>
+<linearGradient id="paint2_linear_0_673" x1="6.85153" y1="19.3015" x2="18.372" y2="17.0753" gradientUnits="userSpaceOnUse">
+<stop stop-color="#B7FEA8"/>
+<stop offset="0.16" stop-color="#B5F9AA"/>
+<stop offset="0.321" stop-color="#B0EDB0"/>
+<stop offset="0.481" stop-color="#A7D9BC"/>
+<stop offset="0.642" stop-color="#9CBDCB"/>
+<stop offset="0.803" stop-color="#8D99E0"/>
+<stop offset="0.962" stop-color="#7A6DF8"/>
+<stop offset="1" stop-color="#7662FF"/>
+</linearGradient>
+</defs>
+</svg>

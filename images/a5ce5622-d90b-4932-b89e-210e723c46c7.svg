@@ -1,0 +1,7 @@
+<svg preserveAspectRatio="none" width="100%" height="100%" overflow="visible" style="display: block;" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Frame 5">
+<rect width="15" height="15" rx="7.5" fill="var(--fill-0, #BAF6D5)"/>
+<path id="Vector" d="M7.5 13C10.5376 13 13 10.5376 13 7.5C13 4.46243 10.5376 2 7.5 2C4.46243 2 2 4.46243 2 7.5C2 10.5376 4.46243 13 7.5 13Z" fill="var(--fill-0, #42DA96)"/>
+<path id="Vector_2" d="M7.67315 9.3463C8.59721 9.3463 9.3463 8.59721 9.3463 7.67315C9.3463 6.7491 8.59721 6 7.67315 6C6.7491 6 6 6.7491 6 7.67315C6 8.59721 6.7491 9.3463 7.67315 9.3463Z" fill="var(--fill-0, white)" stroke="var(--stroke-0, #00B565)" stroke-width="0.930556"/>
+</g>
+</svg>
