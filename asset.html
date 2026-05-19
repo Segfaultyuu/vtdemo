@@ -1,0 +1,1739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=393, initial-scale=1">
+  <title>Asset – VT Markets</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&family=Open+Sans:ital,wght@1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="components.css">
+  <style>
+
+    /* ── Sticky header ── */
+    .tn-status-bar { position: sticky !important; top: 0; z-index: 20; background: #fff; }
+    .tn-nav-bar { position: sticky !important; top: 54px; z-index: 20; background: #fff; }
+    .page-tabs { position: sticky; top: 98px; z-index: 20; background: #fff; padding-bottom: 12px; }
+
+    /* ── Tab content visibility ── */
+    .tab-overview, .tab-cfds, .tab-copy, .tab-funding, .tab-earn { display: none; }
+    .tab-overview.active { display: block; }
+    .tab-cfds.active { display: block; }
+    .tab-copy.active { display: block; }
+    .tab-funding.active { display: block; }
+    .tab-earn.active { display: block; }
+
+    /* ── Hero area (gradient bg) ── */
+    .asset-hero {
+      width: 393px; padding: 12px 20px 0;
+      background: linear-gradient(207deg, #fff 74%, #ebf2fe 127%);
+    }
+
+    /* PRO ECN badge */
+    .pro-ecn-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      height: 14px; padding: 0 6px; border-radius: 3px;
+      background: linear-gradient(90deg, #0a36c7, #00f0ff);
+      font-size: 9px; font-weight: 400; font-style: italic;
+      font-family: 'Open Sans', sans-serif;
+      color: #fff; letter-spacing: -0.35px; line-height: 1;
+      margin-bottom: 4px;
+    }
+
+    /* Total Value */
+    .asset-total-label {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 14px; font-weight: 500; color: #7a8699; line-height: normal;
+      margin-bottom: 4px;
+    }
+    .asset-total-label img { width: 14px; height: 14px; }
+    .asset-amount-row {
+      display: flex; align-items: flex-end; gap: 4px;
+      position: relative;
+    }
+    .asset-amount {
+      font-size: 26px; font-weight: 600; color: #282d34; line-height: normal;
+    }
+    /* ccy-trigger styles now in components.css */
+    .asset-chart-mini {
+      position: absolute; right: 0; top: -8px;
+      width: 86px; height: 32px;
+    }
+    .asset-chart-mini img { width: 100%; height: 100%; }
+
+    /* PnL row */
+    .asset-pnl-row {
+      display: flex; align-items: center; gap: 4px;
+      margin-top: 4px; margin-bottom: 12px;
+    }
+    .asset-pnl-label {
+      font-size: 14px; font-weight: 500; color: #7a8699; line-height: 22px;
+      border-bottom: 1px dashed #b6b6b6;
+    }
+    .asset-pnl-value {
+      font-size: 16px; font-weight: 500; color: #00b565; line-height: 24px;
+    }
+    .asset-pnl-arrow { width: 13px; height: 13px; }
+
+    /* ── Expandable Chart ── */
+    .asset-chart-wrap {
+      position: relative;
+      width: 393px;
+      height: 225px;
+      overflow: hidden;
+      touch-action: none;
+    }
+    .asset-chart-fills {
+      position: absolute;
+      top: 0; left: 0;
+      width: 393px; height: 180px;
+      transition: opacity 0.2s ease;
+    }
+    .asset-chart-fill-img {
+      position: absolute;
+      top: 13px; left: 0;
+      width: 393px;
+    }
+    .asset-chart-value-pill {
+      position: absolute;
+      top: 1px; left: 184px;
+      background: #282d34; color: #fff;
+      font-size: 11px; font-weight: 600;
+      padding: 2px 8px; border-radius: 100px;
+      white-space: nowrap; z-index: 3;
+      transition: left 0.08s ease, top 0.08s ease;
+    }
+    .asset-chart-dot {
+      position: absolute;
+      top: 55px; left: 208px;
+      width: 15px; height: 15px;
+      z-index: 3;
+      transition: left 0.08s ease, top 0.08s ease;
+    }
+    .asset-chart-grid {
+      position: absolute;
+      top: 0; left: 0;
+      width: 393px; height: 180px;
+      pointer-events: none;
+    }
+    .asset-chart-scrub-line {
+      position: absolute;
+      top: 0; width: 1px; height: 180px;
+      background: rgba(0,181,101,0.35);
+      pointer-events: none;
+      display: none; z-index: 2;
+    }
+    .asset-chart-wrap.dragging .asset-chart-dot,
+    .asset-chart-wrap.dragging .asset-chart-value-pill {
+      transition: none;
+    }
+    .asset-time-tabs {
+      position: absolute;
+      bottom: 0; left: 16px; right: 16px;
+      height: 44px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .asset-time-tab {
+      width: 48px; height: 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 500; color: #7a8699;
+      border-radius: 2px; cursor: pointer;
+    }
+    .asset-time-tab.active { background: #e5e7eb; color: #282d34; }
+
+    /* Action buttons row */
+    .asset-actions {
+      display: flex; align-items: center; width: 393px;
+      padding: 12px 0;
+    }
+    .asset-action-item {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 4px; height: 56px; cursor: pointer;
+    }
+    .asset-action-item img { width: 24px; height: 24px; }
+    .asset-action-item span {
+      font-size: 12px; font-weight: 500; color: #282d34;
+      line-height: normal; text-align: center;
+    }
+
+    /* ── Account Distribution ── */
+    .asset-distribution {
+      padding: 0 20px; width: 393px;
+      margin-top: 24px;
+    }
+    .asset-dist-header {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .asset-dist-title {
+      font-size: 16px; font-weight: 600; color: #282d34; line-height: 24px;
+    }
+    .asset-dist-arrow { width: 14px; height: 14px; }
+    .arrow-right { width: 20px; height: 20px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+
+    /* Distribution bar */
+    .asset-dist-bar {
+      display: flex; height: 8px; border-radius: 4px;
+      overflow: hidden; margin-bottom: 16px;
+    }
+    .asset-dist-seg { height: 8px; }
+    .asset-dist-seg.blue { background: linear-gradient(90deg, #0943cb, #01eefe); flex: 30.12; }
+    .asset-dist-seg.green { background: linear-gradient(90deg, #00b565, #78f074); flex: 42.12; }
+    .asset-dist-seg.yellow { background: linear-gradient(90deg, #ffae00, #fff8b5); flex: 20.12; }
+    .asset-dist-seg.purple { background: linear-gradient(90deg, #866eff, #fda0ff); flex: 10.12; }
+
+    /* Distribution legend */
+    .asset-dist-legend {
+      display: flex; align-items: flex-start; justify-content: space-between;
+    }
+    .asset-dist-item {
+      display: flex; align-items: flex-start; gap: 8px;
+    }
+    .asset-dist-dot {
+      width: 8px; height: 16px; display: flex; align-items: flex-start;
+    }
+    .asset-dist-dot img { width: 8px; height: 16px; }
+    .asset-dist-item-text {
+      display: flex; flex-direction: column; gap: 4px;
+      width: 54px;
+    }
+    .asset-dist-pct {
+      font-size: 14px; font-weight: 600; color: #282d34; line-height: normal;
+    }
+    .asset-dist-label {
+      font-size: 12px; font-weight: 400; color: #7a8699; line-height: normal;
+    }
+
+    /* ── Asset Details ── */
+    .asset-details-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px; width: 393px; margin-top: 24px;
+    }
+    .asset-details-title {
+      font-size: 16px; font-weight: 600; color: #282d34; line-height: 24px;
+    }
+    .asset-details-link {
+      font-size: 12px; font-weight: 500; color: #7a8699;
+      line-height: 18px; cursor: pointer;
+    }
+
+    /* Fiat / Crypto tabs */
+    .asset-tabs-wrap {
+      width: 393px; border-bottom: 1px solid #f4f5f6;
+      margin-top: 16px;
+    }
+    .asset-tabs {
+      display: flex; align-items: flex-start; padding: 0 20px;
+    }
+    .asset-tab {
+      font-size: 14px; font-weight: 400; color: #7a8699;
+      padding: 0 0 6px; cursor: pointer; position: relative;
+      white-space: nowrap; line-height: 22px;
+      margin-right: 16px;
+    }
+    .asset-tab.active {
+      color: #0a36c7; font-weight: 600;
+      border-bottom: 2px solid #0a36c7;
+    }
+
+    /* Currency list items */
+    .asset-currency-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 16px 20px; width: 393px;
+      border-bottom: 1px solid #f4f5f6;
+    }
+    .asset-currency-flag {
+      width: 20px; height: 20px; border-radius: 50%;
+      overflow: hidden; flex-shrink: 0;
+    }
+    .asset-currency-flag img { width: 100%; height: 100%; object-fit: cover; }
+    .asset-currency-info {
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .asset-currency-code {
+      font-size: 16px; font-weight: 500; color: #282d34; line-height: normal;
+    }
+    .asset-currency-name {
+      font-size: 12px; font-weight: 400; color: #7a8699; line-height: normal;
+    }
+    .asset-currency-values {
+      flex: 1; display: flex; flex-direction: column; gap: 4px;
+      align-items: flex-end;
+    }
+    .asset-currency-amount {
+      font-size: 16px; font-weight: 600; color: #282d34; line-height: normal;
+    }
+    .asset-currency-equiv {
+      font-size: 12px; font-weight: 400; color: #7a8699; line-height: normal;
+    }
+    .asset-currency-chevron {
+      width: 12px; height: 12px; flex-shrink: 0;
+    }
+
+    /* ============================= */
+    /* ── FIAT TAB STYLES ── */
+    /* ============================= */
+
+    /* Level 2 sub-tabs */
+    .fiat-subtabs {
+      display: flex; align-items: center;
+      width: 393px; border-bottom: 1px solid #f4f5f6;
+      overflow: hidden; padding-top: 12px;
+    }
+    .fiat-subtab {
+      font-size: 14px; font-weight: 400; color: #7a8699;
+      line-height: 22px; padding: 0 16px 6px; cursor: pointer;
+      white-space: nowrap; position: relative;
+    }
+    .fiat-subtab:first-child { padding-left: 16px; }
+    .fiat-subtab.active {
+      color: #0a36c7; font-weight: 600;
+      border-bottom: 2px solid #0a36c7;
+    }
+
+    /* Fiat hero equity */
+    .fiat-hero {
+      width: 393px; padding: 12px 16px 12px;
+      border-bottom: 1px solid #f4f5f6;
+    }
+    .fiat-equity-label {
+      display: flex; align-items: center; gap: 5px;
+      margin-bottom: 8px;
+    }
+    .fiat-equity-label span {
+      font-size: 14px; font-weight: 500; color: #7a8699;
+    }
+    .fiat-amount-row {
+      display: flex; align-items: flex-end; gap: 5px;
+      position: relative;
+    }
+    .fiat-amount {
+      font-size: 26px; font-weight: 600; color: #282d34; line-height: normal;
+    }
+    .fiat-amount-currency {
+      font-size: 14px; font-weight: 600; color: #282d34; margin-bottom: 2px;
+    }
+    .fiat-pnl {
+      font-size: 16px; font-weight: 600; color: #00b565;
+      margin-top: 4px;
+    }
+    .fiat-dropdown-btn {
+      position: absolute; right: 0; top: 27px;
+      width: 24px; height: 24px; border-radius: 60px;
+      background: #f4f5f6; display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Fiat action buttons */
+    .fiat-actions {
+      display: flex; align-items: center; width: 393px;
+      padding: 8px 0;
+    }
+    .fiat-action-item {
+      flex: 1; display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 4px; height: 56px; cursor: pointer;
+    }
+    .fiat-action-item img { width: 24px; height: 24px; }
+    .fiat-action-item span {
+      font-size: 12px; font-weight: 500; color: #282d34;
+      line-height: normal; text-align: center;
+    }
+
+    /* Transaction Details */
+    .fiat-tx-section {
+      padding: 16px; width: 393px;
+    }
+    .fiat-tx-title {
+      font-size: 18px; font-weight: 600; color: #282d34; margin-bottom: 16px;
+    }
+    .fiat-tx-filter {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .fiat-tx-filter-label {
+      font-size: 14px; font-weight: 600; color: #7a8699;
+    }
+    .fiat-tx-date-btn {
+      display: flex; align-items: center; gap: 4px;
+      border: 1px solid #f4f5f6; border-radius: 4px;
+      padding: 3px 8px; height: 24px; cursor: pointer;
+    }
+    .fiat-tx-date-btn img { width: 12px; height: 12px; }
+    .fiat-tx-date-btn span {
+      font-size: 12px; font-weight: 500; color: #0a36c7;
+    }
+
+    /* Transaction list */
+    .fiat-tx-item {
+      display: flex; flex-direction: column; gap: 12px;
+      padding: 12px 0; border-bottom: 1px solid #f4f5f6;
+    }
+    .fiat-tx-item:last-child { border-bottom: 0.5px solid #f4f5f6; }
+    .fiat-tx-row1 {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .fiat-tx-name {
+      font-size: 14px; font-weight: 600; color: #282d34;
+    }
+    .fiat-tx-amount {
+      font-size: 14px; font-weight: 600; color: #282d34;
+    }
+    .fiat-tx-row2 {
+      display: flex; align-items: center; justify-content: space-between;
+      font-size: 12px; font-weight: 500; color: #7a8699;
+    }
+    .fiat-tx-status {
+      text-align: right; text-transform: uppercase; flex: 1;
+    }
+    .fiat-tx-status.reversed { color: #0a36c7; }
+
+    /* Best Copy Trading Performers (Fiat tab) */
+    .fiat-performers {
+      padding: 16px 0 16px 16px; width: 393px;
+    }
+    .fiat-performers-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding-right: 16px; margin-bottom: 16px;
+    }
+    .fiat-performers-title-row {
+      display: flex; align-items: center; gap: 4px;
+    }
+    .fiat-performers-title {
+      font-size: 18px; font-weight: 600; color: #282d34;
+    }
+    .fiat-performers-scroll {
+      display: flex; gap: 16px; overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .fiat-performers-scroll::-webkit-scrollbar { display: none; }
+    .fiat-performer-card {
+      flex-shrink: 0; width: 320px; border: 0.5px solid #e8e9ea;
+      border-radius: 8px; padding: 16px; background: #fff;
+    }
+    .fiat-performer-row {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      padding: 16px 0; border-bottom: 0.5px solid #e8e9ea;
+    }
+    .fiat-performer-row:first-child { padding-top: 0; }
+    .fiat-performer-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .fp-left {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .fp-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      background: #e8e9ea; overflow: hidden; flex-shrink: 0;
+    }
+    .fp-avatar img { width: 100%; height: 100%; object-fit: cover; }
+    .fp-info { display: flex; flex-direction: column; gap: 6px; }
+    .fp-name { font-size: 14px; font-weight: 600; color: #282d34; line-height: 18px; }
+    .fp-roi-row { display: flex; align-items: flex-end; gap: 4px; }
+    .fp-roi-label { font-size: 12px; font-weight: 400; color: #7a8699; }
+    .fp-roi-value { font-size: 14px; font-weight: 500; color: #282d34; }
+    .fp-right { display: flex; flex-direction: column; align-items: flex-end; }
+    .fp-copiers-count { font-size: 22px; font-weight: 600; color: #00b565; }
+    .fp-copiers-label { font-size: 12px; font-weight: 400; color: #7a8699; }
+
+    /* ============================= */
+    /* ── SHARED ACCOUNT CARD ── */
+    /* ============================= */
+    .acct-hero {
+      padding: 16px 20px; border-bottom: 1px solid #f4f5f6;
+    }
+    .acct-equity-label {
+      display: flex; align-items: center; gap: 5px; margin-bottom: 8px;
+    }
+    .acct-equity-label span {
+      font-size: 14px; font-weight: 500; color: #7a8699;
+      text-decoration: underline; text-decoration-style: dashed;
+      text-underline-offset: 2px; text-decoration-color: #7a8699;
+    }
+    .acct-equity-label svg { cursor: pointer; }
+    .acct-history-btn {
+      margin-left: auto; display: flex; align-items: center; gap: 4px;
+      padding: 4px 10px; border: 1px solid #e8e9ea; border-radius: 4px;
+      font-size: 12px; font-weight: 500; color: #282d34; cursor: pointer;
+      background: #fff;
+    }
+    .acct-amount-row {
+      display: flex; align-items: flex-end; gap: 5px;
+    }
+    .acct-amount {
+      font-size: 32px; font-weight: 600; color: #282d34; line-height: 1;
+    }
+    .acct-pnl {
+      font-size: 14px; font-weight: 500; color: #282d34; margin-top: 8px;
+    }
+    .acct-pnl-label {
+      text-decoration: underline; text-decoration-style: dashed;
+      text-underline-offset: 2px; text-decoration-color: #7a8699;
+      color: #7a8699;
+    }
+    .acct-section-title {
+      font-size: 16px; font-weight: 600; color: #282d34;
+      padding: 20px 20px 0;
+    }
+    .acct-section-divider {
+      height: 1px; background: #f4f5f6; margin: 16px 20px 0;
+    }
+    .acct-card {
+      padding: 16px 20px;
+    }
+    .acct-card-nickname {
+      font-size: 14px; font-weight: 600; color: #282d34; margin-bottom: 12px;
+    }
+    .acct-card-balance-row {
+      display: flex; align-items: center; gap: 10px; margin-bottom: 4px;
+    }
+    .acct-card-flag { width: 28px; height: 28px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+    .acct-card-balance {
+      font-size: 18px; font-weight: 600; color: #282d34;
+    }
+    .acct-card-equiv {
+      font-size: 12px; font-weight: 400; color: #7a8699; margin-left: 38px;
+    }
+    .acct-card-stats {
+      display: flex; flex-wrap: wrap; gap: 0; margin-top: 16px;
+    }
+    .acct-card-stat {
+      width: 33.333%; margin-bottom: 12px;
+    }
+    .acct-card-stat-label {
+      font-size: 12px; font-weight: 500; color: #7a8699;
+      text-decoration: underline; text-decoration-style: dashed;
+      text-underline-offset: 2px; text-decoration-color: #7a8699;
+    }
+    .acct-card-stat-value {
+      font-size: 14px; font-weight: 500; color: #282d34; margin-top: 4px;
+    }
+    .acct-card-cta {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 16px; border: 1px solid #e8e9ea; border-radius: 8px;
+      margin-top: 12px;
+    }
+    .acct-card-cta-left {
+      font-size: 14px; font-weight: 400; color: #7a8699;
+    }
+    .acct-card-cta-right {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 14px; font-weight: 600; color: #282d34; cursor: pointer;
+    }
+    .acct-card-buttons {
+      display: flex; gap: 12px; margin-top: 16px;
+    }
+    .acct-card-btn {
+      flex: 1; height: 40px; border: 1px solid #e8e9ea; border-radius: 8px;
+      background: #fff; font-size: 14px; font-weight: 500; color: #282d34;
+      cursor: pointer; font-family: 'Roboto', sans-serif;
+    }
+
+    /* Funding tab: V-Card banner */
+    .vcard-banner {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 12px 16px; margin: 16px 20px 0;
+      background: #fffbe6; border-radius: 8px;
+    }
+    .vcard-banner-left {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .vcard-banner-text {
+      font-size: 13px; font-weight: 500; color: #282d34;
+    }
+    .vcard-banner-right {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 13px; font-weight: 600; color: #0a36c7; cursor: pointer;
+    }
+    /* Funding action buttons */
+    .funding-actions {
+      display: flex; gap: 12px; padding: 16px 20px;
+    }
+    .funding-action-btn {
+      flex: 1; height: 44px; border-radius: 8px;
+      font-size: 14px; font-weight: 500; color: #282d34;
+      cursor: pointer; border: 1px solid #e8e9ea; background: #fff;
+      font-family: 'Roboto', sans-serif;
+    }
+    .funding-action-btn.primary {
+      background: #0a36c7; color: #fff; border: none; font-weight: 600;
+    }
+    /* Funding Assets section */
+    .funding-assets-title {
+      font-size: 16px; font-weight: 600; color: #282d34;
+      padding: 8px 20px 12px;
+    }
+
+    /* ============================= */
+    /* ── VT-WALLET TAB STYLES ── */
+    /* ============================= */
+
+    /* VT-Wallet sub-tabs */
+    .vtw-subtabs {
+      display: flex; align-items: center;
+      width: 393px; border-bottom: 1px solid #f4f5f6;
+      overflow: hidden; padding-top: 12px;
+    }
+    .vtw-subtab {
+      font-size: 14px; font-weight: 400; color: #7a8699;
+      line-height: 22px; padding: 0 16px 6px; cursor: pointer;
+      white-space: nowrap; position: relative;
+    }
+    .vtw-subtab:first-child { padding-left: 20px; }
+    .vtw-subtab.active {
+      color: #0a36c7; font-weight: 600;
+      border-bottom: 2px solid #0a36c7;
+    }
+
+    /* VT-Wallet hero */
+    .vtw-hero {
+      width: 393px; padding: 8px 18px 0;
+      background: linear-gradient(212deg, #fff 74%, #ebf2fe 127%);
+    }
+    .vtw-value-label {
+      display: flex; align-items: center; gap: 5px;
+      padding: 4px 0; margin-bottom: 4px; position: relative;
+    }
+    .vtw-value-label span {
+      font-size: 14px; font-weight: 500; color: #7a8699;
+    }
+    .vtw-value-label img { width: 16px; height: 16px; }
+    .vtw-history-btn {
+      position: absolute; right: 0; top: 0;
+      display: flex; align-items: center; gap: 8px;
+      background: #e8f1ff; border-radius: 60px;
+      height: 24px; padding: 0 16px; cursor: pointer;
+    }
+    .vtw-history-btn img { width: 12px; height: 12px; }
+    .vtw-history-btn span {
+      font-size: 12px; font-weight: 500; color: #0a36c7; line-height: 18px;
+    }
+    .vtw-amount-row {
+      display: flex; align-items: flex-end; gap: 5px;
+      margin-bottom: 16px;
+    }
+    .vtw-amount {
+      font-size: 26px; font-weight: 600; color: #282d34; line-height: normal;
+    }
+    /* vtw ccy-trigger alignment */
+    .vtw-amount-row .ccy-trigger { margin-bottom: 2px; }
+
+    /* Yield row */
+    .vtw-yield-row {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .vtw-yield-col {
+      display: flex; flex-direction: column; gap: 4px;
+      width: 120px;
+    }
+    .vtw-yield-col.right { align-items: flex-end; }
+    .vtw-yield-label {
+      font-size: 12px; font-weight: 500; color: #7a8699; line-height: normal;
+      text-decoration: underline; text-decoration-style: dashed;
+      text-underline-offset: 2px; text-decoration-color: #7a8699;
+    }
+    .vtw-yield-value {
+      font-size: 16px; font-weight: 500; color: #00b565; line-height: normal;
+    }
+
+    /* Action buttons for VTW */
+    .vtw-buttons {
+      display: flex; gap: 16px; padding: 16px;
+      width: 393px;
+    }
+    .vtw-btn {
+      flex: 1; height: 48px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px; font-weight: 600; line-height: 24px;
+      cursor: pointer; border: none;
+    }
+    .vtw-btn-secondary {
+      background: #e8f1ff; color: #282d34;
+    }
+    .vtw-btn-primary {
+      background: #0a36c7; color: #fff;
+    }
+
+    /* VTW Asset list */
+    .vtw-asset-title {
+      font-size: 18px; font-weight: 600; color: #282d34;
+      padding: 0 16px; margin-bottom: 8px;
+    }
+    .vtw-asset-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 16px; width: 393px;
+      border-bottom: 1px solid #f4f5f6;
+    }
+    .vtw-coin-icon {
+      width: 20px; height: 20px; flex-shrink: 0;
+    }
+    .vtw-coin-icon img { width: 100%; height: 100%; }
+    .vtw-asset-main { flex: 1; display: flex; flex-direction: column; gap: 12px; }
+    .vtw-asset-top-row {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .vtw-asset-left { display: flex; flex-direction: column; gap: 8px; }
+    .vtw-coin-name-row {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .vtw-coin-code {
+      font-size: 16px; font-weight: 500; color: #282d34;
+    }
+    .vtw-coin-type {
+      font-size: 12px; font-weight: 400; color: #7a8699;
+    }
+    .vtw-coin-amount-row {
+      display: flex; align-items: center; gap: 4px;
+    }
+    .vtw-coin-amount {
+      font-size: 16px; font-weight: 600; color: #282d34;
+    }
+    .vtw-coin-equiv {
+      font-size: 12px; font-weight: 400; color: #7a8699;
+    }
+    .vtw-asset-chevron {
+      width: 12px; height: 12px; flex-shrink: 0;
+      align-self: center;
+    }
+    .vtw-asset-bottom-row {
+      display: flex; align-items: flex-start; justify-content: space-between;
+    }
+    .vtw-yield-item {
+      display: flex; flex-direction: column; gap: 4px;
+      width: 120px;
+    }
+    .vtw-yield-item.right { align-items: flex-end; }
+    .vtw-yield-item-label {
+      font-size: 12px; font-weight: 500; color: #7a8699;
+      text-decoration: underline; text-decoration-style: dashed;
+      text-underline-offset: 2px; text-decoration-color: #7a8699;
+    }
+    .vtw-yield-item-value {
+      font-size: 14px; font-weight: 500; color: #282d34;
+    }
+    .vtw-yield-item-value.green { color: #00b565; }
+  </style>
+</head>
+<body>
+<div class="page-scroll">
+
+  <!-- Status bar -->
+  <!-- Page tabs -->
+  <div class="page-tabs">
+    <div class="page-tab active" data-tab="overview">Overview<span class="pt-dot"></span></div>
+    <div class="page-tab" data-tab="cfds">Contract</div>
+    <div class="page-tab" data-tab="copy">Copy</div>
+    <div class="page-tab" data-tab="funding">Funding</div>
+    <div class="page-tab" data-tab="earn">Earn</div>
+  </div>
+
+  <!-- ============================= -->
+  <!-- OVERVIEW TAB (existing) -->
+  <!-- ============================= -->
+  <div class="tab-overview active">
+
+    <!-- Hero area -->
+    <div class="asset-hero">
+      <div class="pro-ecn-badge">PRO ECN</div>
+      <div class="asset-total-label">
+        Total Value
+        <img src="images/asset-icon-info.svg" alt="info">
+      </div>
+      <div class="asset-amount-row">
+        <span class="asset-amount">46,595.20</span>
+        <div class="ccy-trigger">
+          <span class="ccy-trigger-text">USD</span>
+          <svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M4 6L0 0H8Z" fill="#282d34"/></svg>
+        </div>
+        <div class="asset-chart-mini">
+          <img src="images/asset-chart-line.svg" alt="" style="position:absolute;top:0;left:0;width:86px;height:25px;">
+          <img src="images/asset-chart-shadow.svg" alt="" style="position:absolute;top:0;left:0;width:86px;height:32px;opacity:0.4;">
+        </div>
+      </div>
+      <div class="asset-pnl-row">
+        <span class="asset-pnl-label">Today's PnL</span>
+        <span class="asset-pnl-value">+12,123,350 USD</span>
+        <svg id="assetChartToggle" class="asset-pnl-arrow" width="13" height="13" viewBox="0 0 13 13" fill="none" style="cursor:pointer;transition:transform 0.25s;flex-shrink:0;">
+          <path d="M2 5L6.5 9L11 5" stroke="#b6b6b6" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Expandable Chart -->
+    <div class="asset-chart-wrap" id="assetChartWrap">
+      <div class="asset-chart-fills" id="assetChartFills">
+        <svg class="asset-chart-fill-img" preserveAspectRatio="none" viewBox="0 0 393 167" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:167px;object-fit:fill;">
+          <path id="assetChartFillPath" d="M9.49849 25.5985L0 18.8942V167H393V78.7286L383.501 88.8679L374.597 59.6429L366.285 78.7286L358.568 82.9036L349.663 136.582L341.946 110.339L333.041 107.357L324.73 113.321L315.825 115.803L300.983 75.15L290.298 70.975L283.174 82.9036L275.456 76.9393L267.145 82.9036L258.24 101.393L249.929 91.2536L242.211 62.0286L233.307 48.9071L224.402 67.9929H216.091L208.373 42.3464L200.062 48.9071L192.938 32.8036L183.44 51.8893L174.535 44.7321L166.224 70.975L150.789 39.9607L142.477 48.9071L133.573 36.3821L125.855 32.8036L108.639 44.7321L100.921 59.6429L92.6103 51.8893L84.2991 62.0286L76.5816 51.8893L67.0831 62.0286L58.7719 15.2372L49.8671 25.05L43.3369 0L33.8384 1.82847L26.1208 15.2372L17.216 0L9.49849 25.5985Z" fill="url(#assetChartGrad)"/>
+          <defs>
+            <linearGradient id="assetChartGrad" x1="196.5" y1="-110.5" x2="196.5" y2="167" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#00B565"/>
+              <stop offset="1" stop-color="#00B565" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <svg class="asset-chart-fill-img" preserveAspectRatio="none" viewBox="0 0 393.649 138.358" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:137px;object-fit:fill;top:13px;">
+          <path id="assetChartStrokePath" d="M0.28391 19.6851L9.7824 26.2373L17.4999 1.21992L26.4048 16.1112L34.1223 3.00688L43.6208 1.21992L50.151 26.2373L59.0558 16.1112L67.367 63.1677L76.8655 53.0417L84.583 63.1677L92.8942 53.0417L101.205 60.7851L108.923 45.8938L126.139 33.9808L133.856 37.5547L142.761 50.0634L151.072 41.1286L166.507 72.1025L174.819 45.8938L183.723 53.0417L193.222 33.9808L200.346 50.0634L208.657 43.5112L216.375 69.1243H224.686L233.591 50.0634L242.495 63.1677L250.213 92.3547L258.524 102.481L267.429 84.0156L275.74 78.0591L283.458 84.0156L290.581 72.1025L301.267 76.2721L316.109 116.776L325.014 114.394L333.325 108.437L342.23 111.416L349.947 138.22L358.852 84.0156L366.569 79.846L374.881 60.7851L383.785 89.9721L393.284 79.846" stroke="#00B565"/>
+        </svg>
+      </div>
+      <svg class="asset-chart-grid" viewBox="0 0 393 180" preserveAspectRatio="none">
+        <line x1="0" y1="20" x2="393" y2="20" stroke="#f4f5f6" stroke-width="0.5"/>
+        <line x1="0" y1="60" x2="393" y2="60" stroke="#f4f5f6" stroke-width="0.5"/>
+        <line x1="0" y1="100" x2="393" y2="100" stroke="#f4f5f6" stroke-width="0.5"/>
+        <line x1="0" y1="140" x2="393" y2="140" stroke="#f4f5f6" stroke-width="0.5"/>
+        <line x1="78.6" y1="0" x2="78.6" y2="180" stroke="#f4f5f6" stroke-width="0.5"/>
+        <line x1="156.6" y1="0" x2="156.6" y2="180" stroke="#f4f5f6" stroke-width="0.5"/>
+        <line x1="235.6" y1="0" x2="235.6" y2="180" stroke="#f4f5f6" stroke-width="0.5"/>
+        <line x1="313.6" y1="0" x2="313.6" y2="180" stroke="#f4f5f6" stroke-width="0.5"/>
+      </svg>
+      <div class="asset-chart-scrub-line" id="assetChartScrubLine"></div>
+      <div class="asset-chart-value-pill" id="assetChartPill">$46,595</div>
+      <img class="asset-chart-dot" id="assetChartDot" src="images/a5ce5622-d90b-4932-b89e-210e723c46c7.svg" alt="">
+      <div class="asset-time-tabs" id="assetTimeTabs">
+        <div class="asset-time-tab">7D</div>
+        <div class="asset-time-tab active">30D</div>
+        <div class="asset-time-tab">90D</div>
+        <div class="asset-time-tab">180D</div>
+        <div class="asset-time-tab">360D</div>
+      </div>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="asset-actions">
+      <div class="asset-action-item">
+        <img src="images/asset-icon-deposit.svg" alt="">
+        <span>Deposit</span>
+      </div>
+      <div class="asset-action-item">
+        <img src="images/asset-icon-transfer.svg" alt="">
+        <span>Transfer</span>
+      </div>
+      <div class="asset-action-item">
+        <img src="images/asset-icon-withdraw.svg" alt="">
+        <span>Withdraw</span>
+      </div>
+      <div class="asset-action-item">
+        <img src="images/asset-icon-convert.svg" alt="">
+        <span>Convert</span>
+      </div>
+    </div>
+
+    <!-- Account Distribution -->
+    <div class="asset-distribution">
+      <div class="asset-dist-header">
+        <span class="asset-dist-title">Account Distribution</span>
+        <svg class="asset-dist-arrow" viewBox="0 0 14 14" fill="none" width="14" height="14"><path d="M4 5L7 8.5L10 5" stroke="#282d34" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="asset-dist-bar">
+        <div class="asset-dist-seg blue"></div>
+        <div class="asset-dist-seg green"></div>
+        <div class="asset-dist-seg yellow"></div>
+        <div class="asset-dist-seg purple"></div>
+      </div>
+      <div class="asset-dist-legend">
+        <div class="asset-dist-item">
+          <div class="asset-dist-dot"><img src="images/asset-dot-blue.svg" alt=""></div>
+          <div class="asset-dist-item-text">
+            <span class="asset-dist-pct">30.12%</span>
+            <span class="asset-dist-label">Contract</span>
+          </div>
+        </div>
+        <div class="asset-dist-item">
+          <div class="asset-dist-dot"><img src="images/asset-dot-green.svg" alt=""></div>
+          <div class="asset-dist-item-text">
+            <span class="asset-dist-pct">42.12%</span>
+            <span class="asset-dist-label">Copy</span>
+          </div>
+        </div>
+        <div class="asset-dist-item">
+          <div class="asset-dist-dot"><img src="images/asset-dot-yellow.svg" alt=""></div>
+          <div class="asset-dist-item-text">
+            <span class="asset-dist-pct">20.12%</span>
+            <span class="asset-dist-label">Funding</span>
+          </div>
+        </div>
+        <div class="asset-dist-item">
+          <div class="asset-dist-dot"><img src="images/asset-dot-purple.svg" alt=""></div>
+          <div class="asset-dist-item-text">
+            <span class="asset-dist-pct">10.12%</span>
+            <span class="asset-dist-label">Earn</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Asset Details -->
+    <div class="asset-details-header">
+      <span class="asset-details-title">Asset Details</span>
+      <span class="asset-details-link">View History</span>
+    </div>
+    <div class="asset-tabs-wrap">
+      <div class="asset-tabs">
+        <div class="asset-tab active">Fiat</div>
+        <div class="asset-tab">Crypto</div>
+      </div>
+    </div>
+    <!-- Fiat panel -->
+    <div id="assetPanelFiat">
+      <div class="asset-currency-item">
+        <div class="asset-currency-flag"><img src="https://flagcdn.com/w40/us.png" alt="USD"></div>
+        <div class="asset-currency-info">
+          <span class="asset-currency-code">USD</span>
+          <span class="asset-currency-name">United States Dollar</span>
+        </div>
+        <div class="asset-currency-values">
+          <span class="asset-currency-amount">259,718.18</span>
+          <span class="asset-currency-equiv">&asymp; 259,718.18 USD</span>
+        </div>
+        <svg class="asset-currency-chevron" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L7.5 6L4.5 9.5" stroke="#7a8699" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="asset-currency-item">
+        <div class="asset-currency-flag"><img src="https://flagcdn.com/w40/jp.png" alt="JPY"></div>
+        <div class="asset-currency-info">
+          <span class="asset-currency-code">JPY</span>
+          <span class="asset-currency-name">Japanese Yen</span>
+        </div>
+        <div class="asset-currency-values">
+          <span class="asset-currency-amount">259,718.18</span>
+          <span class="asset-currency-equiv">&asymp; 1,000.00 USD</span>
+        </div>
+        <svg class="asset-currency-chevron" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L7.5 6L4.5 9.5" stroke="#7a8699" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div style="height:24px;"></div>
+    </div>
+
+    <!-- Crypto panel -->
+    <div id="assetPanelCrypto" style="display:none;">
+      <div class="asset-currency-item">
+        <div class="asset-currency-flag"><img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" alt="BTC"></div>
+        <div class="asset-currency-info">
+          <span class="asset-currency-code">BTC</span>
+          <span class="asset-currency-name">Bitcoin</span>
+        </div>
+        <div class="asset-currency-values">
+          <span class="asset-currency-amount">0.3142</span>
+          <span class="asset-currency-equiv">&asymp; 25,891.20 USD</span>
+        </div>
+        <svg class="asset-currency-chevron" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L7.5 6L4.5 9.5" stroke="#7a8699" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="asset-currency-item">
+        <div class="asset-currency-flag"><img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png" alt="ETH"></div>
+        <div class="asset-currency-info">
+          <span class="asset-currency-code">ETH</span>
+          <span class="asset-currency-name">Ethereum</span>
+        </div>
+        <div class="asset-currency-values">
+          <span class="asset-currency-amount">4.8820</span>
+          <span class="asset-currency-equiv">&asymp; 16,204.80 USD</span>
+        </div>
+        <svg class="asset-currency-chevron" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L7.5 6L4.5 9.5" stroke="#7a8699" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="asset-currency-item">
+        <div class="asset-currency-flag"><img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png" alt="USDT"></div>
+        <div class="asset-currency-info">
+          <span class="asset-currency-code">USDT</span>
+          <span class="asset-currency-name">Tether</span>
+        </div>
+        <div class="asset-currency-values">
+          <span class="asset-currency-amount">8,450.00</span>
+          <span class="asset-currency-equiv">&asymp; 8,450.00 USD</span>
+        </div>
+        <svg class="asset-currency-chevron" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L7.5 6L4.5 9.5" stroke="#7a8699" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="asset-currency-item">
+        <div class="asset-currency-flag"><img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdc.png" alt="USDC"></div>
+        <div class="asset-currency-info">
+          <span class="asset-currency-code">USDC</span>
+          <span class="asset-currency-name">USD Coin</span>
+        </div>
+        <div class="asset-currency-values">
+          <span class="asset-currency-amount">3,200.00</span>
+          <span class="asset-currency-equiv">&asymp; 3,200.00 USD</span>
+        </div>
+        <svg class="asset-currency-chevron" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L7.5 6L4.5 9.5" stroke="#7a8699" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div style="height:24px;"></div>
+    </div>
+  </div>
+
+  <!-- ============================= -->
+  <!-- CFDs TAB -->
+  <!-- ============================= -->
+  <div class="tab-cfds">
+
+    <!-- Equity section -->
+    <div class="acct-hero">
+      <div class="acct-equity-label">
+        <span>Total Equity</span>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#7a8699" stroke-width="1"/><circle cx="7" cy="5" r="0.8" fill="#7a8699"/><line x1="7" y1="7" x2="7" y2="10" stroke="#7a8699" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <div class="acct-history-btn">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2" width="10" height="8" rx="1" stroke="#282d34" stroke-width="1"/><line x1="4" y1="0.5" x2="4" y2="3" stroke="#282d34" stroke-width="1" stroke-linecap="round"/><line x1="8" y1="0.5" x2="8" y2="3" stroke="#282d34" stroke-width="1" stroke-linecap="round"/></svg>
+          History
+        </div>
+      </div>
+      <div class="acct-amount-row">
+        <span class="acct-amount">0.00</span>
+        <div class="ccy-trigger" style="margin-bottom:4px;">
+          <span class="ccy-trigger-text">USD</span>
+          <svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M4 6L0 0H8Z" fill="#282d34"/></svg>
+        </div>
+      </div>
+      <div class="acct-pnl"><span class="acct-pnl-label">Today's PnL</span> 0.00 USD</div>
+    </div>
+
+    <!-- Account section -->
+    <div class="acct-section-title">Account</div>
+    <div class="acct-section-divider"></div>
+
+    <div class="acct-card">
+      <div class="acct-card-nickname">Nickname</div>
+      <div class="acct-card-balance-row">
+        <img class="acct-card-flag" src="https://flagcdn.com/w40/us.png" alt="USD">
+        <span class="acct-card-balance">0.00 USD</span>
+      </div>
+      <div class="acct-card-equiv">&asymp; 0.00 USD</div>
+      <div class="acct-card-stats">
+        <div class="acct-card-stat">
+          <div class="acct-card-stat-label">PnL (USD)</div>
+          <div class="acct-card-stat-value">0.00</div>
+        </div>
+        <div class="acct-card-stat">
+          <div class="acct-card-stat-label">Free Margin (USD)</div>
+          <div class="acct-card-stat-value">0.00</div>
+        </div>
+        <div class="acct-card-stat">
+          <div class="acct-card-stat-label">Margin Level</div>
+          <div class="acct-card-stat-value">--</div>
+        </div>
+      </div>
+      <div class="acct-card-cta">
+        <span class="acct-card-cta-left">Current Position : 0</span>
+        <span class="acct-card-cta-right">Trade Now <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M3 1.5L6 4L3 6.5" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
+      <div class="acct-card-buttons">
+        <button class="acct-card-btn">Transfer</button>
+        <button class="acct-card-btn">Withdraw</button>
+        <button class="acct-card-btn">Deposit</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Copy tab -->
+  <div class="tab-copy">
+
+    <!-- Equity section -->
+    <div class="acct-hero">
+      <div class="acct-equity-label">
+        <span>Total Equity</span>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#7a8699" stroke-width="1"/><circle cx="7" cy="5" r="0.8" fill="#7a8699"/><line x1="7" y1="7" x2="7" y2="10" stroke="#7a8699" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <div class="acct-history-btn">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2" width="10" height="8" rx="1" stroke="#282d34" stroke-width="1"/><line x1="4" y1="0.5" x2="4" y2="3" stroke="#282d34" stroke-width="1" stroke-linecap="round"/><line x1="8" y1="0.5" x2="8" y2="3" stroke="#282d34" stroke-width="1" stroke-linecap="round"/></svg>
+          History
+        </div>
+      </div>
+      <div class="acct-amount-row">
+        <span class="acct-amount">50.05</span>
+        <div class="ccy-trigger" style="margin-bottom:4px;">
+          <span class="ccy-trigger-text">USD</span>
+          <svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M4 6L0 0H8Z" fill="#282d34"/></svg>
+        </div>
+      </div>
+      <div class="acct-pnl"><span class="acct-pnl-label">Today's PnL</span> +0.05 USD</div>
+    </div>
+
+    <!-- Account section -->
+    <div class="acct-section-title">Account</div>
+    <div class="acct-section-divider"></div>
+
+    <div class="acct-card">
+      <div class="acct-card-nickname">Nickname</div>
+      <div class="acct-card-balance-row">
+        <img class="acct-card-flag" src="https://flagcdn.com/w40/us.png" alt="USD">
+        <span class="acct-card-balance">50.05 USD</span>
+      </div>
+      <div class="acct-card-equiv">&asymp; 50.05 USD</div>
+      <div class="acct-card-stats">
+        <div class="acct-card-stat">
+          <div class="acct-card-stat-label">PnL (USD)</div>
+          <div class="acct-card-stat-value">+0.05</div>
+        </div>
+        <div class="acct-card-stat">
+          <div class="acct-card-stat-label">Copy Equity</div>
+          <div class="acct-card-stat-value">50.05</div>
+        </div>
+        <div class="acct-card-stat">
+          <div class="acct-card-stat-label">Available</div>
+          <div class="acct-card-stat-value">0.00</div>
+        </div>
+      </div>
+      <div class="acct-card-cta">
+        <span class="acct-card-cta-left">Copying : 1 Trader</span>
+        <span class="acct-card-cta-right">View All <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M3 1.5L6 4L3 6.5" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      </div>
+      <div class="acct-card-buttons">
+        <button class="acct-card-btn">Transfer</button>
+        <button class="acct-card-btn">Withdraw</button>
+        <button class="acct-card-btn">Deposit</button>
+      </div>
+    </div>
+
+    <!-- Best Copy Trading Performers -->
+    <div class="fiat-performers">
+      <div class="fiat-performers-header">
+        <div class="fiat-performers-title-row">
+          <span class="fiat-performers-title">Best Performers</span>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#7a8699" stroke-width="1"/><circle cx="7" cy="5" r="0.8" fill="#7a8699"/><line x1="7" y1="7" x2="7" y2="10" stroke="#7a8699" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </div>
+        <span class="arrow-right">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3L9 7L5 11" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </div>
+      <div class="fiat-performers-scroll">
+        <!-- Card 1 -->
+        <div class="fiat-performer-card">
+          <div class="fiat-performer-row">
+            <div class="fp-left">
+              <div class="fp-avatar"><img src="images/copy-avatar1.png" alt=""></div>
+              <div class="fp-info">
+                <span class="fp-name">testapp testchris</span>
+                <div class="fp-roi-row">
+                  <span class="fp-roi-label">ROI</span>
+                  <span class="fp-roi-value">+12.5%</span>
+                </div>
+              </div>
+            </div>
+            <div class="fp-right">
+              <span class="fp-copiers-count">326</span>
+              <span class="fp-copiers-label">Copiers</span>
+            </div>
+          </div>
+          <div class="fiat-performer-row">
+            <div class="fp-left">
+              <div class="fp-avatar"><img src="images/copy-avatar2.png" alt=""></div>
+              <div class="fp-info">
+                <span class="fp-name">VT Market Pro</span>
+                <div class="fp-roi-row">
+                  <span class="fp-roi-label">ROI</span>
+                  <span class="fp-roi-value">+8.3%</span>
+                </div>
+              </div>
+            </div>
+            <div class="fp-right">
+              <span class="fp-copiers-count">189</span>
+              <span class="fp-copiers-label">Copiers</span>
+            </div>
+          </div>
+          <div class="fiat-performer-row">
+            <div class="fp-left">
+              <div class="fp-avatar"><img src="images/copy-person.png" alt=""></div>
+              <div class="fp-info">
+                <span class="fp-name">Alpha Trader</span>
+                <div class="fp-roi-row">
+                  <span class="fp-roi-label">ROI</span>
+                  <span class="fp-roi-value">+6.1%</span>
+                </div>
+              </div>
+            </div>
+            <div class="fp-right">
+              <span class="fp-copiers-count">142</span>
+              <span class="fp-copiers-label">Copiers</span>
+            </div>
+          </div>
+        </div>
+        <!-- Card 2 -->
+        <div class="fiat-performer-card">
+          <div class="fiat-performer-row">
+            <div class="fp-left">
+              <div class="fp-avatar"><img src="images/copy-avatar-list3.png" alt=""></div>
+              <div class="fp-info">
+                <span class="fp-name">FX Master</span>
+                <div class="fp-roi-row">
+                  <span class="fp-roi-label">ROI</span>
+                  <span class="fp-roi-value">+15.8%</span>
+                </div>
+              </div>
+            </div>
+            <div class="fp-right">
+              <span class="fp-copiers-count">412</span>
+              <span class="fp-copiers-label">Copiers</span>
+            </div>
+          </div>
+          <div class="fiat-performer-row">
+            <div class="fp-left">
+              <div class="fp-avatar"><img src="images/copy-avatar-list4.png" alt=""></div>
+              <div class="fp-info">
+                <span class="fp-name">Gold Runner</span>
+                <div class="fp-roi-row">
+                  <span class="fp-roi-label">ROI</span>
+                  <span class="fp-roi-value">+9.7%</span>
+                </div>
+              </div>
+            </div>
+            <div class="fp-right">
+              <span class="fp-copiers-count">258</span>
+              <span class="fp-copiers-label">Copiers</span>
+            </div>
+          </div>
+          <div class="fiat-performer-row">
+            <div class="fp-left">
+              <div class="fp-avatar"><img src="images/copy-person2.png" alt=""></div>
+              <div class="fp-info">
+                <span class="fp-name">Swing Elite</span>
+                <div class="fp-roi-row">
+                  <span class="fp-roi-label">ROI</span>
+                  <span class="fp-roi-value">+5.4%</span>
+                </div>
+              </div>
+            </div>
+            <div class="fp-right">
+              <span class="fp-copiers-count">97</span>
+              <span class="fp-copiers-label">Copiers</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:24px;"></div>
+  </div>
+
+  <!-- Funding tab -->
+  <div class="tab-funding">
+
+    <!-- Equity section -->
+    <div class="acct-hero">
+      <div class="acct-equity-label">
+        <span>Total Equity</span>
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#7a8699" stroke-width="1"/><circle cx="7" cy="5" r="0.8" fill="#7a8699"/><line x1="7" y1="7" x2="7" y2="10" stroke="#7a8699" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <div class="acct-history-btn">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2" width="10" height="8" rx="1" stroke="#282d34" stroke-width="1"/><line x1="4" y1="0.5" x2="4" y2="3" stroke="#282d34" stroke-width="1" stroke-linecap="round"/><line x1="8" y1="0.5" x2="8" y2="3" stroke="#282d34" stroke-width="1" stroke-linecap="round"/></svg>
+          History
+        </div>
+      </div>
+      <div class="acct-amount-row">
+        <span class="acct-amount">259,718.18</span>
+        <div class="ccy-trigger" style="margin-bottom:4px;">
+          <span class="ccy-trigger-text">USD</span>
+          <svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M4 6L0 0H8Z" fill="#282d34"/></svg>
+        </div>
+      </div>
+      <div class="acct-pnl"><span class="acct-pnl-label">Today's PnL</span> +1,230.50 USD</div>
+    </div>
+
+    <!-- V-Card Banner -->
+    <div class="vcard-banner">
+      <div class="vcard-banner-left">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="1" y="4" width="18" height="12" rx="2" stroke="#e44b4b" stroke-width="1.2"/><line x1="1" y1="8" x2="19" y2="8" stroke="#e44b4b" stroke-width="1.2"/><line x1="4" y1="12" x2="10" y2="12" stroke="#e44b4b" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <span class="vcard-banner-text">Apply for V-Card to enjoy global payments</span>
+      </div>
+      <span class="vcard-banner-right">Apply <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M3 1.5L6 4L3 6.5" stroke="#e44b4b" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+    </div>
+
+    <!-- Action buttons -->
+    <div class="funding-actions">
+      <button class="funding-action-btn primary">Deposit</button>
+      <button class="funding-action-btn">Withdraw</button>
+      <button class="funding-action-btn">Transfer</button>
+    </div>
+
+    <!-- Assets section -->
+    <div class="funding-assets-title">Assets</div>
+
+    <!-- Fiat assets -->
+    <div class="asset-currency-item">
+      <div class="asset-currency-flag"><img src="https://flagcdn.com/w40/us.png" alt="USD"></div>
+      <div class="asset-currency-info">
+        <span class="asset-currency-code">USD</span>
+        <span class="asset-currency-name">United States Dollar</span>
+      </div>
+      <div class="asset-currency-values">
+        <span class="asset-currency-amount">259,718.18</span>
+        <span class="asset-currency-equiv">&asymp; 259,718.18 USD</span>
+      </div>
+      <svg class="asset-currency-chevron" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L7.5 6L4.5 9.5" stroke="#7a8699" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="asset-currency-item">
+      <div class="asset-currency-flag"><img src="https://flagcdn.com/w40/jp.png" alt="JPY"></div>
+      <div class="asset-currency-info">
+        <span class="asset-currency-code">JPY</span>
+        <span class="asset-currency-name">Japanese Yen</span>
+      </div>
+      <div class="asset-currency-values">
+        <span class="asset-currency-amount">259,718.18</span>
+        <span class="asset-currency-equiv">&asymp; 1,000.00 USD</span>
+      </div>
+      <svg class="asset-currency-chevron" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L7.5 6L4.5 9.5" stroke="#7a8699" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <!-- Crypto assets -->
+    <div class="asset-currency-item">
+      <div class="asset-currency-flag"><img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" alt="BTC"></div>
+      <div class="asset-currency-info">
+        <span class="asset-currency-code">BTC</span>
+        <span class="asset-currency-name">Bitcoin</span>
+      </div>
+      <div class="asset-currency-values">
+        <span class="asset-currency-amount">0.3142</span>
+        <span class="asset-currency-equiv">&asymp; 25,891.20 USD</span>
+      </div>
+      <svg class="asset-currency-chevron" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L7.5 6L4.5 9.5" stroke="#7a8699" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="asset-currency-item">
+      <div class="asset-currency-flag"><img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png" alt="ETH"></div>
+      <div class="asset-currency-info">
+        <span class="asset-currency-code">ETH</span>
+        <span class="asset-currency-name">Ethereum</span>
+      </div>
+      <div class="asset-currency-values">
+        <span class="asset-currency-amount">4.8820</span>
+        <span class="asset-currency-equiv">&asymp; 16,204.80 USD</span>
+      </div>
+      <svg class="asset-currency-chevron" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L7.5 6L4.5 9.5" stroke="#7a8699" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="asset-currency-item">
+      <div class="asset-currency-flag"><img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png" alt="USDT"></div>
+      <div class="asset-currency-info">
+        <span class="asset-currency-code">USDT</span>
+        <span class="asset-currency-name">Tether</span>
+      </div>
+      <div class="asset-currency-values">
+        <span class="asset-currency-amount">8,450.00</span>
+        <span class="asset-currency-equiv">&asymp; 8,450.00 USD</span>
+      </div>
+      <svg class="asset-currency-chevron" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L7.5 6L4.5 9.5" stroke="#7a8699" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+
+    <div style="height:24px;"></div>
+  </div>
+
+  <div class="tab-earn">
+
+    <!-- Sub-tabs: Overview | Funding | Earn -->
+    <div class="vtw-subtabs">
+      <div class="vtw-subtab">Overview</div>
+      <div class="vtw-subtab">Funding</div>
+      <div class="vtw-subtab active">Earn</div>
+    </div>
+
+    <!-- VTW Hero area -->
+    <div class="vtw-hero">
+      <div class="vtw-value-label">
+        <span>Total Value</span>
+        <img src="images/asset-icon-eye.svg" alt="">
+        <div class="vtw-history-btn">
+          <img src="images/asset-icon-history.svg" alt="">
+          <span>History</span>
+        </div>
+      </div>
+      <div class="vtw-amount-row">
+        <span class="vtw-amount">1,446,595.20</span>
+        <div class="ccy-trigger">
+          <span class="ccy-trigger-text">USD</span>
+          <svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M4 6L0 0H8Z" fill="#282d34"/></svg>
+        </div>
+      </div>
+      <div class="vtw-yield-row">
+        <div class="vtw-yield-col">
+          <span class="vtw-yield-label">Yesterday's Yield</span>
+          <span class="vtw-yield-value">+0.01</span>
+        </div>
+        <div class="vtw-yield-col right">
+          <span class="vtw-yield-label">Total Yield</span>
+          <span class="vtw-yield-value">+3,242.23</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Analysis / Subscribe buttons -->
+    <div class="vtw-buttons">
+      <button class="vtw-btn vtw-btn-secondary">Analysis</button>
+      <button class="vtw-btn vtw-btn-primary">Subscribe</button>
+    </div>
+
+    <!-- Asset list -->
+    <div class="vtw-asset-title">Asset</div>
+
+    <!-- BTC item -->
+    <div class="vtw-asset-item">
+      <div class="vtw-coin-icon"><img src="images/asset-coin-btc.svg" alt="BTC"></div>
+      <div class="vtw-asset-main">
+        <div class="vtw-asset-top-row">
+          <div class="vtw-asset-left">
+            <div class="vtw-coin-name-row">
+              <span class="vtw-coin-code">BTC</span>
+              <span class="vtw-coin-type">Flexible</span>
+            </div>
+            <div class="vtw-coin-amount-row">
+              <span class="vtw-coin-amount">0.0000000001</span>
+              <span class="vtw-coin-equiv">&asymp; 0.000000000 USD</span>
+            </div>
+          </div>
+          <svg class="vtw-asset-chevron" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L7.5 6L4.5 9.5" stroke="#7a8699" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="vtw-asset-bottom-row">
+          <div class="vtw-yield-item">
+            <span class="vtw-yield-item-label">Est.APR</span>
+            <span class="vtw-yield-item-value">0.3%</span>
+          </div>
+          <div class="vtw-yield-item right">
+            <span class="vtw-yield-item-label">Total Yield</span>
+            <span class="vtw-yield-item-value green">0.000000009 USD</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- USDT item -->
+    <div class="vtw-asset-item">
+      <div class="vtw-coin-icon"><img src="images/asset-coin-usdt.svg" alt="USDT"></div>
+      <div class="vtw-asset-main">
+        <div class="vtw-asset-top-row">
+          <div class="vtw-asset-left">
+            <div class="vtw-coin-name-row">
+              <span class="vtw-coin-code">USDT</span>
+              <span class="vtw-coin-type">Tether</span>
+            </div>
+            <div class="vtw-coin-amount-row">
+              <span class="vtw-coin-amount">30.09</span>
+              <span class="vtw-coin-equiv">&asymp; 30.00 USD</span>
+            </div>
+          </div>
+          <svg class="vtw-asset-chevron" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L7.5 6L4.5 9.5" stroke="#7a8699" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <div class="vtw-asset-bottom-row">
+          <div class="vtw-yield-item">
+            <span class="vtw-yield-item-label">Est.APR</span>
+            <span class="vtw-yield-item-value">0.3%</span>
+          </div>
+          <div class="vtw-yield-item right">
+            <span class="vtw-yield-item-label">Total Yield</span>
+            <span class="vtw-yield-item-value green">0.50 USD</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:24px;"></div>
+  </div>
+
+</div><!-- end page-scroll -->
+
+<script src="top-nav.js"></script>
+<script>
+  TopNav.init({
+    showSearch: true,
+    rightIconSrc: 'images/trade-icon-notification.svg'
+  });
+</script>
+<script src="bottom-nav.js"></script>
+<script>
+  BottomNav.init('asset');
+
+  // Page tab toggle with content switching
+  var pageTabs = document.querySelectorAll('.page-tab');
+  var allPanels = {
+    overview: document.querySelector('.tab-overview'),
+    cfds:     document.querySelector('.tab-cfds'),
+    copy:     document.querySelector('.tab-copy'),
+    funding:  document.querySelector('.tab-funding'),
+    earn:     document.querySelector('.tab-earn')
+  };
+
+  function switchPageTab(tabName) {
+    // Update tab styling
+    pageTabs.forEach(function(t) {
+      t.classList.remove('active');
+      var dot = t.querySelector('.pt-dot');
+      if (dot) dot.remove();
+    });
+    var activeTab = document.querySelector('.page-tab[data-tab="' + tabName + '"]');
+    if (activeTab) {
+      activeTab.classList.add('active');
+      var dot = document.createElement('span');
+      dot.className = 'pt-dot';
+      activeTab.appendChild(dot);
+    }
+
+    // Show/hide content
+    Object.keys(allPanels).forEach(function(k) {
+      if (allPanels[k]) allPanels[k].classList.remove('active');
+    });
+    if (allPanels[tabName]) allPanels[tabName].classList.add('active');
+  }
+
+  pageTabs.forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      switchPageTab(tab.getAttribute('data-tab'));
+    });
+  });
+
+  // Auto-switch to tab from URL hash (e.g. asset.html#earn)
+  var hashTab = window.location.hash.replace('#', '');
+  if (hashTab && allPanels[hashTab]) switchPageTab(hashTab);
+
+  // Asset Fiat / Crypto tab toggle
+  var fiatPanel = document.getElementById('assetPanelFiat');
+  var cryptoPanel = document.getElementById('assetPanelCrypto');
+  document.querySelectorAll('.asset-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.asset-tab').forEach(function(t) { t.classList.remove('active'); });
+      tab.classList.add('active');
+      var isCrypto = tab.textContent.trim() === 'Crypto';
+      fiatPanel.style.display = isCrypto ? 'none' : '';
+      cryptoPanel.style.display = isCrypto ? '' : 'none';
+    });
+  });
+
+  // Fiat sub-tab toggle
+  document.querySelectorAll('.fiat-subtab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.fiat-subtab').forEach(function(t) { t.classList.remove('active'); });
+      tab.classList.add('active');
+    });
+  });
+
+  // VT-Wallet sub-tab toggle
+  document.querySelectorAll('.vtw-subtab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.vtw-subtab').forEach(function(t) { t.classList.remove('active'); });
+      tab.classList.add('active');
+    });
+  });
+
+  // ── Chart collapse / expand ──
+  (function() {
+    var toggleBtn = document.getElementById('assetChartToggle');
+    var chartWrap = document.getElementById('assetChartWrap');
+    var shadowImg = document.querySelector('.asset-chart-mini img[src="images/asset-chart-shadow.svg"]');
+    var collapsed = false;
+
+    function toggle() {
+      collapsed = !collapsed;
+      chartWrap.style.display = collapsed ? 'none' : '';
+      toggleBtn.style.transform = collapsed ? 'rotate(-90deg)' : '';
+    }
+
+    toggleBtn.addEventListener('click', toggle);
+    if (shadowImg) shadowImg.style.cursor = 'pointer';
+    if (shadowImg) shadowImg.addEventListener('click', toggle);
+  })();
+
+  // ── Interactive Asset Chart (time-tab switching + drag scrubbing) ──
+  (function() {
+    var XS = [0.284,9.782,17.5,26.405,34.122,43.621,50.151,59.056,67.367,76.866,84.583,92.894,101.205,108.923,126.139,133.856,142.761,151.072,166.507,174.819,183.723,193.222,200.346,208.657,216.375,224.686,233.591,242.495,250.213,258.524,267.429,275.74,283.458,290.581,301.267,316.109,325.014,333.325,342.23,349.947,358.852,366.569,374.881,383.785,393.284];
+
+    var STROKE_Y = {
+      '7D':  [65,68,62,70,58,64,72,60,78,74,82,70,66,72,80,68,74,84,70,76,82,72,68,80,72,76,70,66,78,85,74,70,68,76,72,80,74,68,72,84,76,70,74,78,80],
+      '30D': [19.685,26.237,1.22,16.111,3.007,1.22,26.237,16.111,63.168,53.042,63.168,53.042,60.785,45.894,33.981,37.555,50.063,41.129,72.103,45.894,53.042,33.981,50.063,43.511,69.124,69.124,50.063,63.168,92.355,102.481,84.016,78.059,84.016,72.103,76.272,116.776,114.394,108.437,111.416,138.22,84.016,79.846,60.785,89.972,79.846],
+      '90D': [118,122,112,120,115,108,118,110,104,98,108,102,95,88,82,90,96,85,78,82,70,75,68,62,72,78,65,58,52,68,72,60,55,48,56,92,88,80,75,105,72,68,58,82,80],
+      '180D':[130,134,125,130,128,122,132,120,115,108,118,110,102,95,88,96,104,92,85,78,68,72,62,55,65,70,58,50,45,62,68,55,48,42,52,85,78,72,65,98,68,62,52,78,80],
+      '360D':[135,132,138,135,130,128,136,125,118,112,122,115,105,98,92,100,108,95,88,80,72,65,58,48,60,65,52,45,38,58,65,48,42,35,48,82,75,68,60,95,65,58,48,72,80]
+    };
+
+    var VALUES = {
+      '7D':  [45800,45600,46200,45300,46800,46000,45200,46500,44500,44900,43800,45200,45700,45000,44000,45400,44800,43500,45200,44400,43800,45000,45400,44000,45000,44600,45200,45700,44500,43200,44800,45200,45400,44600,45000,44000,44800,45400,45000,43500,44600,45200,44800,44500,44200],
+      '30D': [48200,47600,49800,48500,49500,49800,47600,48500,44000,45200,44000,45200,44500,46200,47200,46800,45600,46500,43200,46200,45200,47200,45600,46400,43500,43500,45600,44000,41500,40200,42500,43200,42500,43500,43000,38000,38400,39200,39000,36000,42500,42800,44500,41800,42800],
+      '90D': [38000,37500,39000,38200,38600,39500,38000,39200,40000,40800,39500,40200,41200,42200,43200,42500,40800,42000,43200,43200,44200,43800,44500,46000,43500,43200,44800,45800,47000,44500,43500,45500,46500,47800,46800,41500,42200,43200,43800,40200,43500,44500,45800,43200,43200],
+      '180D':[35000,34500,36200,35000,35500,36500,34800,36200,37200,38500,37000,38200,39800,41200,42200,40800,39500,41000,42000,43200,44500,43500,45500,46500,44800,44200,45800,47000,48200,45500,44500,46500,47800,49000,47000,42000,43200,43500,44800,40800,44500,45500,47000,43200,43200],
+      '360D':[34000,34800,33500,34000,35000,35500,33800,36200,37500,39000,37200,38600,40500,41800,42800,41000,39500,41200,42200,43200,44500,44800,45800,47800,45500,44800,47000,48200,49800,45800,44800,47800,49000,50500,47800,42800,43800,44500,45500,41200,44800,45800,47800,43500,43200]
+    };
+
+    function buildStrokeD(ys) {
+      var d = 'M' + XS[0] + ' ' + ys[0];
+      for (var i = 1; i < XS.length; i++) d += 'L' + XS[i] + ' ' + ys[i];
+      return d;
+    }
+
+    function buildFillD(ys) {
+      var d = 'M' + XS[0] + ' ' + ys[0];
+      for (var i = 1; i < XS.length; i++) d += 'L' + XS[i] + ' ' + ys[i];
+      d += 'L' + XS[XS.length - 1] + ' 167L' + XS[0] + ' 167Z';
+      return d;
+    }
+
+    var fillPath = document.getElementById('assetChartFillPath');
+    var strokePath = document.getElementById('assetChartStrokePath');
+    var chartDot = document.getElementById('assetChartDot');
+    var chartPill = document.getElementById('assetChartPill');
+    var scrubLine = document.getElementById('assetChartScrubLine');
+    var chartWrap = document.getElementById('assetChartWrap');
+    var timeTabs = document.querySelectorAll('.asset-time-tab');
+    var curPeriod = '30D';
+
+    function switchPeriod(p) {
+      curPeriod = p;
+      var ys = STROKE_Y[p];
+      strokePath.setAttribute('d', buildStrokeD(ys));
+      fillPath.setAttribute('d', buildFillD(ys));
+      var midIdx = Math.floor(ys.length / 2);
+      var dotY = ys[midIdx] + 13 - 7.5;
+      chartDot.style.top = dotY + 'px';
+      chartDot.style.left = (XS[midIdx] - 7.5) + 'px';
+      chartPill.style.left = (XS[midIdx] - 25) + 'px';
+      chartPill.style.top = (ys[midIdx] + 13 - 25) + 'px';
+      chartPill.textContent = '$' + VALUES[p][midIdx].toLocaleString();
+    }
+
+    timeTabs.forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        timeTabs.forEach(function(t) { t.classList.remove('active'); });
+        tab.classList.add('active');
+        switchPeriod(tab.textContent);
+      });
+    });
+
+    // Drag scrubbing
+    function lerp(ys, x) {
+      for (var i = 0; i < XS.length - 1; i++) {
+        if (x >= XS[i] && x <= XS[i + 1]) {
+          var t = (x - XS[i]) / (XS[i + 1] - XS[i]);
+          var y = ys[i] + t * (ys[i + 1] - ys[i]);
+          var vi = VALUES[curPeriod][i] + t * (VALUES[curPeriod][i + 1] - VALUES[curPeriod][i]);
+          return { y: y, val: Math.round(vi) };
+        }
+      }
+      var last = XS.length - 1;
+      return { y: ys[last], val: VALUES[curPeriod][last] };
+    }
+
+    function onScrub(clientX) {
+      var rect = chartWrap.getBoundingClientRect();
+      var x = Math.max(0, Math.min(393, clientX - rect.left));
+      var res = lerp(STROKE_Y[curPeriod], x);
+      var dotY = res.y + 13 - 7.5;
+      chartDot.style.left = (x - 7.5) + 'px';
+      chartDot.style.top = dotY + 'px';
+      chartPill.style.left = (x - 25) + 'px';
+      chartPill.style.top = (res.y + 13 - 25) + 'px';
+      chartPill.textContent = '$' + res.val.toLocaleString();
+      scrubLine.style.left = x + 'px';
+      scrubLine.style.display = 'block';
+    }
+
+    var dragging = false;
+    chartWrap.addEventListener('pointerdown', function(e) {
+      if (e.target.closest('.asset-time-tabs')) return;
+      dragging = true;
+      chartWrap.classList.add('dragging');
+      chartWrap.setPointerCapture(e.pointerId);
+      onScrub(e.clientX);
+    });
+    chartWrap.addEventListener('pointermove', function(e) {
+      if (dragging) onScrub(e.clientX);
+    });
+    chartWrap.addEventListener('pointerup', function() {
+      dragging = false;
+      chartWrap.classList.remove('dragging');
+      scrubLine.style.display = 'none';
+    });
+    chartWrap.addEventListener('pointercancel', function() {
+      dragging = false;
+      chartWrap.classList.remove('dragging');
+      scrubLine.style.display = 'none';
+    });
+  })();
+</script>
+
+<!-- ── Currency bottom sheet ── -->
+<script>
+(function() {
+  var currencies = [
+    { code: 'USD', name: 'US Dollar',          flag: 'us' },
+    { code: 'GBP', name: 'British Pound',      flag: 'gb' },
+    { code: 'CAD', name: 'Canadian Dollar',    flag: 'ca' },
+    { code: 'AUD', name: 'Australian Dollar',  flag: 'au' },
+    { code: 'EUR', name: 'Euro',               flag: 'eu' },
+    { code: 'SGD', name: 'Singapore Dollar',   flag: 'sg' },
+    { code: 'NZD', name: 'New Zealand Dollar', flag: 'nz' },
+    { code: 'HKD', name: 'Hong Kong Dollar',   flag: 'hk' },
+    { code: 'JPY', name: 'Japanese Yen',       flag: 'jp' },
+    { code: 'PLN', name: 'Polish Złoty',       flag: 'pl' },
+    { code: 'AED', name: 'UAE Dirham',         flag: 'ae' },
+    { code: 'INR', name: 'Indian Rupee',       flag: 'in' },
+  ];
+  var selected = 'USD';
+
+  var s = document.createElement('style');
+  s.textContent =
+    '#ccyOverlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9000;opacity:0;transition:opacity .28s;display:none;}' +
+    '#ccyOverlay.open{opacity:1;}' +
+    '#ccySheet{position:fixed;bottom:0;left:0;width:393px;max-width:100vw;background:#fff;border-radius:16px 16px 0 0;z-index:9001;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,1,.36,1);display:none;}' +
+    '#ccySheet.open{transform:translateY(0);}' +
+    '.ccy-item{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;cursor:pointer;}' +
+    '.ccy-item:active{background:#f4f5f6;}' +
+    '.ccy-left{display:flex;align-items:center;gap:12px;}' +
+    '.ccy-flag{width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;}' +
+    '.ccy-code{font-size:14px;font-weight:600;color:#1a1a1e;line-height:1.2;}' +
+    '.ccy-name{font-size:12px;font-weight:400;color:#7a8699;line-height:1.4;}' +
+    '.ccy-check{width:20px;height:20px;flex-shrink:0;}';
+  document.head.appendChild(s);
+
+  var overlay = document.createElement('div');
+  overlay.id = 'ccyOverlay';
+
+  var sheet = document.createElement('div');
+  sheet.id = 'ccySheet';
+  sheet.innerHTML =
+    '<div style="display:flex;justify-content:center;padding:10px 0 0;">' +
+      '<div style="width:36px;height:4px;border-radius:2px;background:#e0e3e8;"></div>' +
+    '</div>' +
+    '<div style="padding:14px 20px 10px;">' +
+      '<span style="font-size:16px;font-weight:600;color:#1a1a1e;">Select Currency</span>' +
+    '</div>' +
+    '<div id="ccyList" style="overflow-y:auto;max-height:58vh;padding-bottom:28px;"></div>';
+
+  document.body.appendChild(overlay);
+  document.body.appendChild(sheet);
+
+  function buildList() {
+    var list = document.getElementById('ccyList');
+    list.innerHTML = currencies.map(function(c) {
+      var checked = c.code === selected;
+      return '<div class="ccy-item" data-code="' + c.code + '">' +
+        '<div class="ccy-left">' +
+          '<img class="ccy-flag" src="https://flagcdn.com/w40/' + c.flag + '.png" alt="' + c.code + '">' +
+          '<div><div class="ccy-code">' + c.code + '</div><div class="ccy-name">' + c.name + '</div></div>' +
+        '</div>' +
+        (checked
+          ? '<svg class="ccy-check" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" fill="#0a36c7"/><path d="M6 10l3 3 5-5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+          : '<div class="ccy-check"></div>') +
+        '</div>';
+    }).join('');
+    list.querySelectorAll('.ccy-item').forEach(function(item) {
+      item.addEventListener('click', function() {
+        selected = item.dataset.code;
+        updateTriggers();
+        closeSheet();
+      });
+    });
+  }
+
+  function updateTriggers() {
+    document.querySelectorAll('.ccy-trigger-text').forEach(function(el) { el.textContent = selected; });
+  }
+
+  function openSheet() {
+    buildList();
+    overlay.style.display = 'block';
+    sheet.style.display = 'block';
+    requestAnimationFrame(function() { requestAnimationFrame(function() {
+      overlay.classList.add('open');
+      sheet.classList.add('open');
+    }); });
+  }
+
+  function closeSheet() {
+    overlay.classList.remove('open');
+    sheet.classList.remove('open');
+    setTimeout(function() {
+      overlay.style.display = 'none';
+      sheet.style.display = 'none';
+    }, 300);
+  }
+
+  overlay.addEventListener('click', closeSheet);
+
+  document.querySelectorAll('.ccy-trigger').forEach(function(el) {
+    el.addEventListener('click', openSheet);
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,2190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=393, initial-scale=1">
+  <title>Trade – VT Markets</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="components.css">
+  <style>
+    /* ── Page title row ── */
+    .page-title-row {
+      display: flex; align-items: center; gap: 16px;
+      padding: 16px 20px 12px; position: relative;
+    }
+    .pt-tab {
+      font-size: 20px; font-weight: 600; line-height: 28px;
+      color: #7a8699; cursor: pointer; position: relative;
+    }
+    .pt-tab.active { color: #0a36c7; }
+    .pt-dot {
+      position: absolute; top: 3px; right: -8px;
+      width: 4px; height: 4px; border-radius: 50%; background: #0a36c7;
+    }
+
+    /* ── Main content area ── */
+    .trade-body {
+      display: flex; flex-direction: column; gap: 16px;
+      align-items: center; width: 393px;
+    }
+
+    /* ── Product row ── */
+    .product-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px; width: 393px; height: 32px; box-sizing: border-box;
+    }
+    .product-name {
+      display: flex; align-items: center; gap: 8px; cursor: pointer;
+    }
+    .product-name-text { font-size: 20px; font-weight: 600; color: #282d34; line-height: normal; }
+    .product-dropdown { width: 8px; height: 8px; display: flex; align-items: center; justify-content: center; }
+    .product-dropdown svg { width: 8px; height: 5px; }
+    .product-icons { display: flex; align-items: center; gap: 24px; }
+    .product-icons img { width: 20px; height: 20px; cursor: pointer; display: block; }
+
+    /* ── Mini chart panel (toggled by first chart icon) ── */
+    .mini-chart-panel {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.32s cubic-bezier(.32,1,.36,1);
+      padding: 0 20px;
+    }
+    .mini-chart-panel.open { max-height: 240px; }
+    .mini-chart-card {
+      margin-top: 8px;
+      background: #f9fafb;
+      border-radius: 12px;
+      padding: 12px;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .mini-chart-head {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .mini-chart-title {
+      display: flex; align-items: center; gap: 6px;
+      font-size: 13px; font-weight: 600; color: #282d34;
+    }
+    .mini-chart-price {
+      font-size: 14px; font-weight: 600; color: #282d34;
+    }
+    .mini-chart-pct {
+      font-size: 11px; font-weight: 500; color: #00b565;
+      background: rgba(0,181,101,0.08);
+      padding: 2px 6px; border-radius: 4px;
+    }
+    .mini-chart-svg-wrap { width: 100%; height: 120px; }
+    .mini-chart-svg-wrap svg { width: 100%; height: 100%; display: block; }
+    .mini-chart-tf {
+      display: flex; gap: 8px;
+    }
+    .mini-chart-tf button {
+      border: none; background: transparent;
+      font-size: 11px; font-weight: 500; color: #7a8699;
+      padding: 2px 8px; border-radius: 10px; cursor: pointer;
+    }
+    .mini-chart-tf button.on {
+      background: #e6efff; color: #0a36c7;
+    }
+
+    /* ── Sell / Buy price block ── */
+    .price-block {
+      position: relative; width: 353px; height: 42px;
+    }
+    .price-sell-bg, .price-buy-bg {
+      position: absolute; top: 0; bottom: 0;
+    }
+    .price-sell-bg { left: 0; right: 54.02%; }
+    .price-sell-bg img { width: 100%; height: 100%; display: block; }
+    .price-buy-bg { left: 54.02%; right: 0; }
+    .price-buy-bg img { width: 100%; height: 100%; display: block; }
+    .price-spread {
+      position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+      font-size: 10px; font-weight: 400; color: #7a8699;
+      z-index: 2; text-align: center;
+    }
+    .price-content {
+      position: absolute; display: flex; flex-direction: column; gap: 2px;
+      align-items: center; text-align: center;
+      color: #fff; line-height: normal;
+    }
+    .price-content.sell-content {
+      top: 50%; transform: translateY(-50%);
+      left: 13.85%; right: 69.53%;
+      color: #fff;
+    }
+    .price-content.buy-content {
+      top: 50%; transform: translateY(-50%);
+      left: 69.53%; right: 13.85%;
+      color: #7a8699;
+    }
+    .price-amount { font-size: 16px; font-weight: 600; white-space: nowrap; }
+    .price-label { font-size: 12px; font-weight: 500; }
+
+    /* ── Slider bar ── */
+    .slider-bar {
+      display: flex; align-items: center; gap: 4px;
+      padding: 0 20px; width: 393px;
+    }
+    .slider-tracks {
+      display: flex; align-items: center; gap: 2px;
+      flex: 1; height: 4px;
+    }
+    .slider-green {
+      width: 64%; height: 4px; background: #00b565;
+      border-radius: 4px 1px 1px 4px; flex-shrink: 0;
+      transition: width 0.6s ease;
+    }
+    @keyframes priceFlashUp {
+      0%,100% { opacity: 1; } 40% { opacity: 0.4; color: #00b565; }
+    }
+    @keyframes priceFlashDown {
+      0%,100% { opacity: 1; } 40% { opacity: 0.4; color: #ff2c40; }
+    }
+    .flash-up   { animation: priceFlashUp   0.35s ease; }
+    .flash-down { animation: priceFlashDown 0.35s ease; }
+    .slider-red {
+      flex: 1; height: 4px; background: #ff2c40;
+      border-radius: 1px 4px 4px 1px;
+    }
+    .slider-indicator {
+      display: flex; flex-direction: column; align-items: center;
+      flex-shrink: 0;
+    }
+    .slider-indicator img { width: 11px; height: 8px; }
+    .slider-indicator-text {
+      font-size: 8px; font-weight: 400; color: #c2c7d0;
+      text-align: center; line-height: 8px; opacity: 0.99;
+    }
+
+    /* ── Order type pills ── */
+    .order-type-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 0 20px; width: 100%;
+    }
+    .order-pill {
+      flex: 1; min-width: 0; height: 32px; border-radius: 30px;
+      font-size: 14px; font-weight: 400; color: #7a8699;
+      background: #fff; cursor: pointer; white-space: nowrap;
+      border: 1px solid #f4f5f6; outline: none;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 12px; line-height: 22px;
+      font-family: 'Roboto', sans-serif;
+    }
+    .order-pill.active {
+      background: #e8f1ff; color: #0a36c7; font-weight: 600;
+      border-color: #f4f5f6;
+    }
+
+    /* ── Limit Price input ── */
+    .input-box {
+      width: 353px; border: 1px solid #e8e9ea; border-radius: 4px;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px;
+    }
+    .input-box.large { height: 64px; }
+    .input-box.medium { height: 48px; }
+    .input-icon { width: 20px; height: 20px; flex-shrink: 0; cursor: pointer; opacity: 0.5; }
+    .input-center {
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center; white-space: nowrap;
+    }
+    .input-center-label {
+      font-size: 12px; font-weight: 400; color: #7a8699;
+      line-height: 18px;
+    }
+    .input-center-label.sm { font-size: 10px; line-height: 15px; }
+    .input-center-value {
+      font-size: 20px; font-weight: 600; color: #282d34;
+      line-height: 28px;
+    }
+    .input-center-value.sm {
+      font-size: 14px; font-weight: 500; line-height: 22px;
+    }
+
+    /* ── Distance row ── */
+    .distance-row {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 100%; padding: 0;
+      font-size: 12px; font-weight: 400; line-height: normal;
+    }
+    .distance-row .dl { color: #7a8699; }
+    .distance-row .dv { color: #282d34; }
+
+    /* ── Volume input has extra right section ── */
+    .vol-input-wrap {
+      width: 353px; border: 1px solid #e8e9ea; border-radius: 4px;
+      display: flex; align-items: center; height: 48px;
+      padding: 0 16px; gap: 16px;
+    }
+    .vol-stepper {
+      flex: 1; display: flex; align-items: center; justify-content: space-between;
+    }
+    .vol-divider {
+      width: 0; height: 20px; display: flex; align-items: center; justify-content: center;
+    }
+    .vol-divider-line {
+      width: 1px; height: 20px; background: #e8e9ea;
+    }
+    .vol-right {
+      display: flex; align-items: center; gap: 24px;
+      height: 24px; border-radius: 4px;
+    }
+    .vol-right-text {
+      font-size: 14px; font-weight: 500; color: #282d34; text-align: center;
+      white-space: nowrap; line-height: 22px;
+    }
+    .vol-right-arrow { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; }
+    .vol-right-arrow svg { width: 10.4px; height: 6px; }
+
+    /* ── Volume slider dots ── */
+    .vol-slider-area {
+      display: flex; flex-direction: column; gap: 8px;
+      width: 393px; padding: 0 20px;
+    }
+    .vol-dots-wrap {
+      position: relative; width: 353px; height: 14px;
+      display: flex; align-items: center;
+      cursor: pointer; touch-action: none;
+    }
+    /* Track background (grey) */
+    .vol-dots-track {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      left: 3px; right: 3px; height: 4px;
+      background: #d9dce1; border-radius: 2px;
+    }
+    /* Track filled (blue) */
+    .vol-dots-fill {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      left: 3px; height: 4px;
+      background: #0a36c7; border-radius: 2px;
+      width: 100%; /* default full */
+    }
+    /* Dots row: sits on top of track, spread evenly */
+    .vol-dots-row {
+      position: relative; z-index: 2;
+      display: flex; justify-content: space-between; align-items: center;
+      width: 100%;
+    }
+    .vol-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #0a36c7; flex-shrink: 0;
+      transition: background 0.15s;
+    }
+    .vol-dot.inactive { background: #d9dce1; }
+    .vol-dot.last {
+      width: 14px; height: 14px;
+    }
+    .vol-labels {
+      display: flex; justify-content: space-between;
+      font-size: 12px; font-weight: 500; color: #7a8699;
+      line-height: normal;
+    }
+
+    /* ── TP/SL row ── */
+    .tpsl-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 0 20px; width: 100%;
+    }
+    .tpsl-checkbox {
+      width: 16px; height: 16px; position: relative; flex-shrink: 0; cursor: pointer;
+    }
+    .tpsl-checkbox-inner {
+      position: absolute; inset: 12.5%;
+      border: 0.64px solid #c2c7d0; border-radius: 1.67px;
+    }
+    .tpsl-label {
+      font-size: 14px; font-weight: 600; color: #282d34; line-height: 22px;
+    }
+
+    /* ── Info rows ── */
+    .info-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px; width: 393px;
+    }
+    .info-key {
+      font-size: 12px; font-weight: 400; color: #7a8699;
+      line-height: normal;
+    }
+    .info-key-underline {
+      text-decoration: underline; text-decoration-color: #7a8699;
+      text-underline-offset: 1px;
+    }
+    .info-val {
+      font-size: 14px; font-weight: 400; color: #282d34;
+      line-height: normal; display: flex; align-items: center; gap: 4px;
+    }
+    .info-plus-circle {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: #0a36c7; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; font-weight: 400; line-height: 1; cursor: pointer;
+    }
+
+    /* ── Sell button ── */
+    .sell-btn-wrap {
+      border-bottom: 0.5px solid #f4f5f6;
+      display: flex; flex-direction: column; align-items: center;
+      padding: 16px 0; width: 100%;
+    }
+    .btn-sell {
+      width: 353px; height: 48px; border-radius: 8px;
+      background: #ff2c40; border: none; outline: none; cursor: pointer;
+      font-size: 16px; font-weight: 600; color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    /* ── Position tabs ── */
+    .pos-tabs-wrap {
+      border-bottom: 1px solid #f4f5f6; width: 393px;
+    }
+    .pos-tabs {
+      display: flex; align-items: flex-start; gap: 20px;
+      padding: 0 20px; width: 393px;
+    }
+    .pos-tab {
+      font-size: 14px; font-weight: 400; color: #7a8699;
+      padding-bottom: 12px; cursor: pointer; position: relative;
+      white-space: nowrap; line-height: normal;
+    }
+    .pos-tab.active {
+      color: #0a36c7; font-weight: 600;
+      border-bottom: 2px solid #0a36c7;
+    }
+
+    /* ── Filter row ── */
+    .filter-row {
+      display: flex; align-items: center; justify-content: flex-end;
+      gap: 10px; padding: 0 20px; width: 393px;
+    }
+    .filter-cb-wrap {
+      flex: 1; display: flex; gap: 8px; align-items: flex-start;
+    }
+    .filter-cb-box {
+      width: 16px; height: 16px; margin-top: 3px; flex-shrink: 0;
+      position: relative;
+    }
+    .filter-cb-box svg { position: absolute; inset: 0; width: 16px; height: 16px; }
+    .filter-cb-label {
+      flex: 1; font-size: 14px; font-weight: 400; color: #282d34;
+      line-height: 22px;
+    }
+    .close-all-text {
+      font-size: 12px; font-weight: 500; color: #282d34;
+      text-align: right; white-space: nowrap; line-height: normal;
+      cursor: pointer; flex-shrink: 0;
+      padding: 3px 0; height: 24px; display: flex; align-items: center;
+    }
+
+    /* ── Position card ── */
+    .pos-card {
+      width: 393px; padding: 16px 20px;
+      background: #fff;
+      border-bottom: 1px solid #f4f5f6;
+      display: flex; flex-direction: column; gap: 16px;
+    }
+    .pos-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+    }
+    .pos-left { display: flex; flex-direction: column; gap: 0; }
+    .pos-left-top { display: flex; align-items: center; gap: 4px; }
+    .pos-badge {
+      height: 20px; padding: 0 8px; border-radius: 2px;
+      font-size: 12px; font-weight: 500; display: flex; align-items: center;
+      text-align: center; white-space: nowrap; line-height: normal;
+    }
+    .pos-badge.buy { background: rgba(0,181,101,0.12); color: #00b565; }
+    .pos-badge.sell { background: rgba(255,44,64,0.12); color: #ff2c40; }
+    .pos-symbol-wrap { display: flex; align-items: center; gap: 4px; }
+    .pos-symbol {
+      font-size: 16px; font-weight: 700; color: #282d34;
+      line-height: normal; white-space: nowrap;
+    }
+    .pos-viewchart { width: 16px; height: 16px; display: block; }
+    .pos-right { display: flex; align-items: center; gap: 8px; width: 145px; justify-content: flex-end; }
+    .pos-pnl-wrap { display: flex; align-items: center; gap: 4px; font-weight: 500; }
+    .pos-pnl-amount { font-size: 16px; white-space: nowrap; line-height: normal; }
+    .pos-pnl-unit { font-size: 12px; line-height: normal; align-self: flex-end; height: 18px; display: flex; align-items: flex-end; width: 23px; }
+    .pos-pnl-wrap.up { color: #00b565; }
+    .pos-pnl-wrap.down { color: #ff2c40; }
+    .pos-share { width: 16px; height: 16px; display: block; cursor: pointer; }
+
+    /* ── Position detail row (3 columns) ── */
+    .pos-detail-row {
+      display: flex; gap: 12px; align-items: flex-start; justify-content: center;
+      width: 100; line-height: normal;
+    }
+    .pos-detail-col {
+      flex: 1; display: flex; flex-direction: column; gap: 4px;
+    }
+    .pos-detail-col:nth-child(2) { text-align: center; }
+    .pos-detail-col:nth-child(3) { text-align: right; }
+    .pos-detail-label { font-size: 10px; font-weight: 400; color: #7a8699; }
+    .pos-detail-value { font-size: 16px; font-weight: 500; color: #282d34; }
+
+    /* ── Position action buttons ── */
+    .pos-actions {
+      display: flex; align-items: center; gap: 12px; width: 100%;
+    }
+    .pos-reverse-btn {
+      width: 28px; height: 28px; border-radius: 50%; background: #f4f5f6;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; cursor: pointer; position: relative;
+    }
+    .pos-reverse-btn img { width: 14px; height: 14px; }
+    .pos-action-btn {
+      flex: 1; height: 28px; border-radius: 4px; background: #f4f5f6;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 11px; font-weight: 500; color: #282d34;
+      cursor: pointer; white-space: nowrap; line-height: 18px;
+      border: none; outline: none; font-family: 'Roboto', sans-serif;
+      padding: 0 8px;
+    }
+
+    /* ── TP/SL info row in position card ── */
+    .pos-tpsl-row {
+      display: flex; align-items: center; justify-content: space-between;
+      border-top: 1px solid #f4f5f6; padding-top: 16px;
+      width: 100%;
+    }
+    .pos-tpsl-left {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .pos-tpsl-label {
+      font-size: 10px; font-weight: 400; color: #7a8699;
+      white-space: nowrap; line-height: normal;
+    }
+    .pos-tpsl-values {
+      font-size: 14px; font-weight: 500; line-height: normal;
+    }
+    .pos-tpsl-values .tp-val { color: #00b565; }
+    .pos-tpsl-values .sl-val { color: #ff2c40; }
+    .pos-tpsl-values .sep { color: #282d34; }
+    .pos-tpsl-actions {
+      display: flex; align-items: center; justify-content: space-between;
+      width: 48px;
+    }
+    .pos-tpsl-actions img { width: 12px; height: 12px; cursor: pointer; display: block; }
+    .pos-tpsl-divider { width: 1px; height: 11.5px; background: #e8e9ea; }
+
+    /* ── Sticky header (always) ── */
+    .tn-status-bar,
+    .tn-nav-bar,
+    .page-title-row,
+    .product-row {
+      position: sticky !important;
+      z-index: 20;
+      background: #fff;
+    }
+    .tn-status-bar { top: 0; }
+    .tn-nav-bar { top: 54px; }
+    .page-title-row { top: 98px; }
+    .product-row { top: 154px; }
+
+    /* ── Expanded positions mode ── */
+    .page-scroll.expanded .product-row {
+      position: fixed !important; top: 154px; left: 0; width: 393px;
+      height: 32px; box-sizing: border-box;
+      display: flex; align-items: center;
+      z-index: 20; background: #fff;
+    }
+    .page-scroll.expanded .product-row-spacer { display: block; height: 32px; }
+    .page-scroll.expanded { padding-bottom: 80vh; }
+
+    /* ── Tab content visibility ── */
+    .tab-contract { display: block; }
+    .tab-copy { display: none; }
+
+    /* ── Copy Tab Styles ── */
+
+    /* Equity section */
+    .copy-equity-section {
+      padding: 16px 20px 16px; width: 393px;
+      border-bottom: 1px solid #f4f5f6;
+    }
+    .copy-equity-inner {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      padding-top: 8px;
+    }
+    .copy-equity-left { display: flex; flex-direction: column; gap: 8px; }
+    .copy-equity-label {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 14px; font-weight: 500; color: #7a8699; line-height: normal;
+    }
+    .copy-equity-label img { width: 14px; height: 14px; }
+    .copy-equity-amount-row {
+      display: flex; align-items: flex-end; gap: 5px;
+    }
+    .copy-equity-amount {
+      font-size: 26px; font-weight: 600; color: #282d34; line-height: normal;
+    }
+    /* ccy-trigger styles now in components.css */
+    .copy-pnl-row {
+      display: flex; align-items: center; gap: 4px;
+    }
+    .copy-pnl-label {
+      font-size: 14px; font-weight: 500; color: #7a8699; line-height: 22px;
+      text-decoration: underline; text-underline-offset: 2px;
+    }
+    .copy-pnl-value {
+      font-size: 16px; font-weight: 500; color: #00b565; line-height: 24px;
+    }
+    .copy-pnl-arrow { width: 13px; height: 13px; }
+    .copy-pnl-arrow svg { width: 13px; height: 13px; }
+
+    /* ── Copy Chart (same as asset-chart-fills component) ── */
+    .copy-chart-wrap {
+      position: relative;
+      width: 393px;
+      height: 225px;
+      overflow: hidden;
+      touch-action: none;
+    }
+    .copy-chart-fills {
+      position: absolute;
+      top: 0; left: 0;
+      width: 393px; height: 180px;
+      transition: opacity 0.2s ease;
+    }
+    .copy-chart-fill-img {
+      position: absolute;
+      top: 13px; left: 0;
+      width: 393px;
+    }
+    .copy-chart-value-pill {
+      position: absolute;
+      top: 1px; left: 184px;
+      background: #282d34; color: #fff;
+      font-size: 11px; font-weight: 600;
+      padding: 2px 8px; border-radius: 100px;
+      white-space: nowrap; z-index: 3;
+      transition: left 0.08s ease, top 0.08s ease;
+    }
+    .copy-chart-dot {
+      position: absolute;
+      top: 55px; left: 208px;
+      width: 15px; height: 15px;
+      z-index: 3;
+      transition: left 0.08s ease, top 0.08s ease;
+    }
+    .copy-chart-grid {
+      position: absolute;
+      top: 0; left: 0;
+      width: 393px; height: 180px;
+      pointer-events: none;
+    }
+    .copy-chart-scrub-line {
+      position: absolute;
+      top: 0; width: 1px; height: 180px;
+      background: rgba(0,181,101,0.35);
+      pointer-events: none;
+      display: none; z-index: 2;
+    }
+    .copy-chart-wrap.dragging .copy-chart-dot,
+    .copy-chart-wrap.dragging .copy-chart-value-pill {
+      transition: none;
+    }
+    .copy-time-tabs {
+      position: absolute;
+      bottom: 0; left: 16px; right: 16px;
+      height: 44px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .copy-time-tab {
+      width: 48px; height: 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 500; color: #7a8699;
+      border-radius: 2px; cursor: pointer;
+    }
+    .copy-time-tab.active { background: #e5e7eb; color: #282d34; }
+    .copy-add-funds-btn {
+      width: 88px; height: 40px; border-radius: 8px;
+      background: #0a36c7; border: none; outline: none; cursor: pointer;
+      font-size: 14px; font-weight: 600; color: #fff;
+      font-family: 'Roboto', sans-serif;
+      display: flex; align-items: center; justify-content: center;
+      margin-top: 19px; flex-shrink: 0;
+    }
+
+    /* Filter pills (reuse order-pill style) */
+    .copy-filter-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 0 20px; width: 393px;
+    }
+    .copy-pill {
+      height: 32px; border-radius: 30px;
+      font-size: 14px; font-weight: 400; color: #7a8699;
+      background: #fff; cursor: pointer; white-space: nowrap;
+      border: 1px solid #f4f5f6; outline: none;
+      display: flex; align-items: center; justify-content: center;
+      padding: 0 12px; line-height: 22px;
+      font-family: 'Roboto', sans-serif;
+    }
+    .copy-pill.active {
+      background: #e8f1ff; color: #0a36c7; font-weight: 600;
+      border-color: #f4f5f6;
+    }
+
+    /* Section heading */
+    .copy-section-heading {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px; width: 393px;
+    }
+    .copy-section-title {
+      font-size: 18px; font-weight: 600; color: #1a1a1e; line-height: 26px;
+    }
+    .copy-section-arrow { width: 20px; height: 20px; cursor: pointer; }
+
+    /* Top Trader cards (horizontal scroll) */
+    .copy-trader-scroll-wrap {
+      width: 393px; overflow-x: auto; overflow-y: visible;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .copy-trader-scroll-wrap::-webkit-scrollbar { display: none; }
+    .copy-trader-scroll {
+      display: flex; gap: 16px;
+      padding: 36px 20px 20px;
+      width: max-content;
+      overflow-y: visible;
+    }
+    .copy-trader-card {
+      width: 160px; height: 198px; border-radius: 8px;
+      border: 0.5px solid #d4d6db;
+      background: rgba(85,132,250,0.04);
+      backdrop-filter: blur(50px);
+      position: relative; flex-shrink: 0; overflow: visible;
+    }
+    .copy-trader-card-bg {
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; border-radius: 8px;
+      clip-path: inset(0 round 8px);
+      pointer-events: none;
+    }
+    /* Avatar hangs above the card */
+    .copy-trader-avatar-wrap {
+      position: absolute; left: 50%; top: -30px;
+      transform: translateX(-50%);
+    }
+    .copy-trader-avatar {
+      width: 44px; height: 44px; border-radius: 50%;
+      object-fit: cover; border: 2.5px solid transparent;
+      display: block;
+    }
+    /* Border colours by rank */
+    .copy-trader-card:has(.copy-trader-badge.gold) .copy-trader-avatar { border-color: #e39f1b; }
+    .copy-trader-card:has(.copy-trader-badge.silver) .copy-trader-avatar { border-color: #b6b6b6; }
+    .copy-trader-card:has(.copy-trader-badge.bronze) .copy-trader-avatar { border-color: #b1917b; }
+    /* Rank badge – centred at top of card */
+    .copy-trader-badge {
+      position: absolute; left: 50%; top: 4px;
+      transform: translateX(-50%);
+      padding: 2px 4px; border-radius: 2px;
+      font-size: 8px; font-weight: 700; color: #fff;
+      letter-spacing: 0.3px; white-space: nowrap;
+      text-shadow: 0.1px 0.1px 0 #8c2307;
+    }
+    .copy-trader-badge.gold {
+      background: linear-gradient(101deg, rgba(255,214,134,0.8) 5%, rgba(227,159,27,0.8) 99%);
+    }
+    .copy-trader-badge.silver {
+      background: linear-gradient(110deg, #b6b6b6 23%, #cecdce 35%, #b8b5ac 100%);
+    }
+    .copy-trader-badge.bronze {
+      background: linear-gradient(101deg, rgba(247,207,175,0.8) 5%, rgba(177,145,123,0.8) 99%);
+    }
+    .copy-trader-divider {
+      position: absolute; left: 16px; right: 16px; top: 66px;
+      height: 0.5px; background: #d4d6db;
+    }
+    .copy-trader-name {
+      position: absolute; top: 28px; left: 50%;
+      transform: translateX(-50%);
+      font-size: 12px; font-weight: 700; color: #282d34;
+      white-space: nowrap;
+    }
+    .copy-trader-copiers {
+      position: absolute; top: 46px; left: 50%; transform: translateX(-50%);
+      display: flex; align-items: center; gap: 4px;
+    }
+    .copy-trader-copiers img { width: 12px; height: 12px; }
+    .copy-trader-copiers span { font-size: 12px; font-weight: 500; color: #282d34; }
+    .copy-trader-return-wrap {
+      position: absolute; top: 71px; left: 50%; transform: translateX(-50%);
+      display: flex; flex-direction: column; align-items: center; gap: 1px;
+    }
+    .copy-trader-return-label {
+      font-size: 10px; font-weight: 500; color: #7a8699; line-height: normal;
+      white-space: nowrap;
+    }
+    .copy-trader-return-value {
+      font-size: 14px; font-weight: 700; color: #00b565; line-height: 18px;
+      white-space: nowrap;
+    }
+    .copy-trader-chart {
+      position: absolute; left: 13px; right: 13px; top: 103px;
+      height: 32px;
+    }
+    .copy-trader-chart img { width: 100%; height: 100%; object-fit: cover; }
+    .copy-trader-stats {
+      position: absolute; top: 137px; left: 16px; right: 16px;
+      display: flex; justify-content: space-between; align-items: flex-end;
+    }
+    .copy-trader-stat {
+      display: flex; flex-direction: column; align-items: center; gap: 2px;
+    }
+    .copy-trader-stat-val {
+      font-size: 10px; font-weight: 600; color: #282d34;
+      display: block; text-align: center;
+    }
+    .copy-trader-stat-label {
+      font-size: 10px; font-weight: 500; color: #c2c7d0;
+      display: block; text-align: center;
+    }
+    .copy-trader-stat-divider {
+      width: 0; height: 14px; border-left: 0.5px solid #e8e9ea;
+      align-self: center;
+    }
+    .copy-risk-badge {
+      width: 11px; height: 11.4px; border-radius: 1.6px;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 2px;
+      font-size: 8.6px; font-weight: 700; color: #fff;
+    }
+    .copy-risk-badge.green { background: #31ca8d; border: 0.4px solid #75d8b1; }
+    .copy-risk-badge.gold  { background: #d9bf91; border: 0.4px solid #d9bf91; }
+    .copy-trader-view-btn {
+      position: absolute; left: 16px; right: 16px; bottom: 8px;
+      height: 24px; border-radius: 4px;
+      background: rgba(255,255,255,0.92);
+      box-shadow: 0 4px 7px rgba(10,54,199,0.1);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 10px; font-weight: 500; color: #000; cursor: pointer;
+    }
+
+    /* Most Copied section */
+    .copy-sectors-wrap {
+      display: flex; flex-direction: column; gap: 20px;
+      padding: 0 20px; width: 393px;
+    }
+    .copy-sector-tabs {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .copy-sector-tab {
+      height: 20px; padding: 0 8px; border-radius: 2px;
+      background: #f4f5f6; font-size: 12px; font-weight: 500;
+      color: #c2c7d0; display: flex; align-items: center;
+      justify-content: center; cursor: pointer; white-space: nowrap;
+    }
+    .copy-sector-tab.active { color: #0a36c7; }
+    .copy-filter-bar {
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .copy-filter-bar-label {
+      font-size: 12px; font-weight: 500; color: #282d34; line-height: normal;
+    }
+    .copy-filter-bar-right {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .copy-filter-bar-right img { width: 16px; height: 16px; }
+
+    /* Strategy list items */
+    .copy-strategy-item {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      padding-bottom: 16px;
+      border-bottom: 0.5px solid #f4f5f6;
+    }
+    .copy-strategy-left {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .copy-strategy-avatar {
+      width: 40px; height: 40px; border-radius: 50%;
+      object-fit: cover; flex-shrink: 0;
+    }
+    .copy-strategy-info {
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .copy-strategy-name {
+      font-size: 16px; font-weight: 600; color: #282d34; line-height: normal;
+    }
+    .copy-strategy-meta {
+      display: flex; align-items: center; gap: 12px;
+    }
+    .copy-strategy-meta-item {
+      display: flex; align-items: flex-end; gap: 4px; white-space: nowrap;
+    }
+    .copy-strategy-meta-label {
+      font-size: 12px; font-weight: 500; color: #7a8699; line-height: normal;
+    }
+    .copy-strategy-meta-value {
+      font-size: 14px; font-weight: 500; color: #282d34; line-height: normal;
+    }
+    .copy-strategy-divider {
+      width: 0; height: 9px; border-left: 0.5px solid #e8e9ea;
+      align-self: center;
+    }
+    .copy-strategy-right {
+      display: flex; flex-direction: column; align-items: flex-end; gap: 8px;
+    }
+    .copy-strategy-return {
+      font-size: 20px; font-weight: 600; color: #00b565; line-height: normal;
+      text-align: right;
+    }
+    .copy-strategy-return-label {
+      font-size: 11px; font-weight: 500; color: #7a8699;
+      text-align: right; line-height: normal;
+    }
+    .copy-view-more {
+      font-size: 12px; font-weight: 500; color: #7a8699;
+      line-height: 18px; padding: 0 12px; cursor: pointer;
+      align-self: center;
+    }
+
+    /* Signal Provider banner */
+    .copy-signal-banner {
+      width: 353px; border-radius: 4px; background: #e8f1ff;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 8px 16px; margin: 0 20px;
+    }
+    .copy-signal-left {
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .copy-signal-title {
+      font-size: 14px; font-weight: 600; color: #282d34; line-height: normal;
+    }
+    .copy-signal-link {
+      display: flex; align-items: center; gap: 5px;
+    }
+    .copy-signal-link-text {
+      font-size: 12px; font-weight: 400; color: #0a36c7; line-height: normal;
+    }
+    .copy-signal-link img { width: 10px; height: 10px; }
+    .copy-signal-person {
+      width: 50px; height: 50px; object-fit: contain;
+    }
+
+    /* Starter Guide */
+    .copy-guide-scroll-wrap {
+      width: 393px; overflow-x: auto; overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .copy-guide-scroll-wrap::-webkit-scrollbar { display: none; }
+    .copy-guide-scroll {
+      display: flex; gap: 13px; padding: 0 20px;
+      width: max-content;
+    }
+    .copy-guide-card {
+      width: 165px; border-radius: 22px;
+      background: #f9f9f9; border: 0.9px solid rgba(255,255,255,0.1);
+      backdrop-filter: blur(5px);
+      padding: 12px; display: flex; flex-direction: column; gap: 8px;
+      flex-shrink: 0;
+    }
+    .copy-guide-icon {
+      width: 40px; height: 40px; border-radius: 8px;
+      overflow: hidden;
+    }
+    .copy-guide-icon img { width: 100%; height: 100%; object-fit: cover; }
+    .copy-guide-title {
+      font-size: 16px; font-weight: 600; color: #282d34; line-height: 24px;
+    }
+  </style>
+</head>
+<body>
+<div class="page-scroll">
+
+  <!-- Status bar -->
+  <!-- Page title -->
+  <div class="page-title-row">
+    <div class="pt-tab active" data-tab="contract">Contract<span class="pt-dot"></span></div>
+    <div class="pt-tab" data-tab="copy">Copy</div>
+  </div>
+
+  <!-- ═══ CONTRACT TAB CONTENT ═══ -->
+  <div class="tab-contract">
+  <!-- Trade body (gap: 16px between sections) -->
+  <div class="trade-body">
+
+    <!-- Product row -->
+    <div class="product-row">
+      <div class="product-name">
+        <span class="product-name-text">BTCUSD</span>
+        <div class="product-dropdown">
+          <svg viewBox="0 0 8 5" fill="none"><path d="M1 1L4 4L7 1" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+      </div>
+      <div class="product-icons">
+        <img id="chartIcon" src="images/trade-icon-chart.svg" alt="chart">
+        <img src="images/trade-icon-viewchart.svg" alt="view chart">
+        <svg id="expandIcon" width="20" height="20" viewBox="0 0 20 20" fill="none" style="cursor:pointer;transition:transform 0.3s ease;">
+          <path d="M17.2922 1.25H5.62578C5.23901 1.25 4.86809 1.40364 4.59461 1.67713C4.32112 1.95061 4.16748 2.32153 4.16748 2.7083V7.0832C4.16748 7.27658 4.2443 7.46204 4.38104 7.59878C4.51779 7.73553 4.70325 7.81235 4.89663 7.81235C5.09001 7.81235 5.27547 7.73553 5.41222 7.59878C5.54896 7.46204 5.62578 7.27658 5.62578 7.0832V2.7083H17.2922V14.3747H12.9173C12.7239 14.3747 12.5384 14.4515 12.4017 14.5883C12.2649 14.725 12.1881 14.9105 12.1881 15.1038C12.1881 15.2972 12.2649 15.4827 12.4017 15.6194C12.5384 15.7562 12.7239 15.833 12.9173 15.833H17.2922C17.6789 15.833 18.0499 15.6794 18.3233 15.4059C18.5968 15.1324 18.7505 14.7615 18.7505 14.3747V2.7083C18.7505 2.32153 18.5968 1.95061 18.3233 1.67713C18.0499 1.40364 17.6789 1.25 17.2922 1.25Z" fill="#282D34"/>
+          <path d="M10 16.5621L10 10.7289C10 10.5356 9.92318 10.3501 9.78644 10.2134C9.6497 10.0766 9.46423 9.9998 9.27085 9.9998L3.43765 9.9998C3.24427 9.9998 3.05881 10.0766 2.92207 10.2134C2.78532 10.3501 2.7085 10.5356 2.7085 10.7289C2.7085 10.9223 2.78532 11.1078 2.92207 11.2445C3.05881 11.3813 3.24427 11.4581 3.43765 11.4581L7.50995 11.4581L1.46348 17.5046C1.39573 17.5723 1.342 17.6527 1.30533 17.7413C1.26867 17.8298 1.2498 17.9246 1.2498 18.0204C1.2498 18.1163 1.26867 18.2111 1.30533 18.2996C1.342 18.3881 1.39573 18.4686 1.46348 18.5363C1.53122 18.6041 1.61165 18.6578 1.70016 18.6945C1.78868 18.7311 1.88355 18.75 1.97935 18.75C2.07516 18.75 2.17003 18.7311 2.25854 18.6945C2.34706 18.6578 2.42748 18.6041 2.49523 18.5363L8.5417 12.4898L8.5417 16.5621C8.5417 16.7555 8.61852 16.941 8.75526 17.0777C8.89201 17.2145 9.07747 17.2913 9.27085 17.2913C9.46423 17.2913 9.6497 17.2145 9.78644 17.0777C9.92318 16.941 10 16.7555 10 16.5621Z" fill="#282D34"/>
+        </svg>
+      </div>
+    </div>
+
+    <!-- Mini chart panel (toggled by chart icon) -->
+    <div class="mini-chart-panel" id="miniChartPanel">
+      <div class="mini-chart-card">
+        <div class="mini-chart-head">
+          <div class="mini-chart-title">
+            <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" alt="" style="width:16px;height:16px;">
+            <span>BTCUSD</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span class="mini-chart-price" id="miniChartPrice">82,302.00</span>
+            <span class="mini-chart-pct" id="miniChartPct">+1.50%</span>
+          </div>
+        </div>
+        <div class="mini-chart-svg-wrap">
+          <svg viewBox="0 0 320 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="miniChartFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#00b565" stop-opacity="0.25"/>
+                <stop offset="100%" stop-color="#00b565" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path id="miniChartArea" d="" fill="url(#miniChartFill)"/>
+            <path id="miniChartLine" d="" fill="none" stroke="#00b565" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+        <div class="mini-chart-tf">
+          <button class="on">1H</button>
+          <button>1D</button>
+          <button>1W</button>
+          <button>1M</button>
+          <button>1Y</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sell / Buy price block -->
+    <div class="price-block">
+      <div class="price-sell-bg"><img src="images/trade-sell-bg.svg" alt=""></div>
+      <div class="price-buy-bg"><img src="images/trade-buy-bg.svg" alt=""></div>
+      <span class="price-spread">15</span>
+      <div class="price-content sell-content" id="sellContent">
+        <span class="price-amount" id="sellPrice">82,302</span>
+        <span class="price-label">Sell</span>
+      </div>
+      <div class="price-content buy-content" id="buyContent">
+        <span class="price-amount" id="buyPrice">82,317</span>
+        <span class="price-label">Buy</span>
+      </div>
+    </div>
+
+    <!-- Slider bar -->
+    <div class="slider-bar">
+      <div class="slider-tracks">
+        <div class="slider-green" id="sliderGreen"></div>
+        <div class="slider-red"></div>
+      </div>
+      <div class="slider-indicator">
+        <img src="images/trade-slider-indicator.svg" alt="">
+        <span class="slider-indicator-text" id="sliderIndicatorText">+8888</span>
+      </div>
+    </div>
+
+    <!-- Order type pills -->
+    <div class="order-type-row">
+      <button class="order-pill">Market</button>
+      <button class="order-pill active">Limit</button>
+      <button class="order-pill">Stop</button>
+      <button class="order-pill">Stop Limit</button>
+    </div>
+
+    <!-- Price inputs (change per order type) -->
+    <div id="priceInputArea" style="display:flex;flex-direction:column;gap:0px;align-items:center;padding:0 20px;width:100%;">
+      <!-- Stop Price (Stop / Stop Limit only) -->
+      <div class="input-box large" id="stopPriceBox" style="display:none;margin-bottom:8px;">
+        <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><line x1="3.5" y1="10" x2="16.5" y2="10" stroke="#282d34" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <div class="input-center">
+          <span class="input-center-label">Stop Price</span>
+          <span class="input-center-value">89,988.89</span>
+        </div>
+        <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><line x1="3.5" y1="10" x2="16.5" y2="10" stroke="#282d34" stroke-width="1.5" stroke-linecap="round"/><line x1="10" y1="3.5" x2="10" y2="16.5" stroke="#282d34" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <!-- Limit Price (Limit / Stop Limit only) -->
+      <div class="input-box large" id="limitPriceBox">
+        <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><line x1="3.5" y1="10" x2="16.5" y2="10" stroke="#282d34" stroke-width="1.5" stroke-linecap="round"/></svg>
+        <div class="input-center">
+          <span class="input-center-label">Limit Price</span>
+          <span class="input-center-value">90,000.89</span>
+        </div>
+        <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><line x1="3.5" y1="10" x2="16.5" y2="10" stroke="#282d34" stroke-width="1.5" stroke-linecap="round"/><line x1="10" y1="3.5" x2="10" y2="16.5" stroke="#282d34" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <div class="distance-row" id="distanceRow" style="margin-top: 8px;">
+        <span class="dl">Distance</span>
+        <span class="dv">12 points</span>
+      </div>
+    </div>
+
+    <!-- Volume input -->
+    <div style="display:flex;justify-content:center;padding:0 20px;width:100%;">
+      <div class="vol-input-wrap">
+        <div class="vol-stepper">
+          <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><line x1="3.5" y1="10" x2="16.5" y2="10" stroke="#282d34" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <div class="input-center">
+            <span class="input-center-label sm">Volume</span>
+            <span class="input-center-value sm" id="volValue">0.01</span>
+          </div>
+          <svg class="input-icon" width="20" height="20" viewBox="0 0 20 20" fill="none"><line x1="3.5" y1="10" x2="16.5" y2="10" stroke="#282d34" stroke-width="1.5" stroke-linecap="round"/><line x1="10" y1="3.5" x2="10" y2="16.5" stroke="#282d34" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+        <div class="vol-divider"><div class="vol-divider-line"></div></div>
+        <div class="vol-right">
+          <span class="vol-right-text">Lots</span>
+          <div class="vol-right-arrow">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M5.6 6.44L8 9.28L10.4 6.44" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Volume slider -->
+    <div class="vol-slider-area">
+      <div class="vol-dots-wrap" id="volWrap">
+        <div class="vol-dots-track"></div>
+        <div class="vol-dots-fill" id="volFill"></div>
+        <div class="vol-dots-row">
+          <div class="vol-dot" data-step="0"></div>
+          <div class="vol-dot" data-step="1"></div>
+          <div class="vol-dot" data-step="2"></div>
+          <div class="vol-dot" data-step="3"></div>
+          <div class="vol-dot last" data-step="4"></div>
+        </div>
+      </div>
+      <div class="vol-labels">
+        <span>0</span>
+        <span>Max open 2.50</span>
+      </div>
+    </div>
+
+    <!-- TP/SL -->
+    <div class="tpsl-row">
+      <div class="tpsl-checkbox">
+        <div class="tpsl-checkbox-inner"></div>
+      </div>
+      <span class="tpsl-label">TP/SL</span>
+    </div>
+
+    <!-- Info rows -->
+    <div class="info-row">
+      <span class="info-key"><span class="info-key-underline">Equity</span></span>
+      <span class="info-val">500.00 USD <span class="info-plus-circle">+</span></span>
+    </div>
+    <div class="info-row">
+      <span class="info-key"><span class="info-key-underline">Free Margin</span></span>
+      <span class="info-val">500.00 USD</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">Margin Level After Trading</span>
+      <span class="info-val">18.62%</span>
+    </div>
+    <div class="info-row">
+      <span class="info-key">Leverage</span>
+      <span class="info-val">1:20,000</span>
+    </div>
+
+  </div><!-- end trade-body -->
+
+  <!-- Sell button -->
+  <div class="sell-btn-wrap">
+    <button class="btn-sell">Sell</button>
+  </div>
+
+  <!-- Position tabs -->
+  <div class="pos-tabs-wrap">
+    <div class="pos-tabs" style="padding-top:16px;">
+      <div class="pos-tab active">Positions (2)</div>
+      <div class="pos-tab">Pending Orders</div>
+      <div class="pos-tab">History</div>
+    </div>
+  </div>
+
+  <!-- Filter row -->
+  <div class="filter-row" style="padding-top:10px;padding-bottom:0;">
+    <div class="filter-cb-wrap">
+      <div class="filter-cb-box">
+        <svg viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5.6" fill="#0a36c7"/><path d="M5.5 8.2L7.2 9.9L10.5 6.1" stroke="#fff" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <span class="filter-cb-label">Hide Other Symbols</span>
+    </div>
+    <div class="close-all-text">Close All</div>
+  </div>
+
+  <!-- Position card 1: Buy BTCUSD -->
+  <div class="pos-card">
+    <div class="pos-header">
+      <div class="pos-left">
+        <div class="pos-left-top">
+          <span class="pos-badge buy">Buy</span>
+          <div class="pos-symbol-wrap">
+            <span class="pos-symbol">BTCUSD</span>
+            <img class="pos-viewchart" src="images/trade-icon-viewchart-sm.svg" alt="">
+          </div>
+        </div>
+      </div>
+      <div class="pos-right">
+        <div class="pos-pnl-wrap up">
+          <span class="pos-pnl-amount">+12,823.78</span>
+          <span class="pos-pnl-unit">USD</span>
+        </div>
+        <img class="pos-share" src="images/trade-icon-share.svg" alt="share">
+      </div>
+    </div>
+    <div class="pos-detail-row">
+      <div class="pos-detail-col">
+        <span class="pos-detail-label">Volume (Lot)</span>
+        <span class="pos-detail-value">0.01</span>
+      </div>
+      <div class="pos-detail-col">
+        <span class="pos-detail-label">Entry Price</span>
+        <span class="pos-detail-value">104,823.78</span>
+      </div>
+      <div class="pos-detail-col">
+        <span class="pos-detail-label">Current Price</span>
+        <span class="pos-detail-value">102,823.78</span>
+      </div>
+    </div>
+    <div class="pos-actions">
+      <div class="pos-reverse-btn"><img src="images/trade-icon-reverse.svg" alt=""></div>
+      <button class="pos-action-btn">TP/SL</button>
+      <button class="pos-action-btn">Partially Close</button>
+      <button class="pos-action-btn">Close</button>
+    </div>
+  </div>
+
+  <!-- Position card 2: Sell BTCUSD -->
+  <div class="pos-card">
+    <div class="pos-header">
+      <div class="pos-left">
+        <div class="pos-left-top">
+          <span class="pos-badge sell">Sell</span>
+          <div class="pos-symbol-wrap">
+            <span class="pos-symbol">BTCUSD</span>
+            <img class="pos-viewchart" src="images/trade-icon-viewchart-sm.svg" alt="">
+          </div>
+        </div>
+      </div>
+      <div class="pos-right">
+        <div class="pos-pnl-wrap down">
+          <span class="pos-pnl-amount">-12,823.78</span>
+          <span class="pos-pnl-unit">USD</span>
+        </div>
+        <img class="pos-share" src="images/trade-icon-share.svg" alt="share">
+      </div>
+    </div>
+    <div class="pos-detail-row">
+      <div class="pos-detail-col">
+        <span class="pos-detail-label">Volume (Lot)</span>
+        <span class="pos-detail-value">0.01</span>
+      </div>
+      <div class="pos-detail-col">
+        <span class="pos-detail-label">Entry Price</span>
+        <span class="pos-detail-value">104,823.78</span>
+      </div>
+      <div class="pos-detail-col">
+        <span class="pos-detail-label">Current Price</span>
+        <span class="pos-detail-value">102,823.78</span>
+      </div>
+    </div>
+    <div class="pos-tpsl-row">
+      <div class="pos-tpsl-left">
+        <span class="pos-tpsl-label">TP / SL</span>
+        <span class="pos-tpsl-values">
+          <span class="tp-val">200,000.00</span><span class="sep">  / </span><span class="sl-val">108,000.00</span>
+        </span>
+      </div>
+      <div class="pos-tpsl-actions">
+        <img src="images/trade-icon-trash.svg" alt="delete">
+        <div class="pos-tpsl-divider"></div>
+        <img src="images/trade-icon-edit.svg" alt="edit">
+      </div>
+    </div>
+    <div class="pos-actions">
+      <div class="pos-reverse-btn"><img src="images/trade-icon-reverse.svg" alt=""></div>
+      <button class="pos-action-btn">TP/SL</button>
+      <button class="pos-action-btn">Partially Close</button>
+      <button class="pos-action-btn">Close</button>
+    </div>
+  </div>
+
+  <div style="height:12px;"></div>
+
+  </div><!-- end tab-contract -->
+
+  <!-- ═══ COPY TAB CONTENT ═══ -->
+  <div class="tab-copy">
+
+    <!-- Equity section -->
+    <div class="copy-equity-section">
+      <div class="copy-equity-inner">
+        <div class="copy-equity-left">
+          <div class="copy-equity-label">
+            Equity
+            <img src="images/copy-icon-eye.svg" alt="eye">
+          </div>
+          <div class="copy-equity-amount-row">
+            <span class="copy-equity-amount">5,000,000.00</span>
+            <div class="ccy-trigger">
+              <span class="ccy-trigger-text">USD</span>
+              <svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M4 6L0 0H8Z" fill="#282d34"/></svg>
+            </div>
+          </div>
+          <div class="copy-pnl-row">
+            <span class="copy-pnl-label">Total PnL</span>
+            <span class="copy-pnl-value">+12,123,350 USD</span>
+            <span class="copy-pnl-arrow" id="copyChartToggle">
+              <svg viewBox="0 0 13 13" fill="none"><path d="M2 5L6.5 9L11 5" stroke="#b6b6b6" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </span>
+          </div>
+        </div>
+        <button class="copy-add-funds-btn">Add Funds</button>
+      </div>
+    </div>
+
+    <!-- Expandable Chart -->
+    <div class="copy-chart-wrap" id="copyChartWrap" style="display:none;">
+      <div class="copy-chart-fills" id="copyChartFills">
+        <svg class="copy-chart-fill-img" preserveAspectRatio="none" viewBox="0 0 393 167" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:167px;object-fit:fill;">
+          <path id="copyChartFillPath" d="M9.49849 25.5985L0 18.8942V167H393V78.7286L383.501 88.8679L374.597 59.6429L366.285 78.7286L358.568 82.9036L349.663 136.582L341.946 110.339L333.041 107.357L324.73 113.321L315.825 115.803L300.983 75.15L290.298 70.975L283.174 82.9036L275.456 76.9393L267.145 82.9036L258.24 101.393L249.929 91.2536L242.211 62.0286L233.307 48.9071L224.402 67.9929H216.091L208.373 42.3464L200.062 48.9071L192.938 32.8036L183.44 51.8893L174.535 44.7321L166.224 70.975L150.789 39.9607L142.477 48.9071L133.573 36.3821L125.855 32.8036L108.639 44.7321L100.921 59.6429L92.6103 51.8893L84.2991 62.0286L76.5816 51.8893L67.0831 62.0286L58.7719 15.2372L49.8671 25.05L43.3369 0L33.8384 1.82847L26.1208 15.2372L17.216 0L9.49849 25.5985Z" fill="url(#copyChartGrad)"/>
+          <defs>
+            <linearGradient id="copyChartGrad" x1="196.5" y1="-110.5" x2="196.5" y2="167" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#00B565"/>
+              <stop offset="1" stop-color="#00B565" stop-opacity="0"/>
+            </linearGradient>
+          </defs>
+        </svg>
+        <svg class="copy-chart-fill-img" preserveAspectRatio="none" viewBox="0 0 393.649 138.358" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:137px;object-fit:fill;top:13px;">
+          <path id="copyChartStrokePath" d="M0.28391 19.6851L9.7824 26.2373L17.4999 1.21992L26.4048 16.1112L34.1223 3.00688L43.6208 1.21992L50.151 26.2373L59.0558 16.1112L67.367 63.1677L76.8655 53.0417L84.583 63.1677L92.8942 53.0417L101.205 60.7851L108.923 45.8938L126.139 33.9808L133.856 37.5547L142.761 50.0634L151.072 41.1286L166.507 72.1025L174.819 45.8938L183.723 53.0417L193.222 33.9808L200.346 50.0634L208.657 43.5112L216.375 69.1243H224.686L233.591 50.0634L242.495 63.1677L250.213 92.3547L258.524 102.481L267.429 84.0156L275.74 78.0591L283.458 84.0156L290.581 72.1025L301.267 76.2721L316.109 116.776L325.014 114.394L333.325 108.437L342.23 111.416L349.947 138.22L358.852 84.0156L366.569 79.846L374.881 60.7851L383.785 89.9721L393.284 79.846" stroke="#00B565"/>
+        </svg>
+      </div>
+      <svg class="copy-chart-grid" viewBox="0 0 393 180" preserveAspectRatio="none">
+        <line x1="0" y1="20" x2="393" y2="20" stroke="#f4f5f6" stroke-width="0.5"/>
+        <line x1="0" y1="60" x2="393" y2="60" stroke="#f4f5f6" stroke-width="0.5"/>
+        <line x1="0" y1="100" x2="393" y2="100" stroke="#f4f5f6" stroke-width="0.5"/>
+        <line x1="0" y1="140" x2="393" y2="140" stroke="#f4f5f6" stroke-width="0.5"/>
+        <line x1="78.6" y1="0" x2="78.6" y2="180" stroke="#f4f5f6" stroke-width="0.5"/>
+        <line x1="156.6" y1="0" x2="156.6" y2="180" stroke="#f4f5f6" stroke-width="0.5"/>
+        <line x1="235.6" y1="0" x2="235.6" y2="180" stroke="#f4f5f6" stroke-width="0.5"/>
+        <line x1="313.6" y1="0" x2="313.6" y2="180" stroke="#f4f5f6" stroke-width="0.5"/>
+      </svg>
+      <div class="copy-chart-scrub-line" id="copyChartScrubLine"></div>
+      <div class="copy-chart-value-pill" id="copyChartPill">$46,595</div>
+      <img class="copy-chart-dot" id="copyChartDot" src="images/a5ce5622-d90b-4932-b89e-210e723c46c7.svg" alt="">
+      <div class="copy-time-tabs" id="copyTimeTabs">
+        <div class="copy-time-tab">7D</div>
+        <div class="copy-time-tab active">30D</div>
+        <div class="copy-time-tab">90D</div>
+        <div class="copy-time-tab">180D</div>
+        <div class="copy-time-tab">360D</div>
+      </div>
+    </div>
+
+    <!-- Filter pills -->
+    <div class="copy-filter-row" style="margin-top:16px;">
+      <button class="copy-pill active">Discover</button>
+      <button class="copy-pill">Community</button>
+      <button class="copy-pill">My Copy</button>
+    </div>
+
+    <!-- Top Trader -->
+    <div style="display:flex;flex-direction:column;gap:20px;margin-top:32px;">
+      <div class="copy-section-heading">
+        <span class="copy-section-title">Top Trader</span>
+        <div class="arrow-right"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><line x1="3" y1="10" x2="16" y2="10" stroke="#282d34" stroke-width="1.8" stroke-linecap="round"/><path d="M11 5.5L16.5 10L11 14.5" stroke="#282d34" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="copy-trader-scroll-wrap">
+        <div class="copy-trader-scroll">
+
+          <!-- Card 1: Matteo Masino (1st) -->
+          <div class="copy-trader-card">
+            <img class="copy-trader-card-bg" src="images/0485bc50-fc5f-49e8-9068-eb3b146111c1.svg" alt="">
+            <div class="copy-trader-divider"></div>
+            <div class="copy-trader-avatar-wrap">
+              <img class="copy-trader-avatar" src="images/toptrader1.png" alt="Matteo Masino">
+            </div>
+            <div class="copy-trader-badge gold">1st</div>
+            <div class="copy-trader-name">Matteo Masino</div>
+            <div class="copy-trader-copiers">
+              <img src="images/5b3cdfe7-d5ea-433b-b21c-19aaf782c889.svg" alt="">
+              <span>398</span>
+            </div>
+            <div class="copy-trader-return-wrap">
+              <span class="copy-trader-return-label">Return (1Y)</span>
+              <span class="copy-trader-return-value">+550.56%</span>
+            </div>
+            <div class="copy-trader-chart"><img src="images/c171a03f-dcf1-4067-b716-1624bb15d0e0.svg" alt="chart"></div>
+            <div class="copy-trader-stats">
+              <div class="copy-trader-stat">
+                <span class="copy-trader-stat-val">0.10%</span>
+                <span class="copy-trader-stat-label">Win Rate</span>
+              </div>
+              <div class="copy-trader-stat-divider"></div>
+              <div class="copy-trader-stat">
+                <div class="copy-risk-badge green">1</div>
+                <span class="copy-trader-stat-label">Risk Level</span>
+              </div>
+            </div>
+            <div class="copy-trader-view-btn">View</div>
+          </div>
+
+          <!-- Card 2: Alice Masino (2nd) -->
+          <div class="copy-trader-card">
+            <div style="position:absolute;inset:0;overflow:hidden;border-radius:8px;">
+              <div style="position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:136px;height:31px;background:radial-gradient(ellipse,rgba(85,132,250,0.15) 0%,transparent 70%);filter:blur(8px);"></div>
+              <div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:136px;height:31px;background:radial-gradient(ellipse,rgba(85,132,250,0.12) 0%,transparent 70%);filter:blur(8px);"></div>
+            </div>
+            <div class="copy-trader-divider"></div>
+            <div class="copy-trader-avatar-wrap">
+              <img class="copy-trader-avatar" src="images/toptrader2.png" alt="Alice Masino">
+            </div>
+            <div class="copy-trader-badge silver">2nd</div>
+            <div class="copy-trader-name">Alice Masino</div>
+            <div class="copy-trader-copiers">
+              <img src="images/5b3cdfe7-d5ea-433b-b21c-19aaf782c889.svg" alt="">
+              <span>198</span>
+            </div>
+            <div class="copy-trader-return-wrap">
+              <span class="copy-trader-return-label">Return (1Y)</span>
+              <span class="copy-trader-return-value">+250.56%</span>
+            </div>
+            <div class="copy-trader-chart"><img src="images/c171a03f-dcf1-4067-b716-1624bb15d0e0.svg" alt="chart"></div>
+            <div class="copy-trader-stats">
+              <div class="copy-trader-stat">
+                <span class="copy-trader-stat-val">2.00%</span>
+                <span class="copy-trader-stat-label">Win Rate</span>
+              </div>
+              <div class="copy-trader-stat-divider"></div>
+              <div class="copy-trader-stat">
+                <div class="copy-risk-badge gold">3</div>
+                <span class="copy-trader-stat-label">Risk Level</span>
+              </div>
+            </div>
+            <div class="copy-trader-view-btn">View</div>
+          </div>
+
+          <!-- Card 3 (3rd) -->
+          <div class="copy-trader-card">
+            <img class="copy-trader-card-bg" src="images/8a90fd8b-2f4a-4664-93b2-e6b552c9b569.svg" alt="">
+            <div class="copy-trader-divider"></div>
+            <div class="copy-trader-avatar-wrap">
+              <img class="copy-trader-avatar" src="images/toptrader2.png" alt="Alice Masino">
+            </div>
+            <div class="copy-trader-badge bronze">3rd</div>
+            <div class="copy-trader-name">Alice Masino</div>
+            <div class="copy-trader-copiers">
+              <img src="images/5b3cdfe7-d5ea-433b-b21c-19aaf782c889.svg" alt="">
+              <span>198</span>
+            </div>
+            <div class="copy-trader-return-wrap">
+              <span class="copy-trader-return-label">Return (30d)</span>
+              <span class="copy-trader-return-value">+250.56%</span>
+            </div>
+            <div class="copy-trader-chart"><img src="images/c171a03f-dcf1-4067-b716-1624bb15d0e0.svg" alt="chart"></div>
+            <div class="copy-trader-stats">
+              <div class="copy-trader-stat">
+                <span class="copy-trader-stat-val">2.00%</span>
+                <span class="copy-trader-stat-label">Drawdown</span>
+              </div>
+              <div class="copy-trader-stat-divider"></div>
+              <div class="copy-trader-stat">
+                <div class="copy-risk-badge gold">3</div>
+                <span class="copy-trader-stat-label">Risk Level</span>
+              </div>
+            </div>
+            <div class="copy-trader-view-btn">View</div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Most Copied By Sectors -->
+    <div style="margin-top:32px;">
+      <div class="copy-sectors-wrap">
+        <div class="copy-section-heading" style="padding:0;width:100%;">
+          <span class="copy-section-title">Most Copied By Sectors</span>
+          <div class="arrow-right"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><line x1="3" y1="10" x2="16" y2="10" stroke="#282d34" stroke-width="1.8" stroke-linecap="round"/><path d="M11 5.5L16.5 10L11 14.5" stroke="#282d34" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+        </div>
+
+        <div class="copy-sector-tabs">
+          <div class="copy-sector-tab active">High Return</div>
+          <div class="copy-sector-tab">High Copiers</div>
+          <div class="copy-sector-tab">High Win Rate</div>
+          <div class="copy-sector-tab">Best Risk</div>
+        </div>
+
+        <div class="copy-filter-bar">
+          <span class="copy-filter-bar-label">Strategy</span>
+          <div class="copy-filter-bar-right">
+            <img src="images/copy-icon-sort.svg" alt="">
+            <span class="copy-filter-bar-label">7D AUM / Return</span>
+          </div>
+        </div>
+
+        <!-- Strategy list -->
+        <div style="display:flex;flex-direction:column;gap:20px;">
+
+          <!-- Item 1 -->
+          <div class="copy-strategy-item">
+            <div class="copy-strategy-left">
+              <img class="copy-strategy-avatar" src="images/copy-avatar-list3.png" alt="">
+              <div class="copy-strategy-info">
+                <span class="copy-strategy-name">XXX Name Evnol...</span>
+                <div class="copy-strategy-meta">
+                  <div class="copy-strategy-meta-item">
+                    <span class="copy-strategy-meta-label">Copiers</span>
+                    <span class="copy-strategy-meta-value">110</span>
+                  </div>
+                  <div class="copy-strategy-divider"></div>
+                  <div class="copy-strategy-meta-item">
+                    <span class="copy-strategy-meta-label">Risk</span>
+                    <span class="copy-strategy-meta-value">2</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="copy-strategy-right">
+              <span class="copy-strategy-return">500000.00%</span>
+              <span class="copy-strategy-return-label">Return</span>
+            </div>
+          </div>
+
+          <!-- Item 2 -->
+          <div class="copy-strategy-item">
+            <div class="copy-strategy-left">
+              <img class="copy-strategy-avatar" src="images/copy-avatar-list4.png" alt="">
+              <div class="copy-strategy-info">
+                <span class="copy-strategy-name">XXXXXXXXXXXXXXXXXX</span>
+                <div class="copy-strategy-meta">
+                  <div class="copy-strategy-meta-item">
+                    <span class="copy-strategy-meta-label">Copiers</span>
+                    <span class="copy-strategy-meta-value">11</span>
+                  </div>
+                  <div class="copy-strategy-divider"></div>
+                  <div class="copy-strategy-meta-item">
+                    <span class="copy-strategy-meta-label">Risk</span>
+                    <span class="copy-strategy-meta-value">3</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="copy-strategy-right">
+              <span class="copy-strategy-return">956.90%</span>
+              <span class="copy-strategy-return-label">Return</span>
+            </div>
+          </div>
+
+          <!-- Item 3 -->
+          <div class="copy-strategy-item">
+            <div class="copy-strategy-left">
+              <img class="copy-strategy-avatar" src="images/copy-avatar-list3.png" alt="">
+              <div class="copy-strategy-info">
+                <span class="copy-strategy-name">Ela Bruno</span>
+                <div class="copy-strategy-meta">
+                  <div class="copy-strategy-meta-item">
+                    <span class="copy-strategy-meta-label">Copiers</span>
+                    <span class="copy-strategy-meta-value">5</span>
+                  </div>
+                  <div class="copy-strategy-divider"></div>
+                  <div class="copy-strategy-meta-item">
+                    <span class="copy-strategy-meta-label">Risk</span>
+                    <span class="copy-strategy-meta-value">3</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="copy-strategy-right">
+              <span class="copy-strategy-return">784.44%</span>
+              <span class="copy-strategy-return-label">Return</span>
+            </div>
+          </div>
+
+          <!-- Item 4 -->
+          <div class="copy-strategy-item">
+            <div class="copy-strategy-left">
+              <img class="copy-strategy-avatar" src="images/copy-avatar-list4.png" alt="">
+              <div class="copy-strategy-info">
+                <span class="copy-strategy-name">Fryderyka Rajmund</span>
+                <div class="copy-strategy-meta">
+                  <div class="copy-strategy-meta-item">
+                    <span class="copy-strategy-meta-label">Copiers</span>
+                    <span class="copy-strategy-meta-value">200</span>
+                  </div>
+                  <div class="copy-strategy-divider"></div>
+                  <div class="copy-strategy-meta-item">
+                    <span class="copy-strategy-meta-label">Risk</span>
+                    <span class="copy-strategy-meta-value">4</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="copy-strategy-right">
+              <span class="copy-strategy-return">775.44%</span>
+              <span class="copy-strategy-return-label">Return</span>
+            </div>
+          </div>
+
+          <!-- Item 5 -->
+          <div class="copy-strategy-item">
+            <div class="copy-strategy-left">
+              <img class="copy-strategy-avatar" src="images/copy-avatar-list3.png" alt="">
+              <div class="copy-strategy-info">
+                <span class="copy-strategy-name">Taniel Elen</span>
+                <div class="copy-strategy-meta">
+                  <div class="copy-strategy-meta-item">
+                    <span class="copy-strategy-meta-label">Copiers</span>
+                    <span class="copy-strategy-meta-value">4</span>
+                  </div>
+                  <div class="copy-strategy-divider"></div>
+                  <div class="copy-strategy-meta-item">
+                    <span class="copy-strategy-meta-label">Risk</span>
+                    <span class="copy-strategy-meta-value">1</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="copy-strategy-right">
+              <span class="copy-strategy-return">690.90%</span>
+              <span class="copy-strategy-return-label">Return</span>
+            </div>
+          </div>
+
+          <div class="copy-view-more">View More</div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- Signal Provider banner -->
+    <div style="margin-top:32px;">
+      <div class="copy-signal-banner">
+        <div class="copy-signal-left">
+          <span class="copy-signal-title">Apply to Become a Signal Provider</span>
+          <div class="copy-signal-link">
+            <span class="copy-signal-link-text">Apply Now</span>
+            <img src="images/copy-icon-arrow-right.svg" alt="">
+          </div>
+        </div>
+        <img class="copy-signal-person" src="images/copy-person2.png" alt="">
+      </div>
+    </div>
+
+    <!-- Starter Guide -->
+    <div style="display:flex;flex-direction:column;gap:20px;margin-top:20px;">
+      <div class="copy-section-heading">
+        <span class="copy-section-title">Starter Guide</span>
+        <div class="arrow-right"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><line x1="3" y1="10" x2="16" y2="10" stroke="#282d34" stroke-width="1.8" stroke-linecap="round"/><path d="M11 5.5L16.5 10L11 14.5" stroke="#282d34" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div>
+      <div class="copy-guide-scroll-wrap">
+        <div class="copy-guide-scroll">
+          <div class="copy-guide-card">
+            <div class="copy-guide-icon"><img src="images/copy-guide1.png" alt=""></div>
+            <span class="copy-guide-title">Copy Trading Glossary</span>
+          </div>
+          <div class="copy-guide-card">
+            <div class="copy-guide-icon"><img src="images/copy-guide2.png" alt=""></div>
+            <span class="copy-guide-title">FAQs</span>
+          </div>
+          <div class="copy-guide-card">
+            <div class="copy-guide-icon"><img src="images/copy-guide2.png" alt=""></div>
+            <span class="copy-guide-title">FAQs</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div style="height:24px;"></div>
+
+  </div><!-- end tab-copy -->
+
+</div><!-- end page-scroll -->
+
+<script src="top-nav.js"></script>
+<script>
+  TopNav.init({
+    centerText: 'Copy Trading 12345678',
+    centerIconSrc: 'images/trade-icon-switch.svg',
+    rightIcons: [
+      { src: 'images/trade-icon-settings.svg', alt: 'settings' },
+      { src: 'images/trade-icon-notification.svg', alt: 'notification' }
+    ]
+  });
+</script>
+<script src="bottom-nav.js"></script>
+<script>
+  BottomNav.init('trade');
+
+  // Order type pill toggle
+  (function() {
+    var priceArea = document.getElementById('priceInputArea');
+    var stopBox = document.getElementById('stopPriceBox');
+    var limitBox = document.getElementById('limitPriceBox');
+    var distRow = document.getElementById('distanceRow');
+
+    function updateInputs(type) {
+      switch (type) {
+        case 'Market':
+          priceArea.style.display = 'none';
+          break;
+        case 'Limit':
+          priceArea.style.display = '';
+          stopBox.style.display = 'none';
+          limitBox.style.display = '';
+          distRow.style.display = '';
+          break;
+        case 'Stop':
+          priceArea.style.display = '';
+          stopBox.style.display = '';
+          limitBox.style.display = 'none';
+          distRow.style.display = '';
+          break;
+        case 'Stop Limit':
+          priceArea.style.display = '';
+          stopBox.style.display = '';
+          limitBox.style.display = '';
+          distRow.style.display = '';
+          break;
+      }
+    }
+
+    document.querySelectorAll('.order-pill').forEach(function(pill) {
+      pill.addEventListener('click', function() {
+        document.querySelectorAll('.order-pill').forEach(function(p) { p.classList.remove('active'); });
+        pill.classList.add('active');
+        updateInputs(pill.textContent.trim());
+      });
+    });
+  })();
+
+  // Volume dots slider
+  (function() {
+    var wrap = document.getElementById('volWrap');
+    var fill = document.getElementById('volFill');
+    var dots = wrap.querySelectorAll('.vol-dot');
+    var volValue = document.getElementById('volValue');
+    var totalSteps = dots.length - 1; // 0-4
+    var currentStep = totalSteps; // start at max
+    var stepValues = ['0.00', '0.63', '1.25', '1.88', '2.50'];
+
+    function setStep(step) {
+      currentStep = Math.max(0, Math.min(totalSteps, step));
+      /* Update volume input */
+      if (volValue) volValue.textContent = stepValues[currentStep];
+      /* Position the big dot at currentStep, update fill width */
+      var pct = currentStep / totalSteps * 100;
+      fill.style.width = pct + '%';
+      /* Move big dot: remove .last from all, add to current step */
+      dots.forEach(function(d, i) {
+        d.classList.remove('last', 'inactive');
+        d.style.width = ''; d.style.height = '';
+        if (i > currentStep) d.classList.add('inactive');
+      });
+      dots[currentStep].classList.add('last');
+      dots[currentStep].style.width = '14px';
+      dots[currentStep].style.height = '14px';
+    }
+
+    /* Click on any dot to snap */
+    dots.forEach(function(dot) {
+      dot.addEventListener('click', function(e) {
+        e.stopPropagation();
+        setStep(parseInt(dot.dataset.step));
+      });
+    });
+
+    /* Click on track to snap to nearest step */
+    wrap.addEventListener('click', function(e) {
+      var rect = wrap.getBoundingClientRect();
+      var x = e.clientX - rect.left;
+      var step = Math.round(x / rect.width * totalSteps);
+      setStep(step);
+    });
+
+    /* Drag the big dot */
+    var dragging = false;
+    function onDown(e) {
+      if (!e.target.classList.contains('last')) return;
+      dragging = true;
+      e.preventDefault();
+    }
+    function onMove(e) {
+      if (!dragging) return;
+      var rect = wrap.getBoundingClientRect();
+      var clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      var x = clientX - rect.left;
+      var step = Math.round(x / rect.width * totalSteps);
+      setStep(step);
+    }
+    function onUp() { dragging = false; }
+    wrap.addEventListener('pointerdown', onDown);
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp);
+
+    setStep(totalSteps); // init at max
+  })();
+
+  // Position tab toggle
+  document.querySelectorAll('.pos-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.pos-tab').forEach(function(t) { t.classList.remove('active'); });
+      tab.classList.add('active');
+    });
+  });
+
+  // Page title tab toggle (Contract / Copy)
+  document.querySelectorAll('.pt-tab').forEach(function(tab, idx) {
+    tab.addEventListener('click', function() {
+      // Move active class and dot
+      document.querySelectorAll('.pt-tab').forEach(function(t) {
+        t.classList.remove('active');
+        var dot = t.querySelector('.pt-dot');
+        if (dot) dot.remove();
+      });
+      tab.classList.add('active');
+      var dot = document.createElement('span');
+      dot.className = 'pt-dot';
+      tab.appendChild(dot);
+      // Toggle content
+      var contractEl = document.querySelector('.tab-contract');
+      var copyEl = document.querySelector('.tab-copy');
+      if (idx === 0) {
+        contractEl.style.display = 'block';
+        copyEl.style.display = 'none';
+      } else {
+        contractEl.style.display = 'none';
+        copyEl.style.display = 'block';
+      }
+    });
+  });
+
+  // Copy filter pill toggle
+  document.querySelectorAll('.copy-pill').forEach(function(pill) {
+    pill.addEventListener('click', function() {
+      document.querySelectorAll('.copy-pill').forEach(function(p) { p.classList.remove('active'); });
+      pill.classList.add('active');
+    });
+  });
+
+  // Copy sector tab toggle
+  document.querySelectorAll('.copy-sector-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.copy-sector-tab').forEach(function(t) { t.classList.remove('active'); });
+      tab.classList.add('active');
+    });
+  });
+
+  // ── Copy Chart Toggle + Interactive Chart ──
+  (function() {
+    var toggleBtn = document.getElementById('copyChartToggle');
+    var chartWrap = document.getElementById('copyChartWrap');
+    var collapsed = true;
+
+    toggleBtn.addEventListener('click', function() {
+      collapsed = !collapsed;
+      chartWrap.style.display = collapsed ? 'none' : '';
+      toggleBtn.style.transform = collapsed ? '' : 'rotate(180deg)';
+    });
+
+    var XS = [0.284,9.782,17.5,26.405,34.122,43.621,50.151,59.056,67.367,76.866,84.583,92.894,101.205,108.923,126.139,133.856,142.761,151.072,166.507,174.819,183.723,193.222,200.346,208.657,216.375,224.686,233.591,242.495,250.213,258.524,267.429,275.74,283.458,290.581,301.267,316.109,325.014,333.325,342.23,349.947,358.852,366.569,374.881,383.785,393.284];
+
+    var STROKE_Y = {
+      '7D':  [65,68,62,70,58,64,72,60,78,74,82,70,66,72,80,68,74,84,70,76,82,72,68,80,72,76,70,66,78,85,74,70,68,76,72,80,74,68,72,84,76,70,74,78,80],
+      '30D': [19.685,26.237,1.22,16.111,3.007,1.22,26.237,16.111,63.168,53.042,63.168,53.042,60.785,45.894,33.981,37.555,50.063,41.129,72.103,45.894,53.042,33.981,50.063,43.511,69.124,69.124,50.063,63.168,92.355,102.481,84.016,78.059,84.016,72.103,76.272,116.776,114.394,108.437,111.416,138.22,84.016,79.846,60.785,89.972,79.846],
+      '90D': [118,122,112,120,115,108,118,110,104,98,108,102,95,88,82,90,96,85,78,82,70,75,68,62,72,78,65,58,52,68,72,60,55,48,56,92,88,80,75,105,72,68,58,82,80],
+      '180D':[130,134,125,130,128,122,132,120,115,108,118,110,102,95,88,96,104,92,85,78,68,72,62,55,65,70,58,50,45,62,68,55,48,42,52,85,78,72,65,98,68,62,52,78,80],
+      '360D':[135,132,138,135,130,128,136,125,118,112,122,115,105,98,92,100,108,95,88,80,72,65,58,48,60,65,52,45,38,58,65,48,42,35,48,82,75,68,60,95,65,58,48,72,80]
+    };
+
+    var VALUES = {
+      '7D':  [45800,45600,46200,45300,46800,46000,45200,46500,44500,44900,43800,45200,45700,45000,44000,45400,44800,43500,45200,44400,43800,45000,45400,44000,45000,44600,45200,45700,44500,43200,44800,45200,45400,44600,45000,44000,44800,45400,45000,43500,44600,45200,44800,44500,44200],
+      '30D': [48200,47600,49800,48500,49500,49800,47600,48500,44000,45200,44000,45200,44500,46200,47200,46800,45600,46500,43200,46200,45200,47200,45600,46400,43500,43500,45600,44000,41500,40200,42500,43200,42500,43500,43000,38000,38400,39200,39000,36000,42500,42800,44500,41800,42800],
+      '90D': [38000,37500,39000,38200,38600,39500,38000,39200,40000,40800,39500,40200,41200,42200,43200,42500,40800,42000,43200,43200,44200,43800,44500,46000,43500,43200,44800,45800,47000,44500,43500,45500,46500,47800,46800,41500,42200,43200,43800,40200,43500,44500,45800,43200,43200],
+      '180D':[35000,34500,36200,35000,35500,36500,34800,36200,37200,38500,37000,38200,39800,41200,42200,40800,39500,41000,42000,43200,44500,43500,45500,46500,44800,44200,45800,47000,48200,45500,44500,46500,47800,49000,47000,42000,43200,43500,44800,40800,44500,45500,47000,43200,43200],
+      '360D':[34000,34800,33500,34000,35000,35500,33800,36200,37500,39000,37200,38600,40500,41800,42800,41000,39500,41200,42200,43200,44500,44800,45800,47800,45500,44800,47000,48200,49800,45800,44800,47800,49000,50500,47800,42800,43800,44500,45500,41200,44800,45800,47800,43500,43200]
+    };
+
+    function buildStrokeD(ys) {
+      var d = 'M' + XS[0] + ' ' + ys[0];
+      for (var i = 1; i < XS.length; i++) d += 'L' + XS[i] + ' ' + ys[i];
+      return d;
+    }
+
+    function buildFillD(ys) {
+      var d = 'M' + XS[0] + ' ' + ys[0];
+      for (var i = 1; i < XS.length; i++) d += 'L' + XS[i] + ' ' + ys[i];
+      d += 'L' + XS[XS.length - 1] + ' 167L' + XS[0] + ' 167Z';
+      return d;
+    }
+
+    var fillPath   = document.getElementById('copyChartFillPath');
+    var strokePath = document.getElementById('copyChartStrokePath');
+    var chartDot   = document.getElementById('copyChartDot');
+    var chartPill  = document.getElementById('copyChartPill');
+    var scrubLine  = document.getElementById('copyChartScrubLine');
+    var fills      = document.getElementById('copyChartFills');
+    var timeTabs   = document.querySelectorAll('.copy-time-tab');
+    var curPeriod  = '30D';
+
+    function switchPeriod(p) {
+      curPeriod = p;
+      fills.style.opacity = '0';
+      setTimeout(function() {
+        var ys = STROKE_Y[p];
+        strokePath.setAttribute('d', buildStrokeD(ys));
+        fillPath.setAttribute('d', buildFillD(ys));
+        var midIdx = Math.floor(ys.length / 2);
+        var dotY = ys[midIdx] + 13 - 7.5;
+        chartDot.style.top = dotY + 'px';
+        chartDot.style.left = (XS[midIdx] - 7.5) + 'px';
+        chartPill.style.left = (XS[midIdx] - 25) + 'px';
+        chartPill.style.top = (ys[midIdx] + 13 - 25) + 'px';
+        chartPill.textContent = '$' + VALUES[p][midIdx].toLocaleString();
+        fills.style.opacity = '1';
+      }, 200);
+    }
+
+    timeTabs.forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        timeTabs.forEach(function(t) { t.classList.remove('active'); });
+        tab.classList.add('active');
+        switchPeriod(tab.textContent);
+      });
+    });
+
+    // Drag scrubbing
+    function lerp(ys, x) {
+      for (var i = 0; i < XS.length - 1; i++) {
+        if (x >= XS[i] && x <= XS[i + 1]) {
+          var t = (x - XS[i]) / (XS[i + 1] - XS[i]);
+          var y = ys[i] + t * (ys[i + 1] - ys[i]);
+          var vi = VALUES[curPeriod][i] + t * (VALUES[curPeriod][i + 1] - VALUES[curPeriod][i]);
+          return { y: y, val: Math.round(vi) };
+        }
+      }
+      var last = XS.length - 1;
+      return { y: ys[last], val: VALUES[curPeriod][last] };
+    }
+
+    function onScrub(clientX) {
+      var rect = chartWrap.getBoundingClientRect();
+      var x = Math.max(0, Math.min(393, clientX - rect.left));
+      var res = lerp(STROKE_Y[curPeriod], x);
+      var dotY = res.y + 13 - 7.5;
+      chartDot.style.left = (x - 7.5) + 'px';
+      chartDot.style.top = dotY + 'px';
+      chartPill.style.left = (x - 25) + 'px';
+      chartPill.style.top = (res.y + 13 - 25) + 'px';
+      chartPill.textContent = '$' + res.val.toLocaleString();
+      scrubLine.style.left = x + 'px';
+      scrubLine.style.display = 'block';
+    }
+
+    var dragging = false;
+    chartWrap.addEventListener('pointerdown', function(e) {
+      if (e.target.closest('.copy-time-tabs')) return;
+      dragging = true;
+      chartWrap.classList.add('dragging');
+      chartWrap.setPointerCapture(e.pointerId);
+      onScrub(e.clientX);
+    });
+    chartWrap.addEventListener('pointermove', function(e) {
+      if (dragging) onScrub(e.clientX);
+    });
+    chartWrap.addEventListener('pointerup', function() {
+      dragging = false;
+      chartWrap.classList.remove('dragging');
+      scrubLine.style.display = 'none';
+    });
+    chartWrap.addEventListener('pointercancel', function() {
+      dragging = false;
+      chartWrap.classList.remove('dragging');
+      scrubLine.style.display = 'none';
+    });
+  })();
+</script>
+<script>
+  /* ── Expand icon toggle ── */
+  (function() {
+    var expandIcon = document.getElementById('expandIcon');
+    var pageScroll = document.querySelector('.page-scroll');
+    var productRow = document.querySelector('.product-row');
+    var tradeBody = document.querySelector('.trade-body');
+    var tabContract = document.querySelector('.tab-contract');
+    var expanded = false;
+
+    /* Create spacer to replace product-row height when it becomes fixed */
+    var spacer = document.createElement('div');
+    spacer.className = 'product-row-spacer';
+    spacer.style.display = 'none';
+
+    expandIcon.addEventListener('click', function() {
+      expanded = !expanded;
+      expandIcon.style.transform = expanded ? 'rotate(180deg)' : '';
+      if (expanded) {
+        /* Insert spacer where product-row was, then move product-row to tab-contract */
+        tradeBody.insertBefore(spacer, tradeBody.firstChild);
+        tabContract.insertBefore(productRow, tradeBody);
+        spacer.style.display = 'block';
+        pageScroll.classList.add('expanded');
+        requestAnimationFrame(function() {
+          var posTabsWrap = document.querySelector('.pos-tabs-wrap');
+          if (posTabsWrap) {
+            /* product-row is fixed at top:154, height 32, so sticky bottom = 186 */
+            var stickyBottom = 186;
+            var posTop = posTabsWrap.getBoundingClientRect().top + window.scrollY;
+            window.scrollTo({ top: posTop - stickyBottom, behavior: 'smooth' });
+          }
+        });
+      } else {
+        /* Move product-row back, remove spacer */
+        tradeBody.insertBefore(productRow, spacer);
+        spacer.style.display = 'none';
+        if (spacer.parentNode) spacer.parentNode.removeChild(spacer);
+        pageScroll.classList.remove('expanded');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    });
+  })();
+
+  /* ── Mini chart toggle (first chart icon) ── */
+  (function() {
+    var chartIcon = document.getElementById('chartIcon');
+    var panel = document.getElementById('miniChartPanel');
+    var lineEl = document.getElementById('miniChartLine');
+    var areaEl = document.getElementById('miniChartArea');
+    var priceEl = document.getElementById('miniChartPrice');
+    var pctEl = document.getElementById('miniChartPct');
+    if (!chartIcon || !panel) return;
+    var open = false;
+
+    function buildPath() {
+      var pts = 40;
+      var W = 320, H = 120;
+      var values = [];
+      var v = 50 + Math.random() * 30;
+      for (var i = 0; i < pts; i++) {
+        v += (Math.random() - 0.45) * 8;
+        v = Math.max(15, Math.min(105, v));
+        values.push(v);
+      }
+      var min = Math.min.apply(null, values);
+      var max = Math.max.apply(null, values);
+      var range = Math.max(1, max - min);
+      var d = '', dArea = '';
+      values.forEach(function(val, i) {
+        var x = (i / (pts - 1)) * W;
+        var y = H - 8 - ((val - min) / range) * (H - 16);
+        d += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1);
+        dArea += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1);
+      });
+      dArea += 'L' + W + ' ' + H + 'L0 ' + H + 'Z';
+      lineEl.setAttribute('d', d);
+      areaEl.setAttribute('d', dArea);
+      // Trend coloring based on first vs last value
+      var isUp = values[values.length - 1] >= values[0];
+      var color = isUp ? '#00b565' : '#ff2c40';
+      lineEl.setAttribute('stroke', color);
+      // Update gradient fill stop colors
+      var stops = panel.querySelectorAll('#miniChartFill stop');
+      if (stops.length) {
+        stops[0].setAttribute('stop-color', color);
+        stops[1].setAttribute('stop-color', color);
+      }
+      // Update price/pct (mocked)
+      var basePrice = 82302;
+      var newPrice = basePrice * (1 + (values[values.length - 1] - values[0]) / 1000);
+      priceEl.textContent = newPrice.toFixed(2).replace(/\B(?=(\d{3})+\.)/g, ',');
+      var pct = ((values[values.length - 1] - values[0]) / values[0]) * 100;
+      pctEl.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%';
+      pctEl.style.color = color;
+      pctEl.style.background = isUp ? 'rgba(0,181,101,0.08)' : 'rgba(255,44,64,0.08)';
+    }
+
+    chartIcon.addEventListener('click', function() {
+      open = !open;
+      if (open) {
+        buildPath();
+        panel.classList.add('open');
+        chartIcon.style.opacity = '0.6';
+      } else {
+        panel.classList.remove('open');
+        chartIcon.style.opacity = '';
+      }
+    });
+
+    // Timeframe button toggling — regenerates a new chart
+    panel.querySelectorAll('.mini-chart-tf button').forEach(function(b) {
+      b.addEventListener('click', function() {
+        panel.querySelectorAll('.mini-chart-tf button').forEach(function(x) { x.classList.remove('on'); });
+        b.classList.add('on');
+        buildPath();
+      });
+    });
+  })();
+</script>
+
+<!-- ── Dynamic price-block + slider-bar ── -->
+<script>
+(function() {
+  var SPREAD = 15;
+  var mid = 82302;
+  var BASE = mid;
+
+  var sellEl   = document.getElementById('sellPrice');
+  var buyEl    = document.getElementById('buyPrice');
+  var spreadEl = document.querySelector('.price-spread');
+  var miniEl   = document.getElementById('miniChartPrice');
+  var greenBar = document.getElementById('sliderGreen');
+  var indText  = document.getElementById('sliderIndicatorText');
+
+  function fmt(n) {
+    return n.toLocaleString('en-US');
+  }
+
+  function flash(el, cls) {
+    el.classList.remove('flash-up', 'flash-down');
+    void el.offsetWidth; // reflow
+    el.classList.add(cls);
+    setTimeout(function() { el.classList.remove(cls); }, 400);
+  }
+
+  function tick() {
+    var prev = mid;
+    // random walk ±0 to ±25
+    mid = Math.round(mid + (Math.random() - 0.495) * 40);
+    mid = Math.max(81500, Math.min(83000, mid));
+
+    var sell = mid;
+    var buy  = mid + SPREAD;
+    var up   = mid >= prev;
+
+    sellEl.textContent = fmt(sell);
+    buyEl.textContent  = fmt(buy);
+    if (miniEl) miniEl.textContent = fmt(sell) + '.00';
+
+    flash(sellEl, up ? 'flash-up' : 'flash-down');
+    flash(buyEl,  up ? 'flash-up' : 'flash-down');
+
+    // Slider: green% drifts between 30-75 based on price momentum
+    var greenPct = Math.min(75, Math.max(30, 52 + (mid - BASE) / 10));
+    greenBar.style.width = greenPct.toFixed(1) + '%';
+
+    // Indicator: cumulative change from base
+    var delta = mid - BASE;
+    indText.textContent = (delta >= 0 ? '+' : '') + delta;
+
+    setTimeout(tick, 900 + Math.random() * 700);
+  }
+
+  tick();
+})();
+</script>
+
+<!-- ── Currency bottom sheet ── -->
+<script>
+(function() {
+  var currencies = [
+    { code: 'USD', name: 'US Dollar',          flag: 'us' },
+    { code: 'GBP', name: 'British Pound',      flag: 'gb' },
+    { code: 'CAD', name: 'Canadian Dollar',    flag: 'ca' },
+    { code: 'AUD', name: 'Australian Dollar',  flag: 'au' },
+    { code: 'EUR', name: 'Euro',               flag: 'eu' },
+    { code: 'SGD', name: 'Singapore Dollar',   flag: 'sg' },
+    { code: 'NZD', name: 'New Zealand Dollar', flag: 'nz' },
+    { code: 'HKD', name: 'Hong Kong Dollar',   flag: 'hk' },
+    { code: 'JPY', name: 'Japanese Yen',       flag: 'jp' },
+    { code: 'PLN', name: 'Polish Złoty',       flag: 'pl' },
+    { code: 'AED', name: 'UAE Dirham',         flag: 'ae' },
+    { code: 'INR', name: 'Indian Rupee',       flag: 'in' },
+  ];
+  var selected = 'USD';
+
+  var s = document.createElement('style');
+  s.textContent =
+    '#ccyOverlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9000;opacity:0;transition:opacity .28s;display:none;}' +
+    '#ccyOverlay.open{opacity:1;}' +
+    '#ccySheet{position:fixed;bottom:0;left:0;width:393px;max-width:100vw;background:#fff;border-radius:16px 16px 0 0;z-index:9001;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,1,.36,1);display:none;}' +
+    '#ccySheet.open{transform:translateY(0);}' +
+    '.ccy-item{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;cursor:pointer;}' +
+    '.ccy-item:active{background:#f4f5f6;}' +
+    '.ccy-left{display:flex;align-items:center;gap:12px;}' +
+    '.ccy-flag{width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;}' +
+    '.ccy-code{font-size:14px;font-weight:600;color:#1a1a1e;line-height:1.2;}' +
+    '.ccy-name{font-size:12px;font-weight:400;color:#7a8699;line-height:1.4;}' +
+    '.ccy-check{width:20px;height:20px;flex-shrink:0;}';
+  document.head.appendChild(s);
+
+  var overlay = document.createElement('div');
+  overlay.id = 'ccyOverlay';
+
+  var sheet = document.createElement('div');
+  sheet.id = 'ccySheet';
+  sheet.innerHTML =
+    '<div style="display:flex;justify-content:center;padding:10px 0 0;">' +
+      '<div style="width:36px;height:4px;border-radius:2px;background:#e0e3e8;"></div>' +
+    '</div>' +
+    '<div style="padding:14px 20px 10px;">' +
+      '<span style="font-size:16px;font-weight:600;color:#1a1a1e;">Select Currency</span>' +
+    '</div>' +
+    '<div id="ccyList" style="overflow-y:auto;max-height:58vh;padding-bottom:28px;"></div>';
+
+  document.body.appendChild(overlay);
+  document.body.appendChild(sheet);
+
+  function buildList() {
+    var list = document.getElementById('ccyList');
+    list.innerHTML = currencies.map(function(c) {
+      var checked = c.code === selected;
+      return '<div class="ccy-item" data-code="' + c.code + '">' +
+        '<div class="ccy-left">' +
+          '<img class="ccy-flag" src="https://flagcdn.com/w40/' + c.flag + '.png" alt="' + c.code + '">' +
+          '<div><div class="ccy-code">' + c.code + '</div><div class="ccy-name">' + c.name + '</div></div>' +
+        '</div>' +
+        (checked
+          ? '<svg class="ccy-check" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" fill="#0a36c7"/><path d="M6 10l3 3 5-5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+          : '<div class="ccy-check"></div>') +
+        '</div>';
+    }).join('');
+    list.querySelectorAll('.ccy-item').forEach(function(item) {
+      item.addEventListener('click', function() {
+        selected = item.dataset.code;
+        updateTriggers();
+        closeSheet();
+      });
+    });
+  }
+
+  function updateTriggers() {
+    document.querySelectorAll('.ccy-trigger-text').forEach(function(el) { el.textContent = selected; });
+  }
+
+  function openSheet() {
+    buildList();
+    overlay.style.display = 'block';
+    sheet.style.display = 'block';
+    requestAnimationFrame(function() { requestAnimationFrame(function() {
+      overlay.classList.add('open');
+      sheet.classList.add('open');
+    }); });
+  }
+
+  function closeSheet() {
+    overlay.classList.remove('open');
+    sheet.classList.remove('open');
+    setTimeout(function() {
+      overlay.style.display = 'none';
+      sheet.style.display = 'none';
+    }, 300);
+  }
+
+  overlay.addEventListener('click', closeSheet);
+
+  document.querySelectorAll('.ccy-trigger').forEach(function(el) {
+    el.addEventListener('click', openSheet);
+  });
+})();
+</script>
+</body>
+</html>

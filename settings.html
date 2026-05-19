@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=393, initial-scale=1">
+  <title>Settings – VT Markets</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="components.css">
+  <style>
+    body {
+    }
+
+    /* ── Tabs ── */
+    .settings-tabs {
+      width: 393px;
+      padding: 12px 20px 0;
+      border-bottom: 1px solid #f4f5f6;
+      display: flex;
+      gap: 20px;
+    }
+    .settings-tab {
+      padding-bottom: 12px;
+      font-size: 14px;
+      font-weight: 400;
+      color: #7a8699;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .settings-tab.active {
+      font-weight: 600;
+      color: #0a36c7;
+      border-bottom: 2px solid #0a36c7;
+    }
+
+    /* ── Setting rows ── */
+    .settings-list {
+      width: 393px;
+    }
+    .setting-row {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      border-bottom: 0.5px solid #e8e9ea;
+    }
+    .setting-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #7a8699;
+      line-height: 22px;
+    }
+    .setting-value {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .setting-value-text {
+      font-size: 16px;
+      font-weight: 500;
+      color: #282d34;
+      line-height: 22px;
+    }
+    .setting-arrow {
+      width: 10px;
+      height: 10px;
+    }
+    .setting-value img {
+      width: 16px;
+      height: 16px;
+    }
+
+    /* ── Toggle switch ── */
+    .toggle {
+      width: 50px;
+      height: 30px;
+      background: #34c759;
+      border-radius: 15px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .toggle.off { background: #e8e9ea; }
+    .toggle .knob {
+      width: 26px;
+      height: 26px;
+      background: #fff;
+      border-radius: 13px;
+      position: absolute;
+      top: 2px;
+      left: 22px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+      transition: left 0.2s;
+    }
+    .toggle.off .knob { left: 2px; }
+
+    /* ── Bottom section ── */
+    .settings-bottom {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 393px;
+      background: #fff;
+      padding: 16px 20px 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+      z-index: 10;
+    }
+    .btn-logout {
+      width: 100%;
+      height: 48px;
+      background: #0a36c7;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-logout:active { opacity: 0.85; }
+    .btn-delete {
+      font-size: 14px;
+      font-weight: 500;
+      color: #282d34;
+      text-decoration: underline;
+      cursor: pointer;
+      background: none;
+      border: none;
+      line-height: 22px;
+    }
+
+    /* ── Home indicator ── */
+    .home-indicator {
+      width: 393px;
+      height: 21px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 8px;
+    }
+    .home-bar {
+      width: 139px;
+      height: 5px;
+      background: rgba(30,30,30,0.3);
+      border-radius: 100px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Tabs -->
+  <div class="settings-tabs">
+    <div class="settings-tab active">Settings</div>
+    <div class="settings-tab">Profile</div>
+  </div>
+
+  <!-- Settings rows -->
+  <div class="settings-list">
+    <div class="setting-row">
+      <span class="setting-label">Language</span>
+      <div class="setting-value">
+        <span class="setting-value-text">English</span>
+        <svg class="setting-arrow" viewBox="0 0 10 10" fill="none"><path d="M3.5 2L7 5L3.5 8" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+    <div class="setting-row">
+      <span class="setting-label">Theme</span>
+      <div class="setting-value">
+        <span class="setting-value-text">Dark Theme</span>
+        <svg class="setting-arrow" viewBox="0 0 10 10" fill="none"><path d="M3.5 2L7 5L3.5 8" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+    <div class="setting-row">
+      <span class="setting-label">Screenshot Share Popup</span>
+      <div class="toggle" id="toggleScreenshot">
+        <div class="knob"></div>
+      </div>
+    </div>
+    <div class="setting-row">
+      <span class="setting-label">Colour Preference</span>
+      <div class="setting-value">
+        <img src="images/settings-colour-pref.svg" alt="">
+        <svg class="setting-arrow" viewBox="0 0 10 10" fill="none"><path d="M3.5 2L7 5L3.5 8" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+    <div class="setting-row">
+      <span class="setting-label">Account Activity</span>
+      <div class="setting-value">
+        <svg class="setting-arrow" viewBox="0 0 10 10" fill="none"><path d="M3.5 2L7 5L3.5 8" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+    <div class="setting-row">
+      <span class="setting-label">Clear Cache</span>
+      <span class="setting-value-text">0.4M</span>
+    </div>
+    <div class="setting-row">
+      <span class="setting-label">Version</span>
+      <span class="setting-value-text">V5.10.0</span>
+    </div>
+  </div>
+
+  <!-- Bottom actions -->
+  <div class="settings-bottom">
+    <button class="btn-logout" onclick="location.href='index.html'">Log Out</button>
+    <button class="btn-delete">Delete Account</button>
+    <div class="home-indicator">
+      <div class="home-bar"></div>
+    </div>
+  </div>
+
+  <script>
+    document.getElementById('toggleScreenshot').addEventListener('click', function() {
+      this.classList.toggle('off');
+    });
+  </script>
+  <script src="top-nav.js"></script>
+  <script>TopNav.init({
+    showTitle: true,
+    titleText: 'Settings',
+    centerTitle: true,
+    hideRight: true
+  });</script>
+</body>
+</html>

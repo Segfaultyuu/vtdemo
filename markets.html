@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=393, initial-scale=1">
+  <title>Markets – VT Markets</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="components.css">
+  <style>
+    .page-scroll { padding-bottom: 85px; }
+
+    /* ── Sticky header ── */
+    .tn-status-bar { position: sticky !important; top: 0; z-index: 20; background: #fff; }
+    .tn-nav-bar { position: sticky !important; top: 54px; z-index: 20; background: #fff; }
+    .page-title-row { position: sticky; top: 98px; z-index: 20; background: #fff; padding-bottom: 0; }
+    .filter-pills { position: sticky; top: 142px; z-index: 20; background: #fff; padding-bottom: 12px; }
+
+    /* ── Page title row ── */
+    .page-title-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px 0;
+    }
+    .page-title-tabs { display: flex; align-items: center; gap: 16px; }
+    .page-title-tab {
+      font-size: 20px; font-weight: 600; line-height: 28px;
+      color: #7a8699; cursor: pointer; position: relative;
+    }
+    .page-title-tab.active { color: #0a36c7; }
+    .page-title-dot {
+      display: none;
+      position: absolute; top: 3px; right: -8px;
+      width: 4px; height: 4px; border-radius: 50%; background: #0a36c7;
+    }
+    .page-title-tab.active .page-title-dot { display: block; }
+    .page-title-actions { display: flex; gap: 16px; align-items: center; }
+    .page-title-actions svg { cursor: pointer; }
+
+    /* ── Filter pills (override padding) ── */
+    .filter-pills { padding: 12px 20px 12px; }
+
+    /* ── Section header ── */
+    .section-hd {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 20px 20px 0;
+    }
+    .section-hd-title { font-size: 18px; font-weight: 600; color: #1a1a1e; }
+
+    /* ── Spotlight ── */
+    .spotlight-wrap {
+      display: flex; gap: 16px; padding: 12px 20px 0; align-items: center;
+    }
+    .spotlight-main {
+      width: 210px; height: 166px; background: #f9f9f9;
+      border-radius: 8px; position: relative; flex-shrink: 0; overflow: hidden;
+    }
+    .spotlight-coin-icon {
+      position: absolute; left: 20px; top: 24px;
+      width: 48px; height: 48px;
+    }
+    .spotlight-symbol {
+      position: absolute; left: 80px; top: 24px;
+      font-size: 20px; font-weight: 600; color: #282d34; white-space: nowrap;
+    }
+    .spotlight-name {
+      position: absolute; left: 80px; top: 52px;
+      font-size: 12px; font-weight: 500; color: #7a8699;
+    }
+    .spotlight-price {
+      position: absolute; left: 20px; top: 88px;
+      font-size: 18px; font-weight: 600; color: #282d34;
+      display: flex; align-items: baseline; gap: 1px;
+    }
+    .spotlight-price .decimal { font-size: 14px; color: #7a8699; }
+    .spotlight-badge {
+      position: absolute; left: 20px; top: 121px;
+      display: flex; align-items: center; gap: 4px;
+      background: #42da96; border-radius: 4px;
+      padding: 2px 8px;
+      box-shadow: 0 8px 12px rgba(0,181,101,0.2);
+    }
+    .spotlight-badge span { font-size: 12px; font-weight: 500; color: #fff; }
+    .spotlight-side { display: flex; flex-direction: column; gap: 16px; }
+    .mini-card {
+      width: 127px; background: #f9f9f9; border-radius: 8px;
+      padding: 12px; display: flex; flex-direction: column; gap: 8px;
+    }
+    .mini-card-name { display: flex; align-items: center; gap: 8px; }
+    .mini-coin { width: 24px; height: 24px; border-radius: 10px; flex-shrink: 0; }
+    .mini-symbol { font-size: 12px; font-weight: 700; color: #282d34; line-height: 14px; }
+    .mini-sub { font-size: 10px; font-weight: 400; color: #7a8699; }
+    .mini-price-row { display: flex; align-items: center; gap: 4px; }
+    .mini-price { font-size: 12px; font-weight: 500; color: #282d34; }
+    .mini-trend { display: flex; align-items: center; gap: 4px; }
+    .mini-trend span { font-size: 12px; font-weight: 500; color: #00b565; }
+
+    /* ── Sub tabs (Top Risers / Top Fallers) ── */
+    .sub-tabs { display: flex; gap: 12px; padding: 12px 20px 0; }
+    .sub-tab {
+      height: 20px; padding: 0 8px; border-radius: 2px;
+      font-size: 12px; font-weight: 500; color: #c2c7d0;
+      background: #f4f5f6; display: flex; align-items: center; cursor: pointer;
+    }
+    .sub-tab.active { color: #0a36c7; }
+
+    /* ── Market mover cards (horizontal scroll) ── */
+    .movers-scroll {
+      display: flex; gap: 16px; padding: 12px 20px 0;
+      overflow-x: auto; scrollbar-width: none;
+    }
+    .movers-scroll::-webkit-scrollbar { display: none; }
+    .mover-card {
+      width: 127px; background: #f9f9f9; border-radius: 8px;
+      padding: 12px; flex-shrink: 0;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .mover-chart { width: 100%; height: 32px; overflow: hidden; }
+    .mover-chart img, .mover-chart svg { width: 100%; height: 100%; display: block; }
+
+    /* ── Essentials list ── */
+    .essentials-controls {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 16px 20px 0;
+    }
+    .sort-btn {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 12px; font-weight: 500; color: #282d34;
+      background: none; border: none; cursor: pointer; padding: 0;
+    }
+    /* ── Watchlist column headers (override) ── */
+    .wl-col-headers { padding: 16px 20px 0; }
+    .wl-col-label { font-weight: 500; color: #282d34; cursor: pointer; }
+    .view-opt { width: 35px; height: 22px; }
+
+    .essentials-list { display: flex; flex-direction: column; padding: 12px 20px 0; gap: 0; }
+    .list-trade { display: flex; flex-direction: column; padding: 12px 20px 0; gap: 0; }
+
+    /* ── markets t-card overrides (larger sell/buy) ── */
+    .t-sell { height: 48px; border-radius: 8px; padding: 12px 12px 12px 8px; }
+    .t-buy  { height: 48px; border-radius: 8px; padding: 12px; }
+    .t-spread {
+      background: #f5f5f5; border-radius: 6px; width: 36px; height: 16px;
+      font-weight: 500; color: #1a1a1e;
+      box-shadow: 0 0 5px rgba(0,0,0,0.04);
+    }
+
+  </style>
+</head>
+<body>
+<div class="page-scroll">
+
+  <!-- Page title -->
+  <div class="page-title-row">
+    <div class="page-title-tabs">
+      <span class="page-title-tab active">Market<span class="page-title-dot"></span></span>
+      <span class="page-title-tab">Watchlist<span class="page-title-dot"></span></span>
+    </div>
+    <div class="page-title-actions"></div>
+  </div>
+
+  <!-- ── Market view ── -->
+  <div id="market-view">
+
+  <!-- Filter pills -->
+  <div class="filter-pills">
+    <button class="pill active">Overview</button>
+    <button class="pill">Indices</button>
+    <button class="pill">Forex</button>
+    <button class="pill">Metals</button>
+    <button class="pill">Share CFDs</button>
+  </div>
+
+  <!-- Spotlight -->
+  <div class="section-hd">
+    <span class="section-hd-title">Spotlight</span>
+  </div>
+  <div class="spotlight-wrap" id="spotlightWrap">
+    <!-- Big card -->
+    <div class="spotlight-main" id="spotMain">
+      <img class="spotlight-coin-icon" id="spotMainIcon" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" alt="">
+      <div class="spotlight-symbol" id="spotMainSymbol">BTCUSD</div>
+      <div class="spotlight-name" id="spotMainName">Bitcoin</div>
+      <div class="spotlight-price" id="spotMainPrice">
+        <span>88,860</span><span class="decimal">.25</span>
+      </div>
+      <div class="spotlight-badge" id="spotMainBadge">
+        <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0L4 0Z" fill="white"/></svg>
+        <span>11.23%</span>
+      </div>
+    </div>
+    <!-- Side cards -->
+    <div class="spotlight-side">
+      <div class="mini-card" id="spotMini0">
+        <div class="mini-card-name">
+          <img class="mini-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png" alt="">
+          <div><div class="mini-symbol">ETHUSD</div><div class="mini-sub">Ethereum</div></div>
+        </div>
+        <div class="mini-price-row">
+          <span class="mini-price">2,143.50</span>
+          <div class="mini-trend">
+            <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0L4 0Z" fill="#00b565"/></svg>
+            <span style="font-size:12px;font-weight:500;color:#00b565;">1.70%</span>
+          </div>
+        </div>
+      </div>
+      <div class="mini-card" id="spotMini1">
+        <div class="mini-card-name">
+          <img class="mini-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/sol.png" alt="">
+          <div><div class="mini-symbol">SOLUSD</div><div class="mini-sub">Solana</div></div>
+        </div>
+        <div class="mini-price-row">
+          <span class="mini-price">148.74</span>
+          <div class="mini-trend">
+            <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0L4 0Z" fill="#00b565"/></svg>
+            <span style="font-size:12px;font-weight:500;color:#00b565;">3.60%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Market Movers -->
+  <div class="section-hd">
+    <span class="section-hd-title">Market Movers</span>
+    <div class="view-toggle mover-toggle">
+      <button class="view-opt"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M0.853769 3.65548C1.05879 3.45045 1.39121 3.45045 1.59623 3.65548L4.9 6.95925L7.53794 4.3213C7.64311 4.21614 7.78794 4.16051 7.93646 4.16824C8.08499 4.17597 8.22326 4.24634 8.31694 4.36185C9.50121 5.82217 10.4216 7.53284 10.9857 9.43945L12.088 7.53034C12.2329 7.27924 12.554 7.19321 12.8051 7.33818C13.0562 7.48316 13.1423 7.80424 12.9973 8.05535L11.2649 11.056C11.1199 11.3071 10.7988 11.3931 10.5477 11.2481L7.54708 9.51572C7.29598 9.37075 7.20994 9.04966 7.35492 8.79856C7.49989 8.54745 7.82098 8.46142 8.07208 8.6064L9.96808 9.70105C9.50186 8.14106 8.77933 6.72452 7.85947 5.4847L5.27123 8.07294C5.17277 8.1714 5.03924 8.22671 4.9 8.22671C4.76076 8.22671 4.62723 8.1714 4.52877 8.07294L0.853769 4.39794C0.648744 4.19291 0.648744 3.8605 0.853769 3.65548Z" fill="currentColor"/></svg></button>
+      <button class="view-opt on"><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M8.8039 3.41484C8.87894 3.13477 9.16682 2.96856 9.44689 3.04361L12.7937 3.94037C12.9281 3.9764 13.0428 4.06439 13.1124 4.18498C13.1821 4.30556 13.2009 4.44886 13.1649 4.58336L12.2681 7.93012C12.1931 8.21019 11.9052 8.3764 11.6251 8.30135C11.3451 8.22631 11.1789 7.93843 11.2539 7.65836L11.8205 5.54365C10.2412 6.51676 8.92786 7.76305 7.90545 9.18555C7.81554 9.31065 7.67522 9.38994 7.52167 9.40242C7.36812 9.4149 7.21684 9.35931 7.10791 9.25038L4.9 7.04247L1.59623 10.3462C1.39121 10.5513 1.05879 10.5513 0.853769 10.3462C0.648744 10.1412 0.648744 9.8088 0.853769 9.60378L4.52877 5.92878C4.73379 5.72375 5.06621 5.72375 5.27123 5.92878L7.42275 8.08029C8.47341 6.74136 9.77433 5.56542 11.3045 4.62838L9.17513 4.05783C8.89506 3.98278 8.72885 3.69491 8.8039 3.41484Z" fill="currentColor"/></svg></button>
+    </div>
+  </div>
+  <div class="movers-scroll" id="moversScroll"></div>
+
+  <!-- Essentials -->
+  <div class="section-hd" style="padding-top:24px;">
+    <span class="section-hd-title">Essentials</span>
+    <div class="view-toggle">
+      <button class="view-opt on"><svg width="14" height="14" viewBox="0 0 10.2083 10.2083" fill="none"><path d="M3.0625 10.2083H1.3125C0.490583 10.2083 0 9.71775 0 8.89583V1.3125C0 0.490583 0.490583 0 1.3125 0H3.0625C3.88442 0 4.375 0.490583 4.375 1.3125V8.89583C4.375 9.71775 3.88442 10.2083 3.0625 10.2083ZM1.3125 0.875C0.968917 0.875 0.875 0.968917 0.875 1.3125V8.89583C0.875 9.23942 0.968917 9.33333 1.3125 9.33333H3.0625C3.40608 9.33333 3.5 9.23942 3.5 8.89583V1.3125C3.5 0.968917 3.40608 0.875 3.0625 0.875H1.3125ZM8.89583 4.375H7.14583C6.32392 4.375 5.83333 3.88442 5.83333 3.0625V1.3125C5.83333 0.490583 6.32392 0 7.14583 0H8.89583C9.71775 0 10.2083 0.490583 10.2083 1.3125V3.0625C10.2083 3.88442 9.71775 4.375 8.89583 4.375ZM7.14583 0.875C6.80225 0.875 6.70833 0.968917 6.70833 1.3125V3.0625C6.70833 3.40608 6.80225 3.5 7.14583 3.5H8.89583C9.23942 3.5 9.33333 3.40608 9.33333 3.0625V1.3125C9.33333 0.968917 9.23942 0.875 8.89583 0.875H7.14583ZM8.89583 10.2083H7.14583C6.32392 10.2083 5.83333 9.71775 5.83333 8.89583V7.14583C5.83333 6.32392 6.32392 5.83333 7.14583 5.83333H8.89583C9.71775 5.83333 10.2083 6.32392 10.2083 7.14583V8.89583C10.2083 9.71775 9.71775 10.2083 8.89583 10.2083ZM7.14583 6.70833C6.80225 6.70833 6.70833 6.80225 6.70833 7.14583V8.89583C6.70833 9.23942 6.80225 9.33333 7.14583 9.33333H8.89583C9.23942 9.33333 9.33333 9.23942 9.33333 8.89583V7.14583C9.33333 6.80225 9.23942 6.70833 8.89583 6.70833H7.14583Z" fill="currentColor"/></svg></button>
+      <button class="view-opt"><svg width="14" height="14" viewBox="0 0 10.2083 10.2083" fill="none"><path d="M3.0625 10.2083H1.3125C0.490583 10.2083 0 9.71775 0 8.89583V1.3125C0 0.490583 0.490583 0 1.3125 0H3.0625C3.88442 0 4.375 0.490583 4.375 1.3125V8.89583C4.375 9.71775 3.88442 10.2083 3.0625 10.2083ZM1.3125 0.875C0.968917 0.875 0.875 0.968917 0.875 1.3125V8.89583C0.875 9.23942 0.968917 9.33333 1.3125 9.33333H3.0625C3.40608 9.33333 3.5 9.23942 3.5 8.89583V1.3125C3.5 0.968917 3.40608 0.875 3.0625 0.875H1.3125ZM8.89583 10.2083H7.14583C6.32392 10.2083 5.83333 9.71775 5.83333 8.89583V1.3125C5.83333 0.490583 6.32392 0 7.14583 0H8.89583C9.71775 0 10.2083 0.490583 10.2083 1.3125V8.89583C10.2083 9.71775 9.71775 10.2083 8.89583 10.2083ZM7.14583 0.875C6.80225 0.875 6.70833 0.968917 6.70833 1.3125V8.89583C6.70833 9.23942 6.80225 9.33333 7.14583 9.33333H8.89583C9.23942 9.33333 9.33333 9.23942 9.33333 8.89583V1.3125C9.33333 0.968917 9.23942 0.875 8.89583 0.875H7.14583Z" fill="currentColor"/></svg></button>
+    </div>
+  </div>
+  <div class="view-section">
+  <!-- Column headers -->
+  <div class="wl-col-headers" data-list="essentials">
+    <div class="wl-col-label" data-sort="symbol">
+      Symbol
+      <div class="wl-sort-arrows" data-col="symbol">
+        <svg width="8" height="5" viewBox="0 0 8 6"><path class="arr-up" d="M4 0L8 6H0Z"/></svg>
+        <svg width="8" height="5" viewBox="0 0 8 6"><path class="arr-dn" d="M4 6L0 0H8Z"/></svg>
+      </div>
+    </div>
+    <div class="wl-col-label" data-sort="change">
+      Change%
+      <div class="wl-sort-arrows" data-col="change">
+        <svg width="8" height="5" viewBox="0 0 8 6"><path class="arr-up" d="M4 0L8 6H0Z"/></svg>
+        <svg width="8" height="5" viewBox="0 0 8 6"><path class="arr-dn" d="M4 6L0 0H8Z"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Simple list view (right toggle) — default -->
+  <div class="essentials-list list-simple">
+    <div class="e-row">
+      <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" alt="">
+      <div class="e-info"><div class="e-name">BTCUSD</div><div class="e-sub">Bitcoin</div></div>
+      <div class="e-right"><span class="e-price">82,143.50</span><span class="e-chg up">+1.5%</span></div>
+    </div>
+    <div class="e-row">
+      <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png" alt="">
+      <div class="e-info"><div class="e-name">ETHUSD</div><div class="e-sub">Ethereum</div></div>
+      <div class="e-right"><span class="e-price">2,143.50</span><span class="e-chg up">+1.5%</span></div>
+    </div>
+    <div class="e-row">
+      <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/xrp.png" alt="">
+      <div class="e-info"><div class="e-name">XRPUSD</div><div class="e-sub">Ripple</div></div>
+      <div class="e-right"><span class="e-price">0.6234</span><span class="e-chg up">+2.8%</span></div>
+    </div>
+    <div class="e-row">
+      <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/doge.png" alt="">
+      <div class="e-info"><div class="e-name">DOGEUSD</div><div class="e-sub">Dogecoin</div></div>
+      <div class="e-right"><span class="e-price">0.1542</span><span class="e-chg up">+1.2%</span></div>
+    </div>
+    <div class="e-row">
+      <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/link.png" alt="">
+      <div class="e-info"><div class="e-name">LINKUSD</div><div class="e-sub">Chainlink</div></div>
+      <div class="e-right"><span class="e-price">14.85</span><span class="e-chg dn">-1.5%</span></div>
+    </div>
+    <div class="e-row">
+      <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/sol.png" alt="">
+      <div class="e-info"><div class="e-name">SOLUSD</div><div class="e-sub">Solana</div></div>
+      <div class="e-right"><span class="e-price">148.32</span><span class="e-chg up">+3.4%</span></div>
+    </div>
+    <div class="e-row">
+      <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/ada.png" alt="">
+      <div class="e-info"><div class="e-name">ADAUSD</div><div class="e-sub">Cardano</div></div>
+      <div class="e-right"><span class="e-price">0.4521</span><span class="e-chg dn">-0.8%</span></div>
+    </div>
+    <div class="e-row">
+      <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/bnb.png" alt="">
+      <div class="e-info"><div class="e-name">BNBUSD</div><div class="e-sub">BNB</div></div>
+      <div class="e-right"><span class="e-price">584.20</span><span class="e-chg up">+1.9%</span></div>
+    </div>
+    <div class="e-row">
+      <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/avax.png" alt="">
+      <div class="e-info"><div class="e-name">AVAXUSD</div><div class="e-sub">Avalanche</div></div>
+      <div class="e-right"><span class="e-price">35.67</span><span class="e-chg dn">-2.1%</span></div>
+    </div>
+    <div class="e-row">
+      <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/dot.png" alt="">
+      <div class="e-info"><div class="e-name">DOTUSD</div><div class="e-sub">Polkadot</div></div>
+      <div class="e-right"><span class="e-price">7.24</span><span class="e-chg up">+0.6%</span></div>
+    </div>
+  </div>
+
+  <!-- Trading card view (left toggle) -->
+  <div class="list-trade" style="display:none;">
+    <div class="t-card">
+      <div class="t-card-header">
+        <div class="t-card-name"><img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" alt=""><span class="t-symbol">BTCUSD</span></div>
+        <span class="e-chg up">+1.5%</span>
+      </div>
+      <div class="t-trade-row">
+        <div class="t-sell"><svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 8L0 0H8Z" fill="#282d34"/></svg> 82,058.03</div>
+        <div class="t-spread">1210</div>
+        <div class="t-buy">82,083.03 <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0Z" fill="#282d34"/></svg></div>
+      </div>
+    </div>
+    <div class="t-card">
+      <div class="t-card-header">
+        <div class="t-card-name"><img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png" alt=""><span class="t-symbol">ETHUSD</span></div>
+        <span class="e-chg up">+1.5%</span>
+      </div>
+      <div class="t-trade-row">
+        <div class="t-sell"><svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 8L0 0H8Z" fill="#282d34"/></svg> 2,131.50</div>
+        <div class="t-spread">0850</div>
+        <div class="t-buy">2,140.00 <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0Z" fill="#282d34"/></svg></div>
+      </div>
+    </div>
+    <div class="t-card">
+      <div class="t-card-header">
+        <div class="t-card-name"><img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/xrp.png" alt=""><span class="t-symbol">XRPUSD</span></div>
+        <span class="e-chg up">+2.8%</span>
+      </div>
+      <div class="t-trade-row">
+        <div class="t-sell"><svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 8L0 0H8Z" fill="#282d34"/></svg> 0.6218</div>
+        <div class="t-spread">0016</div>
+        <div class="t-buy">0.6250 <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0Z" fill="#282d34"/></svg></div>
+      </div>
+    </div>
+    <div class="t-card">
+      <div class="t-card-header">
+        <div class="t-card-name"><img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/doge.png" alt=""><span class="t-symbol">DOGEUSD</span></div>
+        <span class="e-chg up">+1.2%</span>
+      </div>
+      <div class="t-trade-row">
+        <div class="t-sell"><svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 8L0 0H8Z" fill="#282d34"/></svg> 0.1536</div>
+        <div class="t-spread">0006</div>
+        <div class="t-buy">0.1548 <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0Z" fill="#282d34"/></svg></div>
+      </div>
+    </div>
+    <div class="t-card">
+      <div class="t-card-header">
+        <div class="t-card-name"><img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/link.png" alt=""><span class="t-symbol">LINKUSD</span></div>
+        <span class="e-chg dn">-1.5%</span>
+      </div>
+      <div class="t-trade-row">
+        <div class="t-sell"><svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 8L0 0H8Z" fill="#282d34"/></svg> 14.72</div>
+        <div class="t-spread">0013</div>
+        <div class="t-buy">14.85 <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0Z" fill="#282d34"/></svg></div>
+      </div>
+    </div>
+    <div class="t-card">
+      <div class="t-card-header">
+        <div class="t-card-name"><img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/sol.png" alt=""><span class="t-symbol">SOLUSD</span></div>
+        <span class="e-chg up">+3.4%</span>
+      </div>
+      <div class="t-trade-row">
+        <div class="t-sell"><svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 8L0 0H8Z" fill="#282d34"/></svg> 147.80</div>
+        <div class="t-spread">0052</div>
+        <div class="t-buy">148.32 <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0Z" fill="#282d34"/></svg></div>
+      </div>
+    </div>
+    <div class="t-card">
+      <div class="t-card-header">
+        <div class="t-card-name"><img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/ada.png" alt=""><span class="t-symbol">ADAUSD</span></div>
+        <span class="e-chg dn">-0.8%</span>
+      </div>
+      <div class="t-trade-row">
+        <div class="t-sell"><svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 8L0 0H8Z" fill="#282d34"/></svg> 0.4510</div>
+        <div class="t-spread">0011</div>
+        <div class="t-buy">0.4521 <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0Z" fill="#282d34"/></svg></div>
+      </div>
+    </div>
+    <div class="t-card">
+      <div class="t-card-header">
+        <div class="t-card-name"><img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/bnb.png" alt=""><span class="t-symbol">BNBUSD</span></div>
+        <span class="e-chg up">+1.9%</span>
+      </div>
+      <div class="t-trade-row">
+        <div class="t-sell"><svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 8L0 0H8Z" fill="#282d34"/></svg> 583.40</div>
+        <div class="t-spread">0080</div>
+        <div class="t-buy">584.20 <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0Z" fill="#282d34"/></svg></div>
+      </div>
+    </div>
+    <div class="t-card">
+      <div class="t-card-header">
+        <div class="t-card-name"><img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/avax.png" alt=""><span class="t-symbol">AVAXUSD</span></div>
+        <span class="e-chg dn">-2.1%</span>
+      </div>
+      <div class="t-trade-row">
+        <div class="t-sell"><svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 8L0 0H8Z" fill="#282d34"/></svg> 35.52</div>
+        <div class="t-spread">0015</div>
+        <div class="t-buy">35.67 <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0Z" fill="#282d34"/></svg></div>
+      </div>
+    </div>
+    <div class="t-card">
+      <div class="t-card-header">
+        <div class="t-card-name"><img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/dot.png" alt=""><span class="t-symbol">DOTUSD</span></div>
+        <span class="e-chg up">+0.6%</span>
+      </div>
+      <div class="t-trade-row">
+        <div class="t-sell"><svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 8L0 0H8Z" fill="#282d34"/></svg> 7.18</div>
+        <div class="t-spread">0006</div>
+        <div class="t-buy">7.24 <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0Z" fill="#282d34"/></svg></div>
+      </div>
+    </div>
+  </div>
+  </div><!-- /view-section -->
+
+  </div><!-- /market-view -->
+
+  <!-- ── Watchlist view ── -->
+  <div id="watchlist-view" style="display:none;">
+    <div class="view-section">
+    <div class="essentials-controls">
+      <div class="view-toggle">
+        <button class="view-opt on"><svg width="14" height="14" viewBox="0 0 10.2083 10.2083" fill="none"><path d="M3.0625 10.2083H1.3125C0.490583 10.2083 0 9.71775 0 8.89583V1.3125C0 0.490583 0.490583 0 1.3125 0H3.0625C3.88442 0 4.375 0.490583 4.375 1.3125V8.89583C4.375 9.71775 3.88442 10.2083 3.0625 10.2083ZM1.3125 0.875C0.968917 0.875 0.875 0.968917 0.875 1.3125V8.89583C0.875 9.23942 0.968917 9.33333 1.3125 9.33333H3.0625C3.40608 9.33333 3.5 9.23942 3.5 8.89583V1.3125C3.5 0.968917 3.40608 0.875 3.0625 0.875H1.3125ZM8.89583 4.375H7.14583C6.32392 4.375 5.83333 3.88442 5.83333 3.0625V1.3125C5.83333 0.490583 6.32392 0 7.14583 0H8.89583C9.71775 0 10.2083 0.490583 10.2083 1.3125V3.0625C10.2083 3.88442 9.71775 4.375 8.89583 4.375ZM7.14583 0.875C6.80225 0.875 6.70833 0.968917 6.70833 1.3125V3.0625C6.70833 3.40608 6.80225 3.5 7.14583 3.5H8.89583C9.23942 3.5 9.33333 3.40608 9.33333 3.0625V1.3125C9.33333 0.968917 9.23942 0.875 8.89583 0.875H7.14583ZM8.89583 10.2083H7.14583C6.32392 10.2083 5.83333 9.71775 5.83333 8.89583V7.14583C5.83333 6.32392 6.32392 5.83333 7.14583 5.83333H8.89583C9.71775 5.83333 10.2083 6.32392 10.2083 7.14583V8.89583C10.2083 9.71775 9.71775 10.2083 8.89583 10.2083ZM7.14583 6.70833C6.80225 6.70833 6.70833 6.80225 6.70833 7.14583V8.89583C6.70833 9.23942 6.80225 9.33333 7.14583 9.33333H8.89583C9.23942 9.33333 9.33333 9.23942 9.33333 8.89583V7.14583C9.33333 6.80225 9.23942 6.70833 8.89583 6.70833H7.14583Z" fill="currentColor"/></svg></button>
+        <button class="view-opt"><svg width="14" height="14" viewBox="0 0 10.2083 10.2083" fill="none"><path d="M3.0625 10.2083H1.3125C0.490583 10.2083 0 9.71775 0 8.89583V1.3125C0 0.490583 0.490583 0 1.3125 0H3.0625C3.88442 0 4.375 0.490583 4.375 1.3125V8.89583C4.375 9.71775 3.88442 10.2083 3.0625 10.2083ZM1.3125 0.875C0.968917 0.875 0.875 0.968917 0.875 1.3125V8.89583C0.875 9.23942 0.968917 9.33333 1.3125 9.33333H3.0625C3.40608 9.33333 3.5 9.23942 3.5 8.89583V1.3125C3.5 0.968917 3.40608 0.875 3.0625 0.875H1.3125ZM8.89583 10.2083H7.14583C6.32392 10.2083 5.83333 9.71775 5.83333 8.89583V1.3125C5.83333 0.490583 6.32392 0 7.14583 0H8.89583C9.71775 0 10.2083 0.490583 10.2083 1.3125V8.89583C10.2083 9.71775 9.71775 10.2083 8.89583 10.2083ZM7.14583 0.875C6.80225 0.875 6.70833 0.968917 6.70833 1.3125V8.89583C6.70833 9.23942 6.80225 9.33333 7.14583 9.33333H8.89583C9.23942 9.33333 9.33333 9.23942 9.33333 8.89583V1.3125C9.33333 0.968917 9.23942 0.875 8.89583 0.875H7.14583Z" fill="currentColor"/></svg></button>
+      </div>
+      <div style="display:flex;gap:20px;align-items:center;">
+        <img src="images/icon-pencil-square.svg" width="20" height="20" alt="" style="cursor:pointer;">
+        <img src="images/icon-plus.svg" width="20" height="20" alt="" style="cursor:pointer;">
+      </div>
+    </div>
+    <!-- Column headers -->
+    <div class="wl-col-headers" data-list="watchlist">
+      <div class="wl-col-label" data-sort="symbol">
+        Symbol
+        <div class="wl-sort-arrows" data-col="symbol">
+          <svg width="8" height="5" viewBox="0 0 8 6"><path class="arr-up" d="M4 0L8 6H0Z"/></svg>
+          <svg width="8" height="5" viewBox="0 0 8 6"><path class="arr-dn" d="M4 6L0 0H8Z"/></svg>
+        </div>
+      </div>
+      <div class="wl-col-label" data-sort="change">
+        Change%
+        <div class="wl-sort-arrows" data-col="change">
+          <svg width="8" height="5" viewBox="0 0 8 6"><path class="arr-up" d="M4 0L8 6H0Z"/></svg>
+          <svg width="8" height="5" viewBox="0 0 8 6"><path class="arr-dn" d="M4 6L0 0H8Z"/></svg>
+        </div>
+      </div>
+    </div>
+    <!-- Simple list view (left toggle) — default -->
+    <div class="essentials-list list-simple">
+      <div class="e-row">
+        <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" alt="">
+        <div class="e-info"><div class="e-name">BTCUSD</div><div class="e-sub">Bitcoin</div></div>
+        <div class="e-right"><span class="e-price">82,143.50</span><span class="e-chg up">+1.5%</span></div>
+      </div>
+      <div class="e-row">
+        <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png" alt="">
+        <div class="e-info"><div class="e-name">ETHUSD</div><div class="e-sub">Ethereum</div></div>
+        <div class="e-right"><span class="e-price">2,143.50</span><span class="e-chg up">+1.5%</span></div>
+      </div>
+      <div class="e-row">
+        <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/xrp.png" alt="">
+        <div class="e-info"><div class="e-name">XRPUSD</div><div class="e-sub">Ripple</div></div>
+        <div class="e-right"><span class="e-price">0.6234</span><span class="e-chg up">+2.8%</span></div>
+      </div>
+      <div class="e-row">
+        <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/sol.png" alt="">
+        <div class="e-info"><div class="e-name">SOLUSD</div><div class="e-sub">Solana</div></div>
+        <div class="e-right"><span class="e-price">148.32</span><span class="e-chg up">+3.4%</span></div>
+      </div>
+      <div class="e-row">
+        <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/uni.png" alt="">
+        <div class="e-info"><div class="e-name">UNIUSD</div><div class="e-sub">Uniswap</div></div>
+        <div class="e-right"><span class="e-price">7.82</span><span class="e-chg dn">-1.3%</span></div>
+      </div>
+    </div>
+    <!-- Trading card view (right toggle) -->
+    <div class="list-trade" style="display:none;">
+      <div class="t-card">
+        <div class="t-card-header">
+          <div class="t-card-name"><img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" alt=""><span class="t-symbol">BTCUSD</span></div>
+          <span class="e-chg up">+1.5%</span>
+        </div>
+        <div class="t-trade-row">
+          <div class="t-sell"><svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 8L0 0H8Z" fill="#282d34"/></svg> 82,058.03</div>
+          <div class="t-spread">1210</div>
+          <div class="t-buy">82,083.03 <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0Z" fill="#282d34"/></svg></div>
+        </div>
+      </div>
+      <div class="t-card">
+        <div class="t-card-header">
+          <div class="t-card-name"><img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png" alt=""><span class="t-symbol">ETHUSD</span></div>
+          <span class="e-chg up">+1.5%</span>
+        </div>
+        <div class="t-trade-row">
+          <div class="t-sell"><svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 8L0 0H8Z" fill="#282d34"/></svg> 2,131.50</div>
+          <div class="t-spread">0850</div>
+          <div class="t-buy">2,140.00 <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0Z" fill="#282d34"/></svg></div>
+        </div>
+      </div>
+      <div class="t-card">
+        <div class="t-card-header">
+          <div class="t-card-name"><img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/xrp.png" alt=""><span class="t-symbol">XRPUSD</span></div>
+          <span class="e-chg up">+2.8%</span>
+        </div>
+        <div class="t-trade-row">
+          <div class="t-sell"><svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 8L0 0H8Z" fill="#282d34"/></svg> 0.6218</div>
+          <div class="t-spread">0016</div>
+          <div class="t-buy">0.6250 <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0Z" fill="#282d34"/></svg></div>
+        </div>
+      </div>
+      <div class="t-card">
+        <div class="t-card-header">
+          <div class="t-card-name"><img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/sol.png" alt=""><span class="t-symbol">SOLUSD</span></div>
+          <span class="e-chg up">+3.4%</span>
+        </div>
+        <div class="t-trade-row">
+          <div class="t-sell"><svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 8L0 0H8Z" fill="#282d34"/></svg> 147.80</div>
+          <div class="t-spread">0052</div>
+          <div class="t-buy">148.32 <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0Z" fill="#282d34"/></svg></div>
+        </div>
+      </div>
+      <div class="t-card">
+        <div class="t-card-header">
+          <div class="t-card-name"><img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/uni.png" alt=""><span class="t-symbol">UNIUSD</span></div>
+          <span class="e-chg dn">-1.3%</span>
+        </div>
+        <div class="t-trade-row">
+          <div class="t-sell"><svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 8L0 0H8Z" fill="#282d34"/></svg> 7.76</div>
+          <div class="t-spread">0006</div>
+          <div class="t-buy">7.82 <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0Z" fill="#282d34"/></svg></div>
+        </div>
+      </div>
+    </div>
+    </div><!-- /view-section -->
+  </div><!-- /watchlist-view -->
+
+</div><!-- /page-scroll -->
+
+
+<script>
+  // Hide Watchlist tab in pre-login mode (detected via hash)
+  (function() {
+    if (window.location.hash !== '#noWatchlist') return;
+    function hideWatchlistTab() {
+      var tabs = document.querySelectorAll('.page-title-tab');
+      if (tabs.length > 1) tabs[1].style.display = 'none';
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', hideWatchlistTab);
+    } else {
+      hideWatchlistTab();
+    }
+  })();
+
+  // Page title tabs — toggle market/watchlist view
+  var titleTabs = document.querySelectorAll('.page-title-tab');
+  var marketView = document.getElementById('market-view');
+  var watchlistView = document.getElementById('watchlist-view');
+
+  function switchToTab(idx) {
+    titleTabs.forEach(function(x) { x.classList.remove('active'); });
+    titleTabs[idx].classList.add('active');
+    var isWatchlist = idx === 1;
+    marketView.style.display = isWatchlist ? 'none' : '';
+    watchlistView.style.display = isWatchlist ? '' : 'none';
+  }
+
+  titleTabs.forEach(function(t, i) {
+    t.addEventListener('click', function() { switchToTab(i); });
+  });
+
+  // Auto-switch to watchlist tab if hash is #watchlist
+  if (window.location.hash === '#watchlist') {
+    switchToTab(1);
+  }
+  // View-toggle buttons — switch between simple list and trading card view
+  document.querySelectorAll('.view-toggle:not(.mover-toggle)').forEach(function(group) {
+    group.querySelectorAll('.view-opt').forEach(function(btn, btnIdx) {
+      btn.addEventListener('click', function() {
+        group.querySelectorAll('.view-opt').forEach(function(b) { b.classList.remove('on'); });
+        btn.classList.add('on');
+        // left btn(0) = simple list, right btn(1) = trade card view
+        var isTradeView = btnIdx === 1;
+        // Find the nearest view-section ancestor (for essentials, the toggle is in section-hd above)
+        var section = group.closest('.view-section');
+        if (!section) {
+          // toggle is inside section-hd, look for the next sibling view-section
+          var parent = group.closest('.section-hd');
+          if (parent) section = parent.nextElementSibling;
+        }
+        if (section) {
+          var listSimple = section.querySelector('.list-simple');
+          var listTrade = section.querySelector('.list-trade');
+          if (listSimple) listSimple.style.display = isTradeView ? 'none' : 'flex';
+          if (listTrade) listTrade.style.display = isTradeView ? 'flex' : 'none';
+        }
+      });
+    });
+  });
+  // Filter pill active toggle
+  document.querySelectorAll('.pill').forEach(p => {
+    p.addEventListener('click', () => {
+      document.querySelectorAll('.pill').forEach(x => x.classList.remove('active'));
+      p.classList.add('active');
+    });
+  });
+  // Sub tabs
+  document.querySelectorAll('.sub-tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.sub-tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+    });
+  });
+
+  // ── Column header sort (Symbol A-Z/Z-A, Change% top riser/faller) ──
+  (function() {
+    // Get symbol text from an e-row
+    function getSymbol(row) {
+      var el = row.querySelector('.e-name');
+      return el ? el.textContent.trim() : '';
+    }
+    // Get change % value from an e-row
+    function getChange(row) {
+      var el = row.querySelector('.e-chg');
+      if (!el) return 0;
+      return parseFloat(el.textContent.replace(/[^0-9.\-]/g, '')) * (el.textContent.indexOf('-') >= 0 ? -1 : 1);
+    }
+
+    // Sort rows inside a list container
+    function sortRows(listEl, col, dir) {
+      if (!listEl) return;
+      var rows = Array.from(listEl.querySelectorAll('.e-row'));
+      if (rows.length === 0) return;
+      rows.sort(function(a, b) {
+        if (col === 'symbol') {
+          var sa = getSymbol(a), sb = getSymbol(b);
+          return dir === 'asc' ? sa.localeCompare(sb) : sb.localeCompare(sa);
+        } else {
+          var ca = getChange(a), cb = getChange(b);
+          return dir === 'asc' ? cb - ca : ca - cb; // asc = top riser (highest first), desc = top faller (lowest first)
+        }
+      });
+      rows.forEach(function(r) { listEl.appendChild(r); });
+    }
+
+    // Handle each wl-col-headers group independently
+    document.querySelectorAll('.wl-col-headers').forEach(function(header) {
+      var arrows = header.querySelectorAll('.wl-sort-arrows');
+
+      arrows.forEach(function(arrowGroup) {
+        var col = arrowGroup.getAttribute('data-col'); // 'symbol' or 'change'
+
+        arrowGroup.addEventListener('click', function() {
+          // Cycle: none → asc → desc → none
+          var cur = arrowGroup.classList.contains('asc') ? 'asc'
+                  : arrowGroup.classList.contains('desc') ? 'desc' : 'none';
+          var next = cur === 'none' ? 'asc' : cur === 'asc' ? 'desc' : 'none';
+
+          // Reset all arrows in this header group
+          arrows.forEach(function(a) { a.classList.remove('asc', 'desc'); });
+
+          // Find the list containers to sort
+          // Walk from header to find the sibling or parent's list-simple containers
+          var listsParent = header.nextElementSibling;
+          // Could be a view-section wrapper or direct list
+          var listSimple;
+          if (listsParent && listsParent.classList.contains('view-section')) {
+            listSimple = listsParent.querySelector('.list-simple');
+          } else if (listsParent && listsParent.classList.contains('essentials-list')) {
+            listSimple = listsParent;
+          } else {
+            // Search within parent
+            var parent = header.parentElement;
+            listSimple = parent ? parent.querySelector('.list-simple') : null;
+          }
+
+          if (next !== 'none') {
+            arrowGroup.classList.add(next);
+            sortRows(listSimple, col, next);
+          }
+          // If 'none', rows stay in last sorted order (or could restore original)
+        });
+      });
+    });
+  })();
+
+  // ── Market Movers: Top 5 Risers / Top 5 Fallers ──
+  (function() {
+    var RISERS = [
+      { symbol: 'TSLA.st', name: 'Tesla, Inc', price: '1,335.00', pct: '+11.23%', icon: 'images/5932d1cc-8448-4fd0-b9b4-90e106265e64.svg', iconStyle: 'border-radius:0;' },
+      { symbol: 'NVDA.st', name: 'NVIDIA Corp', price: '892.50', pct: '+8.76%', icon: 'images/f66c47b1-65f4-41ec-9944-3aad9c1cdc7a.svg', iconStyle: 'border-radius:50%;background:#0033ad;' },
+      { symbol: 'BTCUSD', name: 'Bitcoin', price: '68,421.30', pct: '+6.54%', iconCircle: '#fe9b00', innerIcon: 'images/bdbfe528-c90f-4c39-a814-b156ed003138.svg' },
+      { symbol: 'ETHUSD', name: 'Ethereum', price: '3,845.20', pct: '+5.12%', icon: 'images/5932d1cc-8448-4fd0-b9b4-90e106265e64.svg', iconStyle: 'border-radius:0;' },
+      { symbol: 'AAPL.st', name: 'Apple Inc', price: '198.75', pct: '+4.87%', icon: 'images/f66c47b1-65f4-41ec-9944-3aad9c1cdc7a.svg', iconStyle: 'border-radius:50%;background:#0033ad;' }
+    ];
+    var FALLERS = [
+      { symbol: 'META.st', name: 'Meta Platforms', price: '485.30', pct: '-9.45%', icon: 'images/f66c47b1-65f4-41ec-9944-3aad9c1cdc7a.svg', iconStyle: 'border-radius:50%;background:#0033ad;' },
+      { symbol: 'XAUUSD', name: 'Gold', price: '2,312.80', pct: '-7.32%', iconCircle: '#fe9b00', innerIcon: 'images/bdbfe528-c90f-4c39-a814-b156ed003138.svg' },
+      { symbol: 'AMZN.st', name: 'Amazon Inc', price: '178.40', pct: '-5.88%', icon: 'images/5932d1cc-8448-4fd0-b9b4-90e106265e64.svg', iconStyle: 'border-radius:0;' },
+      { symbol: 'GBPUSD', name: 'GBP/USD', price: '1.2634', pct: '-4.21%', icon: 'images/f66c47b1-65f4-41ec-9944-3aad9c1cdc7a.svg', iconStyle: 'border-radius:50%;background:#0033ad;' },
+      { symbol: 'USDJPY', name: 'USD/JPY', price: '154.82', pct: '-3.67%', iconCircle: '#fe9b00', innerIcon: 'images/bdbfe528-c90f-4c39-a814-b156ed003138.svg' }
+    ];
+
+    // SVG mini-chart paths
+    var chartUp = '<svg width="103" height="32" viewBox="0 0 103 32" fill="none" xmlns="http://www.w3.org/2000/svg">'
+      + '<defs><linearGradient id="gUp" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#00b565" stop-opacity="0.25"/><stop offset="100%" stop-color="#00b565" stop-opacity="0"/></linearGradient></defs>'
+      + '<path d="M1 28C6 25 9 22 14 21C19 20 21 24 26 23C31 22 33 17 38 16C43 15 46 19 51 17C56 15 58 11 63 10C68 9 71 13 76 10C81 7 84 5 89 6C94 7 98 4 102 2" fill="none" stroke="#00b565" stroke-width="1.5" stroke-linecap="round"/>'
+      + '<path d="M1 28C6 25 9 22 14 21C19 20 21 24 26 23C31 22 33 17 38 16C43 15 46 19 51 17C56 15 58 11 63 10C68 9 71 13 76 10C81 7 84 5 89 6C94 7 98 4 102 2V32H1Z" fill="url(#gUp)"/></svg>';
+    var chartDn = '<svg width="103" height="32" viewBox="0 0 103 32" fill="none" xmlns="http://www.w3.org/2000/svg">'
+      + '<defs><linearGradient id="gDn" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#ff2c40" stop-opacity="0.25"/><stop offset="100%" stop-color="#ff2c40" stop-opacity="0"/></linearGradient></defs>'
+      + '<path d="M1 3C6 5 9 7 14 9C19 11 21 8 26 11C31 14 33 16 38 18C43 20 46 17 51 20C56 23 58 21 63 23C68 25 71 22 76 25C81 28 84 26 89 27C94 28 98 29 102 30" fill="none" stroke="#ff2c40" stroke-width="1.5" stroke-linecap="round"/>'
+      + '<path d="M1 3C6 5 9 7 14 9C19 11 21 8 26 11C31 14 33 16 38 18C43 20 46 17 51 20C56 23 58 21 63 23C68 25 71 22 76 25C81 28 84 26 89 27C94 28 98 29 102 30V32H1Z" fill="url(#gDn)"/></svg>';
+
+    var arrowUp = '<svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0L4 0Z" fill="#00b565"/></svg>';
+    var arrowDn = '<svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 8L0 0H8L4 8Z" fill="#ff2c40"/></svg>';
+
+    var container = document.getElementById('moversScroll');
+
+    function renderMovers(data, isRiser) {
+      var color = isRiser ? '#00b565' : '#ff2c40';
+      var chart = isRiser ? chartUp : chartDn;
+      var arrow = isRiser ? arrowUp : arrowDn;
+      var html = '';
+      data.forEach(function(d) {
+        var iconHtml;
+        if (d.iconCircle) {
+          iconHtml = '<div style="width:26px;height:26px;border-radius:50%;background:' + d.iconCircle + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;"><img src="' + d.innerIcon + '" alt="" style="width:22px;height:22px;"></div>';
+        } else {
+          iconHtml = '<img class="mini-coin" src="' + d.icon + '" alt="" style="' + d.iconStyle + '">';
+        }
+        html += '<div class="mover-card">'
+          + '<div class="mini-card-name">' + iconHtml
+          + '<div><div class="mini-symbol">' + d.symbol + '</div><div class="mini-sub">' + d.name + '</div></div></div>'
+          + '<div class="mover-chart">' + chart + '</div>'
+          + '<div class="mini-price-row"><span class="mini-price">' + d.price + '</span>'
+          + '<div class="mini-trend">' + arrow
+          + '<span style="font-size:12px;font-weight:500;color:' + color + ';">' + d.pct + '</span></div></div></div>';
+      });
+      container.innerHTML = html;
+    }
+
+    // Initial render: risers (right button is "on")
+    renderMovers(RISERS, true);
+
+    // Toggle handler
+    var moverToggle = document.querySelector('.mover-toggle');
+    var moverBtns = moverToggle.querySelectorAll('.view-opt');
+    moverBtns.forEach(function(btn, idx) {
+      btn.addEventListener('click', function() {
+        moverBtns.forEach(function(b) { b.classList.remove('on'); });
+        btn.classList.add('on');
+        if (idx === 0) {
+          renderMovers(FALLERS, false);
+        } else {
+          renderMovers(RISERS, true);
+        }
+      });
+    });
+  })();
+</script>
+
+<script src="top-nav.js"></script>
+<script>
+(function() {
+  var prelogin = window.location.hash === '#noWatchlist';
+  if (prelogin) {
+  }
+  TopNav.init({ showSearch: true, rightIconSrc: 'images/1eb91ff7-c9b6-4cf5-9118-5938916d3a01.svg', menuHref: prelogin ? 'profile-prelogin.html' : 'profile.html' });
+})();
+</script>
+<script src="bottom-nav.js"></script>
+<script>BottomNav.init('markets', window.location.hash === '#noWatchlist' ? 'prelogin' : undefined);</script>
+<script>
+(function() {
+  var ticker = document.getElementById('searchTicker');
+  var current = 0;
+  setInterval(function() {
+    current = (current + 1) % 3;
+    ticker.style.transform = 'translateY(-' + (current * 20) + 'px)';
+  }, 2000);
+})();
+</script>
+
+<!-- Dynamic e-row & t-card price updates -->
+<script>
+(function() {
+  function parsePrice(str) {
+    return parseFloat(str.replace(/,/g, ''));
+  }
+  function formatPrice(n) {
+    if (n >= 1000) return n.toFixed(2).replace(/\B(?=(\d{3})+\.)/g, ',');
+    if (n >= 1) return n.toFixed(2);
+    return n.toFixed(4);
+  }
+
+  /* ── e-row flash updates ── */
+  function tickERow(row) {
+    var priceEl = row.querySelector('.e-price');
+    var chgEl = row.querySelector('.e-chg');
+    if (!priceEl || !chgEl) return;
+    var price = parsePrice(priceEl.textContent);
+    var pct = (Math.random() - 0.5) * 0.006;
+    priceEl.textContent = formatPrice(price * (1 + pct));
+    var chgVal = parseFloat(chgEl.textContent);
+    chgVal += pct * 100;
+    var isUp = chgVal >= 0;
+    chgEl.textContent = (isUp ? '+' : '') + chgVal.toFixed(1) + '%';
+    chgEl.className = 'e-chg ' + (isUp ? 'up' : 'dn');
+    row.classList.remove('flash-green', 'flash-red');
+    void row.offsetWidth;
+    row.classList.add(pct >= 0 ? 'flash-green' : 'flash-red');
+  }
+
+  var eRows = document.querySelectorAll('.e-row');
+  function tickERows() {
+    if (!eRows.length) return;
+    var count = 1 + Math.floor(Math.random() * 3);
+    for (var i = 0; i < count; i++) {
+      tickERow(eRows[Math.floor(Math.random() * eRows.length)]);
+    }
+    setTimeout(tickERows, 1500 + Math.random() * 1500);
+  }
+  setTimeout(tickERows, 2000);
+
+  /* ── t-card dynamic sell/buy updates ── */
+  var tCards = document.querySelectorAll('.t-card');
+  function extractNum(el) {
+    // Text may include SVG; grab just the number portion
+    var txt = '';
+    el.childNodes.forEach(function(n) { if (n.nodeType === 3) txt += n.textContent; });
+    return parsePrice(txt.trim());
+  }
+  function setNum(el, val, direction) {
+    var formatted = formatPrice(val);
+    // Preserve SVG children, update text node
+    var nodes = el.childNodes;
+    for (var i = 0; i < nodes.length; i++) {
+      if (nodes[i].nodeType === 3) {
+        // sell: "  82,058.03" (space before) or buy: "82,083.03 " (space after)
+        var old = nodes[i].textContent;
+        var lead = old.match(/^\s*/)[0];
+        var trail = old.match(/\s*$/)[0];
+        nodes[i].textContent = lead + formatted + trail;
+      }
+    }
+    // Flash color briefly
+    el.classList.remove('flash-up', 'flash-dn');
+    void el.offsetWidth;
+    el.classList.add(direction >= 0 ? 'flash-up' : 'flash-dn');
+    setTimeout(function() { el.classList.remove('flash-up', 'flash-dn'); }, 400);
+  }
+
+  function tickTCard(card) {
+    var sellEl = card.querySelector('.t-sell');
+    var buyEl = card.querySelector('.t-buy');
+    var chgEl = card.querySelector('.e-chg');
+    if (!sellEl || !buyEl) return;
+
+    var sell = extractNum(sellEl);
+    var buy = extractNum(buyEl);
+    var pct = (Math.random() - 0.5) * 0.004;
+    var newSell = sell * (1 + pct);
+    var newBuy = buy * (1 + pct);
+    setNum(sellEl, newSell, pct);
+    setNum(buyEl, newBuy, pct);
+
+    // Update spread
+    var spreadEl = card.querySelector('.t-spread');
+    if (spreadEl) {
+      var sp = Math.abs(Math.round((newBuy - newSell) * 100));
+      spreadEl.textContent = String(sp).padStart(4, '0');
+    }
+
+    // Update chg badge
+    if (chgEl) {
+      var chgVal = parseFloat(chgEl.textContent);
+      chgVal += pct * 100;
+      var isUp = chgVal >= 0;
+      chgEl.textContent = (isUp ? '+' : '') + chgVal.toFixed(1) + '%';
+      chgEl.className = 'e-chg ' + (isUp ? 'up' : 'dn');
+    }
+  }
+
+  function tickTCards() {
+    if (!tCards.length) return;
+    var count = 1 + Math.floor(Math.random() * 2);
+    for (var i = 0; i < count; i++) {
+      tickTCard(tCards[Math.floor(Math.random() * tCards.length)]);
+    }
+    setTimeout(tickTCards, 1000 + Math.random() * 1500);
+  }
+  setTimeout(tickTCards, 2000);
+
+  /* ── Spotlight dynamic updates ── */
+  function tickSpotMain() {
+    var priceEl = document.getElementById('spotMainPrice');
+    var badgeEl = document.getElementById('spotMainBadge');
+    if (!priceEl || !badgeEl) return;
+    var spans = priceEl.querySelectorAll('span');
+    if (spans.length < 2) return;
+    var whole = spans[0].textContent;
+    var dec = spans[1].textContent; // ".25"
+    var current = parsePrice(whole + dec);
+    var pct = (Math.random() - 0.5) * 0.005;
+    var next = current * (1 + pct);
+    var formatted = formatPrice(next); // e.g. "88,860.25"
+    var dotIdx = formatted.indexOf('.');
+    if (dotIdx >= 0) {
+      spans[0].textContent = formatted.slice(0, dotIdx);
+      spans[1].textContent = formatted.slice(dotIdx);
+    } else {
+      spans[0].textContent = formatted;
+    }
+    // Update badge percentage
+    var badgeSpan = badgeEl.querySelector('span');
+    if (badgeSpan) {
+      var chgVal = parseFloat(badgeSpan.textContent);
+      chgVal += pct * 100;
+      var isUp = chgVal >= 0;
+      badgeSpan.textContent = (isUp ? '' : '') + chgVal.toFixed(2) + '%';
+      // Swap badge color/arrow direction based on sign
+      badgeEl.style.background = isUp ? '#00b565' : '#ff2c40';
+      var pathEl = badgeEl.querySelector('path');
+      if (pathEl) {
+        pathEl.setAttribute('d', isUp ? 'M4 0L8 8H0L4 0Z' : 'M4 8L0 0H8L4 8Z');
+      }
+    }
+    // Flash effect
+    var mainEl = document.getElementById('spotMain');
+    if (mainEl) {
+      mainEl.classList.remove('flash-green', 'flash-red');
+      void mainEl.offsetWidth;
+      mainEl.classList.add(pct >= 0 ? 'flash-green' : 'flash-red');
+    }
+  }
+
+  function tickSpotMini(card) {
+    if (!card) return;
+    var priceEl = card.querySelector('.mini-price');
+    var trendEl = card.querySelector('.mini-trend');
+    if (!priceEl || !trendEl) return;
+    var price = parsePrice(priceEl.textContent);
+    var pct = (Math.random() - 0.5) * 0.006;
+    var newPrice = price * (1 + pct);
+    priceEl.textContent = formatPrice(newPrice);
+    var trendSpan = trendEl.querySelector('span');
+    var trendPath = trendEl.querySelector('path');
+    if (trendSpan) {
+      var chgVal = parseFloat(trendSpan.textContent);
+      chgVal += pct * 100;
+      var isUp = chgVal >= 0;
+      trendSpan.textContent = chgVal.toFixed(2) + '%';
+      trendSpan.style.color = isUp ? '#00b565' : '#ff2c40';
+      if (trendPath) {
+        trendPath.setAttribute('fill', isUp ? '#00b565' : '#ff2c40');
+        trendPath.setAttribute('d', isUp ? 'M4 0L8 8H0L4 0Z' : 'M4 8L0 0H8L4 8Z');
+      }
+    }
+    card.classList.remove('flash-green', 'flash-red');
+    void card.offsetWidth;
+    card.classList.add(pct >= 0 ? 'flash-green' : 'flash-red');
+  }
+
+  var spotMinis = [document.getElementById('spotMini0'), document.getElementById('spotMini1')];
+  function tickSpotlight() {
+    tickSpotMain();
+    spotMinis.forEach(function(c) { if (Math.random() < 0.7) tickSpotMini(c); });
+    setTimeout(tickSpotlight, 1200 + Math.random() * 1200);
+  }
+  setTimeout(tickSpotlight, 1500);
+
+  /* ── Market Movers dynamic updates ── */
+  function tickMoverCard(card) {
+    if (!card) return;
+    var priceEl = card.querySelector('.mini-price');
+    var trendEl = card.querySelector('.mini-trend');
+    if (!priceEl || !trendEl) return;
+    var trendSpan = trendEl.querySelector('span');
+    if (!trendSpan) return;
+    // Determine if this card is a riser (positive) or faller (negative) — keep sign consistent
+    var origText = trendSpan.textContent;
+    var isRiser = origText.indexOf('-') === -1;
+    var price = parsePrice(priceEl.textContent);
+    // Drift price slightly; bias direction so risers stay green, fallers stay red
+    var pct = (Math.random() - 0.5) * 0.004;
+    var newPrice = price * (1 + pct);
+    priceEl.textContent = formatPrice(newPrice);
+    // Drift the % a bit but clamp so it doesn't cross zero
+    var chgVal = parseFloat(origText);
+    chgVal += (Math.random() - 0.5) * 0.4;
+    if (isRiser && chgVal < 0.1) chgVal = 0.1 + Math.random() * 0.5;
+    if (!isRiser && chgVal > -0.1) chgVal = -0.1 - Math.random() * 0.5;
+    trendSpan.textContent = (isRiser ? '+' : '') + chgVal.toFixed(2) + '%';
+    // Flash: align flash with this tick's pct direction
+    card.classList.remove('flash-green', 'flash-red');
+    void card.offsetWidth;
+    card.classList.add(pct >= 0 ? 'flash-green' : 'flash-red');
+  }
+
+  function tickMovers() {
+    var moverCards = document.querySelectorAll('.mover-card');
+    if (moverCards.length) {
+      var count = 1 + Math.floor(Math.random() * 3);
+      for (var i = 0; i < count; i++) {
+        tickMoverCard(moverCards[Math.floor(Math.random() * moverCards.length)]);
+      }
+    }
+    setTimeout(tickMovers, 1000 + Math.random() * 1200);
+  }
+  setTimeout(tickMovers, 1800);
+})();
+</script>
+</body>
+</html>

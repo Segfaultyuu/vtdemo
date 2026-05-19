@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=393, initial-scale=1">
+  <title>Asset – VT Markets</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="components.css">
+  <style>
+    body {
+    }
+    .page-scroll { padding-bottom: 85px; }
+
+    /* Background gradient ellipse */
+    .bg-ellipse {
+      position: absolute;
+      left: -192px;
+      top: 12px;
+      width: 858px;
+      height: 530px;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .bg-ellipse img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transform: rotate(90deg) scaleY(-1);
+      transform-origin: center;
+    }
+
+    /* Main content */
+    .prelogin-content {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 108px;
+    }
+
+    /* Rebate illustration */
+    .rebate-wrap {
+      width: 240px;
+      height: 240px;
+      position: relative;
+      margin-bottom: 24px;
+    }
+    .rebate-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    /* Headline */
+    .prelogin-title {
+      font-size: 32px;
+      font-weight: 700;
+      line-height: 1.2;
+      color: #282d34;
+      text-align: center;
+      width: 361px;
+      margin-bottom: 16px;
+    }
+
+    /* Subtitle */
+    .prelogin-subtitle {
+      font-size: 16px;
+      font-weight: 300;
+      line-height: 1.5;
+      color: #282d34;
+      text-align: center;
+      width: 321px;
+    }
+
+    /* CTA flows 40px below subtitle */
+    .prelogin-cta {
+      position: relative;
+      z-index: 1;
+      margin-top: 40px;
+      padding: 0 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      align-items: center;
+    }
+    .btn-open-account {
+      width: 100%;
+      height: 48px;
+      background: #0a36c7;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .btn-open-account:active { opacity: 0.85; }
+    .prelogin-terms {
+      font-size: 12px;
+      font-weight: 500;
+      color: rgba(30, 30, 30, 0.65);
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+<div class="page-scroll">
+
+  <!-- Background ellipse -->
+  <div class="bg-ellipse">
+    <img src="images/prelogin-bg-ellipse.png" alt="">
+  </div>
+
+  <!-- Main content -->
+  <div class="prelogin-content">
+    <div class="rebate-wrap">
+      <img src="images/prelogin-rebate.png" alt="Investment">
+    </div>
+    <h1 class="prelogin-title">Find Your True Investment Direction</h1>
+    <p class="prelogin-subtitle">Opening up a world of opportunity across all major markets.</p>
+  </div>
+
+  <!-- CTA — 40px below subtitle -->
+  <div class="prelogin-cta">
+    <button class="btn-open-account" onclick="location.href='login.html'">Open Account</button>
+    <p class="prelogin-terms">*Terms and Conditions apply</p>
+  </div>
+
+</div><!-- end page-scroll -->
+
+  <script src="top-nav.js"></script>
+  <script>TopNav.init({ showSearch: true, menuHref: 'profile-prelogin.html' });</script>
+  <script src="bottom-nav.js"></script>
+  <script>BottomNav.init('asset', 'prelogin');</script>
+</body>
+</html>

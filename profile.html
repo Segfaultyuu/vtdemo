@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=393, initial-scale=1">
+  <title>Profile – VT Markets</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="components.css">
+  <style>
+    body {
+    }
+
+    /* ── Head background ── */
+    .head-bg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 393px;
+      height: 220px;
+      overflow: hidden;
+      z-index: 0;
+    }
+    .head-bg-img {
+      width: 393px;
+      height: 523px;
+      object-fit: cover;
+      opacity: 0.30;
+      position: absolute;
+      top: 76px;
+      left: 0;
+    }
+
+    /* ── Profile card ── */
+    .profile-card {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 20px;
+    }
+    .avatar-wrap {
+      position: relative;
+      width: 56px;
+      height: 56px;
+      margin-bottom: 8px;
+    }
+    .avatar-wrap img.avatar {
+      width: 56px;
+      height: 56px;
+      border-radius: 60px;
+      object-fit: cover;
+    }
+    .avatar-edit {
+      position: absolute;
+      right: -2px;
+      bottom: 0;
+      width: 16px;
+      height: 16px;
+      background: rgba(249,249,249,0.7);
+      backdrop-filter: blur(2px);
+      border: 1px solid rgba(255,255,255,0.6);
+      border-radius: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .avatar-edit img {
+      width: 10px;
+      height: 10px;
+    }
+    .profile-name {
+      font-size: 15px;
+      font-weight: 700;
+      color: #282d34;
+      line-height: 20px;
+      margin-bottom: 4px;
+    }
+    .profile-meta {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .verified-badge {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .verified-check {
+      width: 11px;
+      height: 11px;
+      border: 0.8px solid #00b565;
+      border-radius: 2px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    .verified-check::after {
+      content: '';
+      width: 5px;
+      height: 3px;
+      border-left: 1.2px solid #00b565;
+      border-bottom: 1.2px solid #00b565;
+      transform: rotate(-45deg);
+      margin-top: -1px;
+    }
+    .verified-text {
+      font-size: 11px;
+      font-weight: 500;
+      color: #00b565;
+    }
+    .meta-divider {
+      width: 0.9px;
+      height: 8px;
+      background: #c2c7d0;
+    }
+    .uid-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .uid-text {
+      font-size: 11px;
+      font-weight: 400;
+      color: #282d34;
+    }
+    .uid-row img {
+      width: 11px;
+      height: 11px;
+      cursor: pointer;
+    }
+
+    /* ── Member card ── */
+    .member-card {
+      width: 353px;
+      height: 48px;
+      border-radius: 8px 8px 0 0;
+      background: linear-gradient(94deg, #c0e3ff 0.5%, #9cc5ff 117%);
+      margin: 16px auto 0;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 16px;
+      z-index: 1;
+    }
+    .member-text {
+      display: flex;
+      flex-direction: column;
+    }
+    .member-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: #0a36c7;
+      opacity: 0.8;
+      line-height: 20px;
+    }
+    .member-points {
+      font-size: 12px;
+      font-weight: 500;
+      color: #0a36c7;
+      opacity: 0.5;
+    }
+    .member-arrow {
+      width: 20px;
+      height: 20px;
+      background: #0a36c7;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .member-arrow svg {
+      width: 10px;
+      height: 10px;
+    }
+
+    /* ── Signal Provider Center ── */
+    .signal-card {
+      width: 353px;
+      margin: 16px auto 0;
+      padding: 16px;
+      background: #f9f9f9;
+      border-radius: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .signal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .signal-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #282d34;
+    }
+    .signal-stats {
+      display: flex;
+    }
+    .signal-stat {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .signal-stat-label {
+      font-size: 12px;
+      font-weight: 400;
+      color: #7a8699;
+    }
+    .signal-stat-value {
+      font-size: 16px;
+      font-weight: 600;
+      color: #282d34;
+    }
+
+    /* ── Menu rows ── */
+    .menu-section {
+      width: 393px;
+      padding: 0 20px;
+      margin-top: 16px;
+      border-bottom: 1px solid #f4f5f6;
+    }
+    .menu-row {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: pointer;
+    }
+    .menu-row-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .menu-icon {
+      width: 24px;
+      height: 24px;
+      position: relative;
+    }
+    .menu-icon img {
+      width: 24px;
+      height: 24px;
+    }
+    .menu-icon .security-badge {
+      position: absolute;
+      top: -3px;
+      right: -3px;
+      width: 10px;
+      height: 10px;
+    }
+    .menu-label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #282d34;
+    }
+    .menu-arrow {
+      width: 10px;
+      height: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .menu-arrow svg {
+      width: 10px;
+      height: 10px;
+    }
+    .menu-divider {
+      border-bottom: 0.5px solid #f4f5f6;
+      padding-bottom: 12px;
+    }
+
+    /* ── Home indicator ── */
+    .home-indicator {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 393px;
+      height: 21px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 8px;
+      background: #fff;
+      z-index: 10;
+    }
+    .home-bar {
+      width: 139px;
+      height: 5px;
+      background: rgba(30,30,30,0.3);
+      border-radius: 100px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Head background decoration -->
+  <div class="head-bg">
+    <img class="head-bg-img" src="images/profile-head-bg.png" alt="">
+  </div>
+
+  <!-- Profile card -->
+  <div class="profile-card">
+    <div class="avatar-wrap">
+      <img class="avatar" src="images/profile-avatar.png" alt="Rachel">
+      <div class="avatar-edit">
+        <img src="images/profile-edit.svg" alt="edit">
+      </div>
+    </div>
+    <p class="profile-name">Rachel</p>
+    <div class="profile-meta">
+      <div class="verified-badge">
+        <div class="verified-check"></div>
+        <span class="verified-text">Verified</span>
+      </div>
+      <div class="meta-divider"></div>
+      <div class="uid-row">
+        <span class="uid-text">UID: 12345678</span>
+        <img src="images/profile-copy.svg" alt="copy">
+      </div>
+    </div>
+  </div>
+
+  <!-- Member card -->
+  <div class="member-card">
+    <div class="member-text">
+      <span class="member-label">Member</span>
+      <span class="member-points">1234 Points to Next Level</span>
+    </div>
+    <div class="member-arrow">
+      <svg viewBox="0 0 10 10" fill="none">
+        <path d="M3.5 2L7 5L3.5 8" stroke="#fff" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Signal Provider Center -->
+  <div class="signal-card">
+    <div class="signal-header">
+      <span class="signal-title">Signal Provider Center</span>
+      <div class="menu-arrow">
+        <svg viewBox="0 0 10 10" fill="none"><path d="M3.5 2L7 5L3.5 8" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+    <div class="signal-stats">
+      <div class="signal-stat">
+        <span class="signal-stat-label">Strategies</span>
+        <span class="signal-stat-value">0/100</span>
+      </div>
+      <div class="signal-stat">
+        <span class="signal-stat-label">Active Copiers</span>
+        <span class="signal-stat-value">500</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Menu items -->
+  <div class="menu-section">
+    <div class="menu-row">
+      <div class="menu-row-left">
+        <div class="menu-icon"><img src="images/profile-ib.png" alt=""></div>
+        <span class="menu-label">IB Portal</span>
+      </div>
+      <div class="menu-arrow"><svg viewBox="0 0 10 10" fill="none"><path d="M3.5 2L7 5L3.5 8" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="menu-row">
+      <div class="menu-row-left">
+        <div class="menu-icon"><img src="images/profile-mission.png" alt=""></div>
+        <span class="menu-label">Mission Center</span>
+      </div>
+      <div class="menu-arrow"><svg viewBox="0 0 10 10" fill="none"><path d="M3.5 2L7 5L3.5 8" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="menu-row">
+      <div class="menu-row-left">
+        <div class="menu-icon"><img src="images/profile-coupons.png" alt=""></div>
+        <span class="menu-label">Coupons</span>
+      </div>
+      <div class="menu-arrow"><svg viewBox="0 0 10 10" fill="none"><path d="M3.5 2L7 5L3.5 8" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="menu-row menu-divider">
+      <div class="menu-row-left">
+        <div class="menu-icon"><img src="images/profile-referrals.png" alt=""></div>
+        <span class="menu-label">Referrals</span>
+      </div>
+      <div class="menu-arrow"><svg viewBox="0 0 10 10" fill="none"><path d="M3.5 2L7 5L3.5 8" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="menu-row">
+      <div class="menu-row-left">
+        <div class="menu-icon"><img src="images/profile-alerts.png" alt=""></div>
+        <span class="menu-label">Price Alerts</span>
+      </div>
+      <div class="menu-arrow"><svg viewBox="0 0 10 10" fill="none"><path d="M3.5 2L7 5L3.5 8" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="menu-row">
+      <div class="menu-row-left">
+        <div class="menu-icon">
+          <img src="images/profile-security.png" alt="">
+          <svg class="security-badge" width="10" height="10" viewBox="0 0 10 10" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="5" cy="5" r="5" fill="#e53935"/><circle cx="5" cy="5" r="3.5" fill="#ff5252"/></svg>
+        </div>
+        <span class="menu-label">Security</span>
+      </div>
+      <div class="menu-arrow"><svg viewBox="0 0 10 10" fill="none"><path d="M3.5 2L7 5L3.5 8" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+    <div class="menu-row">
+      <div class="menu-row-left">
+        <div class="menu-icon"><img src="images/profile-favourites.png" alt=""></div>
+        <span class="menu-label">Favourites</span>
+      </div>
+      <div class="menu-arrow"><svg viewBox="0 0 10 10" fill="none"><path d="M3.5 2L7 5L3.5 8" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+  </div>
+
+  <!-- Home indicator -->
+  <div class="home-indicator">
+    <div class="home-bar"></div>
+  </div>
+
+  <script src="top-nav.js"></script>
+  <script>TopNav.init({
+    showBack: true,
+    centerText: 'Copy Trading 12345678',
+    centerIconSrc: 'images/trade-icon-switch.svg',
+    rightIcons: [
+      { src: 'images/profile-cs.svg', alt: 'customer service' },
+      { src: 'images/profile-settings.svg', alt: 'settings', href: 'settings.html' }
+    ]
+  });</script>
+</body>
+</html>

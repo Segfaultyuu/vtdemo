@@ -1,0 +1,980 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=393, initial-scale=1">
+  <title>Home – VT Markets</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="components.css">
+  <style>
+    .page-scroll { padding-bottom: 85px; }
+
+    /* ── Sticky header ── */
+    .tn-status-bar { position: sticky !important; top: 0; z-index: 20; background: #fff; }
+    .tn-nav-bar { position: sticky !important; top: 54px; z-index: 20; background: #fff; }
+
+    .deposit-btn { margin-top: 16px; }
+
+    /* ── Chart ── */
+    /* Reuse asset-chart-wrap component */
+    .asset-chart-wrap {
+      position: relative;
+      width: 393px;
+      height: 225px;
+      overflow: hidden;
+      touch-action: none;
+    }
+    .asset-chart-fills {
+      position: absolute;
+      top: 0; left: 0;
+      width: 393px; height: 180px;
+      transition: opacity 0.2s ease;
+    }
+    .asset-chart-fill-img {
+      position: absolute;
+      top: 13px; left: 0;
+      width: 393px;
+    }
+    .asset-chart-value-pill {
+      position: absolute;
+      top: 1px; left: 184px;
+      background: #282d34; color: #fff;
+      font-size: 11px; font-weight: 600;
+      padding: 2px 8px; border-radius: 100px;
+      white-space: nowrap; z-index: 3;
+      transition: left 0.08s ease, top 0.08s ease;
+    }
+    .asset-chart-dot {
+      position: absolute;
+      top: 55px; left: 208px;
+      width: 15px; height: 15px;
+      z-index: 3;
+      transition: left 0.08s ease, top 0.08s ease;
+    }
+    .asset-chart-grid {
+      position: absolute;
+      top: 0; left: 0;
+      width: 393px; height: 180px;
+      pointer-events: none;
+    }
+    .asset-chart-scrub-line {
+      position: absolute;
+      top: 0; width: 1px; height: 180px;
+      background: rgba(0,181,101,0.35);
+      pointer-events: none;
+      display: none; z-index: 2;
+    }
+    .asset-chart-wrap.dragging .asset-chart-dot,
+    .asset-chart-wrap.dragging .asset-chart-value-pill {
+      transition: none;
+    }
+    .asset-time-tabs {
+      position: absolute;
+      bottom: 0; left: 16px; right: 16px;
+      height: 44px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .asset-time-tab {
+      width: 48px; height: 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 500; color: #7a8699;
+      border-radius: 2px; cursor: pointer;
+    }
+    .asset-time-tab.active { background: #e5e7eb; color: #282d34; }
+
+    /* ── Watchlist ── */
+    .watchlist-section { padding: 0 20px; }
+    .wl-list { display: flex; flex-direction: column; gap: 0; }
+    /* ── Watchlist buy/sell view ── */
+    .wl-bs-list {
+      display: none;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .wl-bs-item {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #f4f5f6;
+    }
+    .bs-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .bs-header-left {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .bs-symbol { font-size: 16px; font-weight: 600; color: #282d34; line-height: 24px; }
+    .bs-buttons { display: flex; gap: 12px; position: relative; align-items: center; }
+    .bs-sell {
+      flex: 1;
+      height: 48px;
+      background: rgba(255,44,64,0.12);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 12px 12px 8px;
+    }
+    .bs-buy {
+      flex: 1;
+      height: 48px;
+      background: rgba(0,181,101,0.12);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 12px;
+    }
+    .bs-price { font-size: 16px; font-weight: 600; color: #282d34; }
+    .bs-spread {
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: #f5f5f5;
+      border-radius: 6px;
+      font-size: 10px;
+      font-weight: 500;
+      color: #1a1a1e;
+      height: 16px;
+      width: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 5px rgba(0,0,0,0.04);
+      z-index: 1;
+      white-space: nowrap;
+    }
+
+    .wl-view-more {
+      display: flex; align-items: center; justify-content: center;
+      height: 24px; margin: 0 auto; padding: 12px 12px 0;
+      background: none; border: none;
+      font-size: 12px; font-weight: 500; color: #7a8699; cursor: pointer;
+    }
+    /* news-thumb-img alias for backward compat */
+    .news-thumb-img { width: 68px; height: 68px; border-radius: 6px; object-fit: cover; flex-shrink: 0; }
+
+  </style>
+</head>
+<body>
+<div class="page-scroll">
+
+  <!-- Portfolio section -->
+  <div class="portfolio-section">
+    <div class="portfolio-header">
+      <div>
+        <div class="total-label">
+          Total Value
+          <img width="14" height="14" src="images/c961590d-dfeb-4118-bc85-fde9ef538a6f.svg" alt="">
+        </div>
+        <div class="amount-row">
+          <span class="amount-big">5,000,000.00</span>
+          <div class="ccy-trigger">
+            <span class="ccy-trigger-text">USD</span>
+            <svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M4 6L0 0H8Z" fill="#282d34"/></svg>
+          </div>
+        </div>
+        <div class="pnl-row">
+          <span class="pnl-label">Today's PnL</span>
+          <span class="pnl-value">+12,123,350 USD</span>
+          <svg id="chartToggleBtn" width="13" height="13" viewBox="0 0 13 13" fill="none" style="cursor:pointer;transition:transform 0.25s;flex-shrink:0;">
+            <path d="M2 5L6.5 9L11 5" stroke="#b6b6b6" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+      <button class="deposit-btn">Deposit</button>
+    </div>
+  </div>
+
+  <!-- Chart (asset-chart-wrap component) -->
+  <div class="asset-chart-wrap" id="chartWrap">
+    <div class="asset-chart-fills" id="chartFills">
+      <svg class="asset-chart-fill-img" preserveAspectRatio="none" viewBox="0 0 393 167" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:167px;object-fit:fill;">
+        <path id="chartFillPath" d="M9.49849 25.5985L0 18.8942V167H393V78.7286L383.501 88.8679L374.597 59.6429L366.285 78.7286L358.568 82.9036L349.663 136.582L341.946 110.339L333.041 107.357L324.73 113.321L315.825 115.803L300.983 75.15L290.298 70.975L283.174 82.9036L275.456 76.9393L267.145 82.9036L258.24 101.393L249.929 91.2536L242.211 62.0286L233.307 48.9071L224.402 67.9929H216.091L208.373 42.3464L200.062 48.9071L192.938 32.8036L183.44 51.8893L174.535 44.7321L166.224 70.975L150.789 39.9607L142.477 48.9071L133.573 36.3821L125.855 32.8036L108.639 44.7321L100.921 59.6429L92.6103 51.8893L84.2991 62.0286L76.5816 51.8893L67.0831 62.0286L58.7719 15.2372L49.8671 25.05L43.3369 0L33.8384 1.82847L26.1208 15.2372L17.216 0L9.49849 25.5985Z" fill="url(#chartGrad)"/>
+        <defs>
+          <linearGradient id="chartGrad" x1="196.5" y1="-110.5" x2="196.5" y2="167" gradientUnits="userSpaceOnUse">
+            <stop stop-color="#00B565"/>
+            <stop offset="1" stop-color="#00B565" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+      </svg>
+      <svg class="asset-chart-fill-img" preserveAspectRatio="none" viewBox="0 0 393.649 138.358" fill="none" xmlns="http://www.w3.org/2000/svg" style="height:137px;object-fit:fill;top:13px;">
+        <path id="chartStrokePath" d="M0.28391 19.6851L9.7824 26.2373L17.4999 1.21992L26.4048 16.1112L34.1223 3.00688L43.6208 1.21992L50.151 26.2373L59.0558 16.1112L67.367 63.1677L76.8655 53.0417L84.583 63.1677L92.8942 53.0417L101.205 60.7851L108.923 45.8938L126.139 33.9808L133.856 37.5547L142.761 50.0634L151.072 41.1286L166.507 72.1025L174.819 45.8938L183.723 53.0417L193.222 33.9808L200.346 50.0634L208.657 43.5112L216.375 69.1243H224.686L233.591 50.0634L242.495 63.1677L250.213 92.3547L258.524 102.481L267.429 84.0156L275.74 78.0591L283.458 84.0156L290.581 72.1025L301.267 76.2721L316.109 116.776L325.014 114.394L333.325 108.437L342.23 111.416L349.947 138.22L358.852 84.0156L366.569 79.846L374.881 60.7851L383.785 89.9721L393.284 79.846" stroke="#00B565"/>
+      </svg>
+    </div>
+    <svg class="asset-chart-grid" viewBox="0 0 393 180" preserveAspectRatio="none">
+      <line x1="0" y1="20" x2="393" y2="20" stroke="#f4f5f6" stroke-width="0.5"/>
+      <line x1="0" y1="60" x2="393" y2="60" stroke="#f4f5f6" stroke-width="0.5"/>
+      <line x1="0" y1="100" x2="393" y2="100" stroke="#f4f5f6" stroke-width="0.5"/>
+      <line x1="0" y1="140" x2="393" y2="140" stroke="#f4f5f6" stroke-width="0.5"/>
+      <line x1="78.6" y1="0" x2="78.6" y2="180" stroke="#f4f5f6" stroke-width="0.5"/>
+      <line x1="156.6" y1="0" x2="156.6" y2="180" stroke="#f4f5f6" stroke-width="0.5"/>
+      <line x1="235.6" y1="0" x2="235.6" y2="180" stroke="#f4f5f6" stroke-width="0.5"/>
+      <line x1="313.6" y1="0" x2="313.6" y2="180" stroke="#f4f5f6" stroke-width="0.5"/>
+    </svg>
+    <div class="asset-chart-scrub-line" id="chartScrubLine"></div>
+    <div class="asset-chart-value-pill" id="chartPill">$121,112</div>
+    <img class="asset-chart-dot" id="chartDot" src="images/a5ce5622-d90b-4932-b89e-210e723c46c7.svg" alt="">
+    <div class="asset-time-tabs" id="homeTimeTabs">
+      <div class="asset-time-tab">7D</div>
+      <div class="asset-time-tab active">30D</div>
+      <div class="asset-time-tab">90D</div>
+      <div class="asset-time-tab">180D</div>
+      <div class="asset-time-tab">360D</div>
+    </div>
+  </div>
+
+  <!-- Quick links -->
+  <div class="quick-links">
+    <div class="ql-item">
+      <img class="ql-icon" src="images/b0c595a5-f36c-463a-bb2f-bbc779e9b4d1.svg" alt="">
+      <span class="ql-label">Promo</span>
+    </div>
+    <div class="ql-item">
+      <img class="ql-icon" src="images/d571856d-aff2-48ea-b500-c4732ba94fa7.svg" alt="">
+      <span class="ql-label">Top Traders</span>
+    </div>
+    <div class="ql-item">
+      <img class="ql-icon" src="images/835051a3-af4b-4084-96b6-1753550635f7.svg" alt="">
+      <span class="ql-label">VT Wallet</span>
+    </div>
+    <div class="ql-item">
+      <img class="ql-icon" src="images/1d14d125-c5cd-4285-a039-b083f230252f.svg" alt="">
+      <span class="ql-label">Referrals</span>
+    </div>
+  </div>
+
+  <!-- Banner -->
+  <div class="banner-wrap">
+    <div style="overflow:hidden;">
+      <div id="homeBannerTrack" style="display:flex;width:300%;transition:transform .35s cubic-bezier(.4,0,.2,1);">
+        <!-- Slide 1 -->
+        <div class="banner-inner" style="width:33.333%;flex-shrink:0;padding-bottom:8px;">
+          <img class="banner-img" src="images/Shakeyourclaim_image.png" alt="">
+          <div class="banner-body" style="min-width:0;">
+            <p class="banner-cat">Stake Your Claim</p>
+            <p class="banner-title-text">With a daily turnover of $7.5 trillion, the sheer size of the forex market impacts all...</p>
+          </div>
+        </div>
+        <!-- Slide 2 -->
+        <div class="banner-inner" style="width:33.333%;flex-shrink:0;padding-bottom:8px;">
+          <img class="banner-img" src="images/copy-person2.png" alt="">
+          <div class="banner-body" style="min-width:0;">
+            <p class="banner-cat">Expert Traders</p>
+            <p class="banner-title-text">Follow top-ranked traders and automatically mirror their strategies in real time...</p>
+          </div>
+        </div>
+        <!-- Slide 3 -->
+        <div class="banner-inner" style="width:33.333%;flex-shrink:0;padding-bottom:8px;">
+          <img class="banner-img" src="images/copy-guide1.png" alt="">
+          <div class="banner-body" style="min-width:0;">
+            <p class="banner-cat">Trading Guide</p>
+            <p class="banner-title-text">Access comprehensive guides to sharpen your trading skills and strategy...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Shared footer: dots + arrow -->
+    <div class="banner-foot" style="padding-bottom:12px;">
+      <div class="banner-dots" id="homeBannerDots">
+        <div class="b-dot on"></div><div class="b-dot"></div><div class="b-dot"></div>
+      </div>
+      <svg id="homeBannerArrow" style="cursor:pointer;" width="10" height="10" viewBox="0 0 10 10" fill="none">
+        <line x1="1" y1="5" x2="8.5" y2="5" stroke="#282d34" stroke-width="1.2" stroke-linecap="round"/>
+        <path d="M6 2.5L8.5 5L6 7.5" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Top Trader section -->
+  <div class="top-trader-section">
+    <div class="section-row" style="padding-left:0; padding-right:20px; margin-top:0;">
+      <span class="section-title">Top Trader</span>
+      <div class="arrow-right"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><line x1="3" y1="10" x2="16" y2="10" stroke="#282d34" stroke-width="1.8" stroke-linecap="round"/><path d="M11 5.5L16.5 10L11 14.5" stroke="#282d34" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    </div>
+
+    <div class="trader-cards-row">
+      <!-- Trader 1 – Matteo Masino -->
+      <div class="trader-card">
+        <img class="trader-card-bg" src="images/0485bc50-fc5f-49e8-9068-eb3b146111c1.svg" alt="">
+        <div class="trader-divider"></div>
+        <div class="trader-avatar">
+          <img src="images/toptrader1.png" alt="Matteo Masino">
+        </div>
+        <div class="trader-rank rank-gold">1st</div>
+        <div class="trader-name">Matteo Masino</div>
+        <div class="trader-followers">
+          <img src="images/5b3cdfe7-d5ea-433b-b21c-19aaf782c889.svg" alt="">
+          <span>398</span>
+        </div>
+        <div class="trader-return-label">Return (1Y)</div>
+        <div class="trader-return-value">+550.56%</div>
+        <div class="trader-chart">
+          <img src="images/c171a03f-dcf1-4067-b716-1624bb15d0e0.svg" alt="chart">
+        </div>
+        <div class="trader-stats">
+          <div class="trader-stat">
+            <span class="trader-stat-value">0.10%</span>
+            <span class="trader-stat-label">Win Rate</span>
+          </div>
+          <div class="trader-stat">
+            <div class="risk-badge risk-low">1</div>
+            <span class="trader-stat-label">Risk Level</span>
+          </div>
+        </div>
+        <div class="trader-view-btn">View</div>
+      </div>
+
+      <!-- Trader 2 – Alice Masino -->
+      <div class="trader-card">
+        <div style="position:absolute;inset:0;overflow:hidden;border-radius:8px;">
+          <div style="position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:136px;height:31px;background:radial-gradient(ellipse,rgba(85,132,250,0.15) 0%,transparent 70%);filter:blur(8px);"></div>
+          <div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:136px;height:31px;background:radial-gradient(ellipse,rgba(85,132,250,0.12) 0%,transparent 70%);filter:blur(8px);"></div>
+        </div>
+        <div class="trader-divider"></div>
+        <div class="trader-avatar">
+          <img src="images/toptrader2.png" alt="Alice Masino">
+        </div>
+        <div class="trader-rank rank-silver">2nd</div>
+        <div class="trader-name">Alice Masino</div>
+        <div class="trader-followers">
+          <img src="images/5b3cdfe7-d5ea-433b-b21c-19aaf782c889.svg" alt="">
+          <span>198</span>
+        </div>
+        <div class="trader-return-label">Return (1Y)</div>
+        <div class="trader-return-value">+250.56%</div>
+        <div class="trader-chart">
+          <img src="images/c171a03f-dcf1-4067-b716-1624bb15d0e0.svg" alt="chart">
+        </div>
+        <div class="trader-stats">
+          <div class="trader-stat">
+            <span class="trader-stat-value">2.00%</span>
+            <span class="trader-stat-label">Win Rate</span>
+          </div>
+          <div class="trader-stat">
+            <div class="risk-badge risk-med">3</div>
+            <span class="trader-stat-label">Risk Level</span>
+          </div>
+        </div>
+        <div class="trader-view-btn">View</div>
+      </div>
+
+      <!-- Trader 3 -->
+      <div class="trader-card" style="margin-right:20px;">
+        <img class="trader-card-bg" src="images/8a90fd8b-2f4a-4664-93b2-e6b552c9b569.svg" alt="">
+        <div class="trader-divider"></div>
+        <div class="trader-avatar">
+          <img src="images/toptrader2.png" alt="Alice Masino">
+        </div>
+        <div class="trader-rank rank-bronze">3rd</div>
+        <div class="trader-name">Alice Masino</div>
+        <div class="trader-followers">
+          <img src="images/5b3cdfe7-d5ea-433b-b21c-19aaf782c889.svg" alt="">
+          <span>198</span>
+        </div>
+        <div class="trader-return-label">Return (30d)</div>
+        <div class="trader-return-value">+250.56%</div>
+        <div class="trader-chart">
+          <img src="images/c171a03f-dcf1-4067-b716-1624bb15d0e0.svg" alt="chart">
+        </div>
+        <div class="trader-stats">
+          <div class="trader-stat">
+            <span class="trader-stat-value">2.00%</span>
+            <span class="trader-stat-label">Drawdown</span>
+          </div>
+          <div class="trader-stat">
+            <div class="risk-badge risk-med">3</div>
+            <span class="trader-stat-label">Risk Level</span>
+          </div>
+        </div>
+        <div class="trader-view-btn">View</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Watchlist section -->
+  <div class="section-row" style="margin-top:0;">
+    <span class="section-title">Watchlist</span>
+    <div class="arrow-right" onclick="location.href='markets.html#watchlist'"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><line x1="3" y1="10" x2="16" y2="10" stroke="#282d34" stroke-width="1.8" stroke-linecap="round"/><path d="M11 5.5L16.5 10L11 14.5" stroke="#282d34" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+  <div class="watchlist-section">
+    <div class="wl-list">
+      <div class="e-row">
+        <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" alt="">
+        <div class="e-info"><div class="e-name">BTCUSD</div><div class="e-sub">Bitcoin</div></div>
+        <div class="e-right"><span class="e-price">82,143.50</span><span class="e-chg up">+1.5%</span></div>
+      </div>
+      <div class="e-row">
+        <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png" alt="">
+        <div class="e-info"><div class="e-name">ETHUSD</div><div class="e-sub">Ethereum</div></div>
+        <div class="e-right"><span class="e-price">2,143.50</span><span class="e-chg up">+1.5%</span></div>
+      </div>
+      <div class="e-row">
+        <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/xrp.png" alt="">
+        <div class="e-info"><div class="e-name">XRPUSD</div><div class="e-sub">Ripple</div></div>
+        <div class="e-right"><span class="e-price">0.6234</span><span class="e-chg up">+2.8%</span></div>
+      </div>
+      <div class="e-row">
+        <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/doge.png" alt="">
+        <div class="e-info"><div class="e-name">DOGEUSD</div><div class="e-sub">Dogecoin</div></div>
+        <div class="e-right"><span class="e-price">0.1542</span><span class="e-chg up">+1.2%</span></div>
+      </div>
+      <div class="e-row">
+        <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/link.png" alt="">
+        <div class="e-info"><div class="e-name">LINKUSD</div><div class="e-sub">Chainlink</div></div>
+        <div class="e-right"><span class="e-price">14.85</span><span class="e-chg dn">-1.5%</span></div>
+      </div>
+      <div class="e-row">
+        <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/sol.png" alt="">
+        <div class="e-info"><div class="e-name">SOLUSD</div><div class="e-sub">Solana</div></div>
+        <div class="e-right"><span class="e-price">148.32</span><span class="e-chg up">+3.4%</span></div>
+      </div>
+      <div class="e-row">
+        <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/ada.png" alt="">
+        <div class="e-info"><div class="e-name">ADAUSD</div><div class="e-sub">Cardano</div></div>
+        <div class="e-right"><span class="e-price">0.4521</span><span class="e-chg dn">-0.8%</span></div>
+      </div>
+      <div class="e-row">
+        <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/bnb.png" alt="">
+        <div class="e-info"><div class="e-name">BNBUSD</div><div class="e-sub">BNB</div></div>
+        <div class="e-right"><span class="e-price">584.20</span><span class="e-chg up">+1.9%</span></div>
+      </div>
+      <div class="e-row">
+        <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/avax.png" alt="">
+        <div class="e-info"><div class="e-name">AVAXUSD</div><div class="e-sub">Avalanche</div></div>
+        <div class="e-right"><span class="e-price">35.67</span><span class="e-chg dn">-2.1%</span></div>
+      </div>
+      <div class="e-row">
+        <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/dot.png" alt="">
+        <div class="e-info"><div class="e-name">DOTUSD</div><div class="e-sub">Polkadot</div></div>
+        <div class="e-right"><span class="e-price">7.24</span><span class="e-chg up">+0.6%</span></div>
+      </div>
+    </div>
+    <div class="wl-bs-list">
+      <div class="wl-bs-item">
+        <div class="bs-header">
+          <div class="bs-header-left">
+            <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" alt="">
+            <span class="bs-symbol">BTCUSD</span>
+          </div>
+          <span class="e-chg up">+1.5%</span>
+        </div>
+        <div class="bs-buttons">
+          <div class="bs-sell">
+            <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 8L0 0H8L4 8Z" fill="#ff2c40"/></svg>
+            <span class="bs-price">82,058.03</span>
+          </div>
+          <div class="bs-spread">1210</div>
+          <div class="bs-buy">
+            <span class="bs-price">82,083.03</span>
+            <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0L4 0Z" fill="#00b565"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="wl-bs-item">
+        <div class="bs-header">
+          <div class="bs-header-left">
+            <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png" alt="">
+            <span class="bs-symbol">ETHUSD</span>
+          </div>
+          <span class="e-chg up">+1.5%</span>
+        </div>
+        <div class="bs-buttons">
+          <div class="bs-sell">
+            <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 8L0 0H8L4 8Z" fill="#ff2c40"/></svg>
+            <span class="bs-price">2,058.03</span>
+          </div>
+          <div class="bs-spread">1210</div>
+          <div class="bs-buy">
+            <span class="bs-price">2,083.03</span>
+            <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0L4 0Z" fill="#00b565"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="wl-bs-item">
+        <div class="bs-header">
+          <div class="bs-header-left">
+            <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/xrp.png" alt="">
+            <span class="bs-symbol">XRPUSD</span>
+          </div>
+          <span class="e-chg up">+2.8%</span>
+        </div>
+        <div class="bs-buttons">
+          <div class="bs-sell">
+            <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 8L0 0H8L4 8Z" fill="#ff2c40"/></svg>
+            <span class="bs-price">0.6218</span>
+          </div>
+          <div class="bs-spread">16</div>
+          <div class="bs-buy">
+            <span class="bs-price">0.6250</span>
+            <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0L4 0Z" fill="#00b565"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="wl-bs-item">
+        <div class="bs-header">
+          <div class="bs-header-left">
+            <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/doge.png" alt="">
+            <span class="bs-symbol">DOGEUSD</span>
+          </div>
+          <span class="e-chg up">+1.2%</span>
+        </div>
+        <div class="bs-buttons">
+          <div class="bs-sell">
+            <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 8L0 0H8L4 8Z" fill="#ff2c40"/></svg>
+            <span class="bs-price">0.1536</span>
+          </div>
+          <div class="bs-spread">6</div>
+          <div class="bs-buy">
+            <span class="bs-price">0.1548</span>
+            <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0L4 0Z" fill="#00b565"/></svg>
+          </div>
+        </div>
+      </div>
+      <div class="wl-bs-item">
+        <div class="bs-header">
+          <div class="bs-header-left">
+            <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/link.png" alt="">
+            <span class="bs-symbol">LINKUSD</span>
+          </div>
+          <span class="e-chg dn">-1.5%</span>
+        </div>
+        <div class="bs-buttons">
+          <div class="bs-sell">
+            <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 8L0 0H8L4 8Z" fill="#ff2c40"/></svg>
+            <span class="bs-price">12.058.03</span>
+          </div>
+          <div class="bs-spread">1210</div>
+          <div class="bs-buy">
+            <span class="bs-price">12,083.03</span>
+            <svg width="8" height="8" viewBox="0 0 8 8"><path d="M4 0L8 8H0L4 0Z" fill="#00b565"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+    <button class="wl-view-more" onclick="location.href='markets.html#watchlist'">View More</button>
+  </div>
+
+  <!-- News section -->
+  <div class="section-row">
+    <span class="section-title">News</span>
+    <div class="arrow-right"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><line x1="3" y1="10" x2="16" y2="10" stroke="#282d34" stroke-width="1.8" stroke-linecap="round"/><path d="M11 5.5L16.5 10L11 14.5" stroke="#282d34" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+
+  <div class="news-item">
+    <div class="news-body">
+      <div class="news-title">GBP/USD: Likely to trade in a range between 1.344 and 1.352 - UOB Group</div>
+      <div class="news-sub">Long positions above 21175.00 with target...</div>
+      <div class="news-time">Today 09:05</div>
+    </div>
+    <img class="news-thumb-img" src="images/news1.png" alt="">
+  </div>
+  <div class="news-item">
+    <div class="news-body">
+      <div class="news-title">GBP/USD: Likely to trade in a range between 1.344 and 1.352 - UOB Group</div>
+      <div class="news-sub">Long positions above 21175.00 with target...</div>
+      <div class="news-time">Today 09:05</div>
+    </div>
+    <img class="news-thumb-img" src="images/news2.png" alt="">
+  </div>
+
+</div><!-- end page-scroll -->
+
+<!-- Tab bar -->
+
+<script>
+  const chartToggleBtn = document.getElementById('chartToggleBtn');
+  const chartWrap = document.getElementById('chartWrap');
+  const periodRow = document.querySelector('.period-row');
+  let chartCollapsed = false;
+
+  chartToggleBtn.addEventListener('click', function() {
+    chartCollapsed = !chartCollapsed;
+    chartWrap.style.display = chartCollapsed ? 'none' : '';
+    if (periodRow) periodRow.style.display = chartCollapsed ? 'none' : '';
+    chartToggleBtn.style.transform = chartCollapsed ? 'rotate(-90deg)' : '';
+  });
+
+  // ── Interactive Chart (time-tab switching + drag scrubbing) ─────────
+  (function() {
+    // Shared x-coords from the original stroke path (45 points)
+    var XS = [0.284,9.782,17.5,26.405,34.122,43.621,50.151,59.056,67.367,76.866,84.583,92.894,101.205,108.923,126.139,133.856,142.761,151.072,166.507,174.819,183.723,193.222,200.346,208.657,216.375,224.686,233.591,242.495,250.213,258.524,267.429,275.74,283.458,290.581,301.267,316.109,325.014,333.325,342.23,349.947,358.852,366.569,374.881,383.785,393.284];
+
+    // Stroke y-values per period (viewBox 0–138)
+    var STROKE_Y = {
+      '7D':  [65,68,62,70,58,64,72,60,78,74,82,70,66,72,80,68,74,84,70,76,82,72,68,80,72,76,70,66,78,85,74,70,68,76,72,80,74,68,72,84,76,70,74,78,80],
+      '30D': [19.685,26.237,1.22,16.111,3.007,1.22,26.237,16.111,63.168,53.042,63.168,53.042,60.785,45.894,33.981,37.555,50.063,41.129,72.103,45.894,53.042,33.981,50.063,43.511,69.124,69.124,50.063,63.168,92.355,102.481,84.016,78.059,84.016,72.103,76.272,116.776,114.394,108.437,111.416,138.22,84.016,79.846,60.785,89.972,79.846],
+      '90D': [118,122,112,120,115,108,118,110,104,98,108,102,95,88,82,90,96,85,78,82,70,75,68,62,72,78,65,58,52,68,72,60,55,48,56,92,88,80,75,105,72,68,58,82,80],
+      '180D':[130,134,125,130,128,122,132,120,115,108,118,110,102,95,88,96,104,92,85,78,68,72,62,55,65,70,58,50,45,62,68,55,48,42,52,85,78,72,65,98,68,62,52,78,80],
+      '360D':[135,132,138,135,130,128,136,125,118,112,122,115,105,98,92,100,108,95,88,80,72,65,58,48,60,65,52,45,38,58,65,48,42,35,48,82,75,68,60,95,65,58,48,72,80]
+    };
+
+    // Build stroke path "d" from x-coords and y-values
+    function buildStrokeD(ys) {
+      var d = 'M' + XS[0] + ' ' + ys[0];
+      for (var i = 1; i < XS.length; i++) d += 'L' + XS[i] + ' ' + ys[i];
+      return d;
+    }
+
+    // Build fill path "d" (closed area, matching asset-chart-fills component)
+    function buildFillD(ys) {
+      var d = 'M' + XS[0] + ' ' + ys[0];
+      for (var i = 1; i < XS.length; i++) d += 'L' + XS[i] + ' ' + ys[i];
+      d += 'L' + XS[XS.length - 1] + ' 167L' + XS[0] + ' 167Z';
+      return d;
+    }
+
+    // Original 30D paths (exact Figma exports)
+    var ORIG_FILL_D = 'M9.49849 25.5985L0 18.8942V167H393V78.7286L383.501 88.8679L374.597 59.6429L366.285 78.7286L358.568 82.9036L349.663 136.582L341.946 110.339L333.041 107.357L324.73 113.321L315.825 115.803L300.983 75.15L290.298 70.975L283.174 82.9036L275.456 76.9393L267.145 82.9036L258.24 101.393L249.929 91.2536L242.211 62.0286L233.307 48.9071L224.402 67.9929H216.091L208.373 42.3464L200.062 48.9071L192.938 32.8036L183.44 51.8893L174.535 44.7321L166.224 70.975L150.789 39.9607L142.477 48.9071L133.573 36.3821L125.855 32.8036L108.639 44.7321L100.921 59.6429L92.6103 51.8893L84.2991 62.0286L76.5816 51.8893L67.0831 62.0286L58.7719 15.2372L49.8671 25.05L43.3369 0L33.8384 1.82847L26.1208 15.2372L17.216 0L9.49849 25.5985Z';
+    var ORIG_STROKE_D = 'M0.28391 19.6851L9.7824 26.2373L17.4999 1.21992L26.4048 16.1112L34.1223 3.00688L43.6208 1.21992L50.151 26.2373L59.0558 16.1112L67.367 63.1677L76.8655 53.0417L84.583 63.1677L92.8942 53.0417L101.205 60.7851L108.923 45.8938L126.139 33.9808L133.856 37.5547L142.761 50.0634L151.072 41.1286L166.507 72.1025L174.819 45.8938L183.723 53.0417L193.222 33.9808L200.346 50.0634L208.657 43.5112L216.375 69.1243H224.686L233.591 50.0634L242.495 63.1677L250.213 92.3547L258.524 102.481L267.429 84.0156L275.74 78.0591L283.458 84.0156L290.581 72.1025L301.267 76.2721L316.109 116.776L325.014 114.394L333.325 108.437L342.23 111.416L349.947 138.22L358.852 84.0156L366.569 79.846L374.881 60.7851L383.785 89.9721L393.284 79.846';
+
+    var fillPath   = document.getElementById('chartFillPath');
+    var strokePath = document.getElementById('chartStrokePath');
+    var fills      = document.getElementById('chartFills');
+    var chartWrap  = document.getElementById('chartWrap');
+    var dotEl      = document.getElementById('chartDot');
+    var pillEl     = document.getElementById('chartPill');
+    var scrubLine  = document.getElementById('chartScrubLine');
+
+    var currentPeriod = '30D';
+
+    // ── Value mapping ────────────────────────────────────────────────
+    // viewBox height of stroke SVG, rendered height, and y-offset
+    var VB_H = 138.358, RENDER_H = 137, Y_OFF = 13;
+    var VAL_MAX = 142500, VAL_MIN = 74500;
+
+    function formatVal(n) {
+      var s = Math.round(n).toString();
+      var r = '';
+      for (var i = s.length - 1, c = 0; i >= 0; i--, c++) {
+        if (c > 0 && c % 3 === 0) r = ',' + r;
+        r = s[i] + r;
+      }
+      return '$' + r;
+    }
+
+    function svgYToScreen(sy) { return Y_OFF + (sy / VB_H) * RENDER_H; }
+    function svgYToVal(sy)    { return VAL_MAX - (sy / VB_H) * (VAL_MAX - VAL_MIN); }
+
+    // Interpolate y from the current period's data at a given x
+    function interpY(x) {
+      var ys = STROKE_Y[currentPeriod];
+      if (x <= XS[0]) return ys[0];
+      if (x >= XS[XS.length - 1]) return ys[ys.length - 1];
+      for (var i = 0; i < XS.length - 1; i++) {
+        if (x >= XS[i] && x <= XS[i + 1]) {
+          var t = (x - XS[i]) / (XS[i + 1] - XS[i]);
+          return ys[i] + t * (ys[i + 1] - ys[i]);
+        }
+      }
+      return ys[ys.length - 1];
+    }
+
+    // ── Default (rest) positions ─────────────────────────────────────
+    var DEF_DOT_TOP = 55, DEF_DOT_LEFT = 208;
+    var DEF_PILL_TOP = 1, DEF_PILL_LEFT = 184;
+    var DEF_PILL_TEXT = '$121,112';
+
+    function resetToDefault() {
+      dotEl.style.top  = DEF_DOT_TOP  + 'px';
+      dotEl.style.left = DEF_DOT_LEFT + 'px';
+      pillEl.style.top  = DEF_PILL_TOP  + 'px';
+      pillEl.style.left = DEF_PILL_LEFT + 'px';
+      pillEl.textContent = DEF_PILL_TEXT;
+      scrubLine.style.display = 'none';
+      chartWrap.classList.remove('dragging');
+    }
+
+    // ── Drag / scrub logic ───────────────────────────────────────────
+    var isDragging = false;
+
+    function scrubAt(clientX) {
+      var rect = chartWrap.getBoundingClientRect();
+      var x = clientX - rect.left;
+      x = Math.max(XS[0], Math.min(XS[XS.length - 1], x));
+
+      var svgY   = interpY(x);
+      var screenY = svgYToScreen(svgY);
+
+      // Position dot centred on the line
+      dotEl.style.left = (x - 7.5) + 'px';
+      dotEl.style.top  = (screenY - 7.5) + 'px';
+
+      // Position pill above dot, clamped horizontally
+      var pillW = pillEl.offsetWidth || 64;
+      var pillLeft = x - pillW / 2;
+      pillLeft = Math.max(4, Math.min(393 - pillW - 4, pillLeft));
+      pillEl.style.left = pillLeft + 'px';
+      pillEl.style.top  = Math.max(0, screenY - 7.5 - 22) + 'px';
+
+      // Update value
+      pillEl.textContent = formatVal(svgYToVal(svgY));
+
+      // Vertical scrub line
+      scrubLine.style.display = 'block';
+      scrubLine.style.left = x + 'px';
+    }
+
+    chartWrap.addEventListener('pointerdown', function(e) {
+      // Don't intercept time-tab clicks
+      if (e.target.closest('.asset-time-tabs')) return;
+      isDragging = true;
+      chartWrap.classList.add('dragging');
+      chartWrap.setPointerCapture(e.pointerId);
+      scrubAt(e.clientX);
+      e.preventDefault();
+    });
+
+    chartWrap.addEventListener('pointermove', function(e) {
+      if (!isDragging) return;
+      scrubAt(e.clientX);
+      e.preventDefault();
+    });
+
+    chartWrap.addEventListener('pointerup', function(e) {
+      if (!isDragging) return;
+      isDragging = false;
+      chartWrap.classList.remove('dragging');
+      scrubLine.style.display = 'none';
+    });
+
+    chartWrap.addEventListener('pointercancel', function(e) {
+      isDragging = false;
+      chartWrap.classList.remove('dragging');
+      scrubLine.style.display = 'none';
+    });
+
+    // ── Time-tab switching ───────────────────────────────────────────
+    document.querySelectorAll('#homeTimeTabs .asset-time-tab').forEach(function(tab) {
+      tab.addEventListener('click', function() {
+        document.querySelectorAll('#homeTimeTabs .asset-time-tab').forEach(function(t){ t.classList.remove('active'); });
+        this.classList.add('active');
+        var period = this.textContent.trim();
+        currentPeriod = period;
+
+        // Reset dot/pill to default
+        resetToDefault();
+
+        // Fade out
+        fills.style.opacity = '0';
+        setTimeout(function() {
+          if (period === '30D') {
+            fillPath.setAttribute('d', ORIG_FILL_D);
+            strokePath.setAttribute('d', ORIG_STROKE_D);
+          } else {
+            var ys = STROKE_Y[period];
+            fillPath.setAttribute('d', buildFillD(ys));
+            strokePath.setAttribute('d', buildStrokeD(ys));
+          }
+          fills.style.opacity = '1';
+        }, 200);
+      });
+    });
+  })();
+</script>
+
+<script src="top-nav.js"></script>
+<script>TopNav.init({ showSearch: true, rightIconSrc: 'images/1eb91ff7-c9b6-4cf5-9118-5938916d3a01.svg' });</script>
+<script src="bottom-nav.js"></script>
+<script>BottomNav.init('home');</script>
+<script>
+(function() {
+  var ticker = document.getElementById('searchTicker');
+  var items = ['🔥 BTCUSD', '🔥 ETHUSD', '🔥 SOLUSD'];
+  var current = 0;
+  setInterval(function() {
+    current = (current + 1) % items.length;
+    ticker.style.transform = 'translateY(-' + (current * 20) + 'px)';
+  }, 2000);
+})();
+</script>
+
+<!-- Dynamic e-row price updates with flash -->
+<script>
+(function() {
+  var rows = document.querySelectorAll('.wl-list .e-row');
+  if (!rows.length) return;
+
+  function parsePrice(str) {
+    return parseFloat(str.replace(/,/g, ''));
+  }
+  function formatPrice(n) {
+    if (n >= 1000) return n.toFixed(2).replace(/\B(?=(\d{3})+\.)/g, ',');
+    if (n >= 1) return n.toFixed(2);
+    return n.toFixed(4);
+  }
+
+  function tickRow(row) {
+    var priceEl = row.querySelector('.e-price');
+    var chgEl = row.querySelector('.e-chg');
+    if (!priceEl || !chgEl) return;
+
+    var price = parsePrice(priceEl.textContent);
+    // Random change: -0.3% to +0.3%
+    var pct = (Math.random() - 0.5) * 0.006;
+    var newPrice = price * (1 + pct);
+    priceEl.textContent = formatPrice(newPrice);
+
+    // Update chg badge
+    var chgVal = parseFloat(chgEl.textContent);
+    chgVal += pct * 100;
+    var isUp = chgVal >= 0;
+    chgEl.textContent = (isUp ? '+' : '') + chgVal.toFixed(1) + '%';
+    chgEl.className = 'e-chg ' + (isUp ? 'up' : 'dn');
+
+    // Flash
+    row.classList.remove('flash-green', 'flash-red');
+    // Force reflow for re-triggering animation
+    void row.offsetWidth;
+    row.classList.add(pct >= 0 ? 'flash-green' : 'flash-red');
+  }
+
+  // Pick 1-3 random rows to update every 1.5-3s
+  function tick() {
+    var count = 1 + Math.floor(Math.random() * 3);
+    for (var i = 0; i < count; i++) {
+      var idx = Math.floor(Math.random() * rows.length);
+      tickRow(rows[idx]);
+    }
+    setTimeout(tick, 1500 + Math.random() * 1500);
+  }
+  setTimeout(tick, 2000);
+})();
+</script>
+
+<!-- Banner carousel -->
+<script>
+(function() {
+  var track = document.getElementById('homeBannerTrack');
+  var dotsWrap = document.getElementById('homeBannerDots');
+  var arrow = document.getElementById('homeBannerArrow');
+  var total = 3, cur = 0;
+  function goTo(n) {
+    cur = (n + total) % total;
+    track.style.transform = 'translateX(-' + (cur * 33.333) + '%)';
+    var dots = dotsWrap.children;
+    for (var i = 0; i < dots.length; i++)
+      dots[i].className = i === cur ? 'b-dot on' : 'b-dot';
+  }
+  arrow.addEventListener('click', function() { goTo(cur + 1); });
+  setInterval(function() { goTo(cur + 1); }, 4000);
+})();
+</script>
+
+<!-- ── Currency bottom sheet ── -->
+<script>
+(function() {
+  var currencies = [
+    { code: 'USD', name: 'US Dollar',          flag: 'us' },
+    { code: 'GBP', name: 'British Pound',      flag: 'gb' },
+    { code: 'CAD', name: 'Canadian Dollar',    flag: 'ca' },
+    { code: 'AUD', name: 'Australian Dollar',  flag: 'au' },
+    { code: 'EUR', name: 'Euro',               flag: 'eu' },
+    { code: 'SGD', name: 'Singapore Dollar',   flag: 'sg' },
+    { code: 'NZD', name: 'New Zealand Dollar', flag: 'nz' },
+    { code: 'HKD', name: 'Hong Kong Dollar',   flag: 'hk' },
+    { code: 'JPY', name: 'Japanese Yen',       flag: 'jp' },
+    { code: 'PLN', name: 'Polish Złoty',       flag: 'pl' },
+    { code: 'AED', name: 'UAE Dirham',         flag: 'ae' },
+    { code: 'INR', name: 'Indian Rupee',       flag: 'in' },
+  ];
+  var selected = 'USD';
+
+  /* styles */
+  var s = document.createElement('style');
+  s.textContent =
+    '#ccyOverlay{position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9000;opacity:0;transition:opacity .28s;display:none;}' +
+    '#ccyOverlay.open{opacity:1;}' +
+    '#ccySheet{position:fixed;bottom:0;left:0;width:393px;max-width:100vw;background:#fff;border-radius:16px 16px 0 0;z-index:9001;transform:translateY(100%);transition:transform .3s cubic-bezier(.32,1,.36,1);display:none;}' +
+    '#ccySheet.open{transform:translateY(0);}' +
+    '.ccy-item{display:flex;align-items:center;justify-content:space-between;padding:14px 20px;cursor:pointer;}' +
+    '.ccy-item:active{background:#f4f5f6;}' +
+    '.ccy-left{display:flex;align-items:center;gap:12px;}' +
+    '.ccy-flag{width:28px;height:28px;border-radius:50%;object-fit:cover;flex-shrink:0;}' +
+    '.ccy-code{font-size:14px;font-weight:600;color:#1a1a1e;line-height:1.2;}' +
+    '.ccy-name{font-size:12px;font-weight:400;color:#7a8699;line-height:1.4;}' +
+    '.ccy-check{width:20px;height:20px;flex-shrink:0;}';
+  document.head.appendChild(s);
+
+  /* overlay */
+  var overlay = document.createElement('div');
+  overlay.id = 'ccyOverlay';
+
+  /* sheet */
+  var sheet = document.createElement('div');
+  sheet.id = 'ccySheet';
+  sheet.innerHTML =
+    '<div style="display:flex;justify-content:center;padding:10px 0 0;">' +
+      '<div style="width:36px;height:4px;border-radius:2px;background:#e0e3e8;"></div>' +
+    '</div>' +
+    '<div style="padding:14px 20px 10px;">' +
+      '<span style="font-size:16px;font-weight:600;color:#1a1a1e;">Select Currency</span>' +
+    '</div>' +
+    '<div id="ccyList" style="overflow-y:auto;max-height:58vh;padding-bottom:28px;"></div>';
+
+  document.body.appendChild(overlay);
+  document.body.appendChild(sheet);
+
+  function buildList() {
+    var list = document.getElementById('ccyList');
+    list.innerHTML = currencies.map(function(c) {
+      var checked = c.code === selected;
+      return '<div class="ccy-item" data-code="' + c.code + '">' +
+        '<div class="ccy-left">' +
+          '<img class="ccy-flag" src="https://flagcdn.com/w40/' + c.flag + '.png" alt="' + c.code + '">' +
+          '<div><div class="ccy-code">' + c.code + '</div><div class="ccy-name">' + c.name + '</div></div>' +
+        '</div>' +
+        (checked
+          ? '<svg class="ccy-check" viewBox="0 0 20 20" fill="none"><circle cx="10" cy="10" r="9" fill="#0a36c7"/><path d="M6 10l3 3 5-5" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
+          : '<div class="ccy-check"></div>') +
+        '</div>';
+    }).join('');
+    list.querySelectorAll('.ccy-item').forEach(function(item) {
+      item.addEventListener('click', function() {
+        selected = item.dataset.code;
+        updateTriggers();
+        closeSheet();
+      });
+    });
+  }
+
+  function updateTriggers() {
+    document.querySelectorAll('.ccy-trigger-text').forEach(function(el) { el.textContent = selected; });
+  }
+
+  function openSheet() {
+    buildList();
+    overlay.style.display = 'block';
+    sheet.style.display = 'block';
+    requestAnimationFrame(function() { requestAnimationFrame(function() {
+      overlay.classList.add('open');
+      sheet.classList.add('open');
+    }); });
+  }
+
+  function closeSheet() {
+    overlay.classList.remove('open');
+    sheet.classList.remove('open');
+    setTimeout(function() {
+      overlay.style.display = 'none';
+      sheet.style.display = 'none';
+    }, 300);
+  }
+
+  overlay.addEventListener('click', closeSheet);
+
+  document.querySelectorAll('.ccy-trigger').forEach(function(el) {
+    el.addEventListener('click', openSheet);
+  });
+})();
+</script>
+
+</body>
+</html>

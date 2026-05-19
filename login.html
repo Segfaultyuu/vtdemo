@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=393, initial-scale=1">
+  <title>Login – VT Markets</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="components.css">
+  <style>
+    body {
+      position: relative;
+    }
+
+
+    /* ── Tab selector ── */
+    .tab-selector {
+      width: 393px;
+      padding: 0 20px;
+      margin-top: 24px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #f4f5f6;
+      display: flex;
+      gap: 20px;
+    }
+    .tab-item {
+      padding-bottom: 12px;
+      font-size: 14px;
+      font-weight: 400;
+      color: #7a8699;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .tab-item.active {
+      font-weight: 600;
+      color: #0a36c7;
+      border-bottom: 2px solid #0a36c7;
+    }
+
+    /* ── Form ── */
+    .form-section {
+      position: absolute;
+      top: 171px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 353px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+    .fields-group {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .input-field {
+      width: 100%;
+      height: 48px;
+      border: 1px solid #e8e9ea;
+      border-radius: 4px;
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .input-field input {
+      flex: 1;
+      border: none;
+      outline: none;
+      font-family: 'Roboto', sans-serif;
+      font-size: 14px;
+      font-weight: 500;
+      color: #282d34;
+      background: transparent;
+    }
+    .input-field input::placeholder {
+      color: #c2c7d0;
+    }
+    .eye-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 18px;
+      height: 18px;
+    }
+    .password-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .hint-text {
+      font-size: 12px;
+      font-weight: 400;
+      color: #7a8699;
+      line-height: 18px;
+    }
+    .forgot-link {
+      font-size: 12px;
+      font-weight: 500;
+      color: #282d34;
+      cursor: pointer;
+    }
+
+    /* ── Buttons ── */
+    .buttons-group {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+    }
+    .login-btn {
+      width: 100%;
+      height: 48px;
+      background: #0a36c7;
+      border: none;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      opacity: 0.4;
+      transition: opacity 0.2s;
+    }
+    .login-btn:not(:disabled) {
+      opacity: 1;
+      cursor: pointer;
+    }
+    .login-btn:disabled {
+      cursor: not-allowed;
+    }
+    .login-btn span {
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      line-height: 24px;
+    }
+    .signup-row {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+    }
+    .signup-row .label { font-weight: 400; color: #282d34; }
+    .signup-row .link  { font-weight: 500; color: #0a36c7; cursor: pointer; }
+
+    /* ── Social login ── */
+    .social-section {
+      position: fixed;
+      bottom: 40px;
+      left: 0;
+      width: 393px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      background: #fff;
+      padding-top: 20px;
+    }
+    .divider-row {
+      width: 369px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      height: 15px;
+    }
+    .divider-line {
+      width: 116px;
+      height: 1px;
+      background: #e7e8eb;
+    }
+    .divider-label {
+      font-size: 13px;
+      font-weight: 400;
+      color: #7a8699;
+      white-space: nowrap;
+    }
+    .social-icons {
+      display: flex;
+      gap: 24px;
+      align-items: center;
+    }
+    .social-icon-btn {
+      width: 40px;
+      height: 40px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      border: none;
+    }
+    .social-icon-btn.telegram { background: #41bce7; }
+    .social-icon-btn img { width: 23px; height: 20px; object-fit: contain; }
+
+    /* ── Home indicator ── */
+    .home-indicator {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 393px;
+      height: 21px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 8px;
+    }
+    .home-bar {
+      width: 139px;
+      height: 5px;
+      background: rgba(30,30,30,0.3);
+      border-radius: 100px;
+    }
+  </style>
+</head>
+<body>
+
+
+  <!-- Tab selector -->
+  <div class="tab-selector">
+    <div class="tab-item">Phone Number</div>
+    <div class="tab-item active">Email</div>
+  </div>
+
+  <!-- Form -->
+  <div class="form-section">
+    <div class="fields-group">
+      <!-- Email input -->
+      <div class="input-field">
+        <input type="email" placeholder="Email">
+      </div>
+
+      <!-- Password + helpers -->
+      <div class="password-group">
+        <div class="input-field">
+          <input type="password" placeholder="Password 8-16 characters" id="pwdInput">
+          <button class="eye-btn" onclick="togglePwd()" type="button">
+            <svg id="eyeIcon" width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M1 8C1 8 3.5 3 8 3C12.5 3 15 8 15 8C15 8 12.5 13 8 13C3.5 13 1 8 1 8Z" stroke="#c2c7d0" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="8" cy="8" r="2.2" stroke="#c2c7d0" stroke-width="1.3"/>
+            </svg>
+          </button>
+        </div>
+        <p class="hint-text">After applying for a live account, you can log in by email</p>
+        <p class="forgot-link">Forgot Password?</p>
+      </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="buttons-group">
+      <button class="login-btn" type="button"><span>Log In</span></button>
+      <div class="signup-row">
+        <span class="label">New user?</span>
+        <span class="link">Sign Up</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Social login -->
+  <div class="social-section">
+    <div class="divider-row">
+      <div class="divider-line"></div>
+      <span class="divider-label">or Log In with</span>
+      <div class="divider-line"></div>
+    </div>
+    <div class="social-icons">
+      <button class="social-icon-btn telegram" type="button">
+        <svg width="23" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M21.93 3.42L18.5 19.65C18.26 20.7 17.64 20.96 16.77 20.47L11.77 16.82L9.36 19.13C9.1 19.39 8.88 19.61 8.39 19.61L8.73 14.52L17.93 6.22C18.31 5.88 17.85 5.69 17.35 6.03L5.92 13.19L1.02 11.68C-0.02 11.35 -0.04 10.64 1.23 10.15L20.56 2.9C21.42 2.57 22.18 3.09 21.93 3.42Z" fill="white"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Home indicator -->
+  <div class="home-indicator">
+    <div class="home-bar"></div>
+  </div>
+
+  <script>
+    function togglePwd() {
+      const input = document.getElementById('pwdInput');
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+
+    const emailInput = document.querySelector('input[type="email"]');
+    const pwdInput   = document.getElementById('pwdInput');
+    const loginBtn   = document.querySelector('.login-btn');
+
+    loginBtn.disabled = true;
+
+    function checkFields() {
+      loginBtn.disabled = !(emailInput.value.trim() && pwdInput.value.trim());
+    }
+
+    emailInput.addEventListener('input', checkFields);
+    pwdInput.addEventListener('input', checkFields);
+
+    loginBtn.addEventListener('click', function() {
+      if (!loginBtn.disabled) location.href = 'home-postlogin.html';
+    });
+  </script>
+  <script src="top-nav.js"></script>
+  <script>TopNav.init({
+    showTitle: true,
+    titleText: 'Login',
+    rightIconSvg: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3.5 11A6.5 6.5 0 0 1 16.5 11" stroke="#282d34" stroke-width="1.4" stroke-linecap="round"/><rect x="1.5" y="10.5" width="3.5" height="5" rx="1.5" stroke="#282d34" stroke-width="1.4"/><rect x="15" y="10.5" width="3.5" height="5" rx="1.5" stroke="#282d34" stroke-width="1.4"/><path d="M18.5 14.5C18.5 15.5 17.7 16.5 16.5 16.5" stroke="#282d34" stroke-width="1.4" stroke-linecap="round"/></svg>'
+  });</script>
+</body>
+</html>

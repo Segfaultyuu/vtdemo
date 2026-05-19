@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=393, initial-scale=1">
+  <title>Profile – VT Markets</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="components.css">
+  <style>
+    body {
+    }
+
+    /* ── Welcome section ── */
+    .profile-welcome {
+      padding: 16px 20px 0;
+    }
+    .welcome-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #282d34;
+      line-height: 22px;
+      margin-bottom: 6px;
+    }
+    .welcome-subtitle {
+      font-size: 16px;
+      font-weight: 500;
+      color: #7a8699;
+      line-height: 1.18;
+    }
+    .btn-get-started {
+      width: 353px;
+      height: 48px;
+      background: #0a36c7;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #fff;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 16px;
+    }
+    .btn-get-started:active { opacity: 0.85; }
+
+    /* ── Access section ── */
+    .access-section {
+      margin-top: 16px;
+    }
+    .access-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #282d34;
+      padding: 0 20px;
+      margin-bottom: 16px;
+    }
+    .access-grid {
+      display: flex;
+      gap: 8px;
+      padding: 0 18px;
+    }
+    .access-item {
+      width: 83.25px;
+      height: 56px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+    .access-item img {
+      width: 24px;
+      height: 24px;
+    }
+    .access-item span {
+      font-size: 12px;
+      font-weight: 500;
+      color: #282d34;
+      text-align: center;
+    }
+
+    /* ── Home indicator ── */
+    .home-indicator {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 393px;
+      height: 21px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 8px;
+    }
+    .home-bar {
+      width: 139px;
+      height: 5px;
+      background: rgba(30,30,30,0.3);
+      border-radius: 100px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Welcome -->
+  <div class="profile-welcome">
+    <h1 class="welcome-title">Welcome</h1>
+    <p class="welcome-subtitle">Start Trading On The Go</p>
+    <button class="btn-get-started" onclick="location.href='login.html'">Get Started</button>
+  </div>
+
+  <!-- Access -->
+  <div class="access-section">
+    <p class="access-title">Access</p>
+    <div class="access-grid">
+      <div class="access-item">
+        <img src="images/profile-userguide.svg" alt="User Guide">
+        <span>User Guide</span>
+      </div>
+      <div class="access-item">
+        <img src="images/profile-helpcenter.svg" alt="Help Center">
+        <span>Help Center</span>
+      </div>
+      <div class="access-item">
+        <img src="images/profile-promotion.svg" alt="Promotion">
+        <span>Promotion</span>
+      </div>
+      <div class="access-item">
+        <img src="images/profile-aboutus.svg" alt="About Us">
+        <span>About Us</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Home indicator -->
+  <div class="home-indicator">
+    <div class="home-bar"></div>
+  </div>
+
+  <script src="top-nav.js"></script>
+  <script>TopNav.init({
+    showTitle: true,
+    rightIconSrc: 'images/profile-gear.svg'
+  });</script>
+</body>
+</html>

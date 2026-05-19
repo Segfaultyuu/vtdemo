@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=393, initial-scale=1.0">
+  <title>VT Markets – Home</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="components.css">
+  <style>
+    body { color: #282d34; }
+    .page-scroll { padding-bottom: 85px; }
+
+    /* ── Decorative background blobs ── */
+    .bg-blob-1 {
+      position: absolute;
+      left: -54px;
+      top: 519px;
+      width: 264px;
+      height: 264px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0,240,255,0.08) 0%, rgba(0,240,255,0) 70%);
+      filter: blur(40px);
+      pointer-events: none;
+      z-index: 0;
+    }
+    .bg-blob-2 {
+      position: absolute;
+      left: 239px;
+      top: 902px;
+      width: 198px;
+      height: 198px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(80,120,240,0.30) 0%, rgba(80,120,240,0) 70%);
+      filter: blur(35px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+
+
+    /* ── Hero section ── */
+    .hero-section {
+      padding: 0 20px;
+      position: relative;
+      z-index: 2;
+      border-bottom: 1px solid #f4f5f6;
+      overflow: hidden;
+    }
+    .hero-image-wrap {
+      width: 479px;
+      margin-left: -63px;
+      position: relative;
+      padding-top: 15px;
+    }
+    .hero-image-wrap img {
+      display: block;
+      width: 379px;
+      height: auto;
+      margin-left: 42px;
+    }
+    .hero-text {
+      text-align: center;
+      margin-top: 0;
+      padding-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .hero-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #282d34;
+      line-height: 32px;
+    }
+    .hero-sub {
+      font-size: 20px;
+      font-weight: 500;
+      color: #7a8699;
+      line-height: 24px;
+    }
+    .hero-sub span.cyan { color: #00f0ff; }
+    .btn-login {
+      width: 100%;
+      height: 48px;
+      background: #0a36c7;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 16px;
+      margin-bottom: 16px;
+      cursor: pointer;
+    }
+    .btn-login span {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+    }
+
+    /* ── Banner ── */
+    .banner {
+      padding: 0 20px;
+      border-bottom: 1px solid #f4f5f6;
+      position: relative;
+      z-index: 2;
+      overflow: hidden;
+    }
+    .banner-inner {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 16px 0;
+    }
+    .banner-icon {
+      width: 70px;
+      height: 70px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .banner-icon img { width: 68px; height: 68px; object-fit: contain; }
+    .banner-content { flex: 1; min-width: 0; }
+    .banner-label {
+      font-size: 12px;
+      font-weight: 400;
+      color: #7a8699;
+      line-height: 12px;
+      margin-bottom: 8px;
+    }
+    .banner-title {
+      font-size: 14px;
+      font-weight: 500;
+      color: #282d34;
+      line-height: 20px;
+    }
+    .banner-dots-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .banner-dots { display: flex; align-items: center; gap: 4px; }
+    .dot-active { width: 8px; height: 2px; background: #282d34; border-radius: 1px; }
+    .dot { width: 2px; height: 2px; background: #c2c7d0; border-radius: 50%; }
+    .banner-arrow img { width: 10px; height: 10px; }
+    .banner-close {
+      position: absolute;
+      right: 20px;
+      top: 9px;
+      width: 16px;
+      height: 16px;
+      background: #f4f5f6;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+    .banner-close img { width: 12px; height: 12px; }
+
+    /* ── Market Card ── */
+    .market-card-wrap {
+      padding: 20px;
+      position: relative;
+      z-index: 2;
+    }
+    .market-card {
+      width: 353px;
+      background: rgba(255,255,255,0.18);
+      backdrop-filter: blur(24px) saturate(180%);
+      -webkit-backdrop-filter: blur(24px) saturate(180%);
+      border-radius: 16px;
+      border: 0.5px solid #d4d6db;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+      padding: 32px 0 24px;
+      overflow: hidden;
+      position: relative;
+    }
+    .market-card-title {
+      font-size: 20px;
+      font-weight: 700;
+      color: #282d34;
+      text-align: center;
+      padding: 0 22.5px 24px;
+      line-height: 1.2;
+    }
+    /* Tab bar */
+    .market-tabs {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      padding: 0 22.5px;
+      margin-bottom: 20px;
+    }
+    .market-tab {
+      font-size: 14px;
+      font-weight: 600;
+      color: #7a8699;
+      cursor: pointer;
+      padding: 8px 0;
+      white-space: nowrap;
+    }
+    .market-tab.active {
+      background: rgba(158,195,222,0.08);
+      backdrop-filter: blur(10px);
+      border: 0.5px solid rgba(24,24,24,0.04);
+      border-radius: 40px;
+      padding: 8.5px 25px;
+      color: #282d34;
+      font-weight: 700;
+    }
+    /* Table header */
+    .market-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      margin-bottom: 8px;
+    }
+    .mh-sell {
+      font-size: 12px;
+      font-weight: 500;
+      color: #7a8699;
+      width: 65px;
+    }
+    .mh-buy {
+      font-size: 12px;
+      font-weight: 500;
+      color: #282d34;
+      text-align: center;
+      flex: 1;
+    }
+    .mh-change {
+      font-size: 12px;
+      font-weight: 500;
+      color: #7a8699;
+      width: 72px;
+      text-align: right;
+    }
+    /* Symbol rows */
+    .symbol-row {
+      display: flex;
+      align-items: center;
+      padding: 12px 12px;
+      gap: 0;
+    }
+    .symbol-row + .symbol-row {
+      border-top: none;
+    }
+    /* Currency pair icon */
+    .pair-icon {
+      position: relative;
+      width: 40px;
+      height: 32px;
+      flex-shrink: 0;
+    }
+    .flag-circle {
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      border: 1.5px solid #fff;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 15px;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      box-shadow: 0 0 0 0.5px rgba(0,0,0,0.1);
+      background: #f0f0f0;
+    }
+    .flag-circle.base { left: 0; z-index: 2; }
+    .flag-circle.quote { left: 16px; z-index: 1; }
+
+    .pair-info { flex: 1; padding-left: 8px; }
+    .pair-name {
+      font-size: 14px;
+      font-weight: 600;
+      color: #282d34;
+      line-height: 20px;
+    }
+    .pair-full {
+      font-size: 10px;
+      font-weight: 400;
+      color: #7a8699;
+      line-height: 14px;
+    }
+    .pair-status {
+      display: inline-block;
+      font-size: 8px;
+      font-weight: 500;
+      color: #0a36c7;
+      border: 0.5px solid #0a36c7;
+      border-radius: 2px;
+      padding: 1px 4px;
+      margin-bottom: 2px;
+    }
+    .pair-price-col {
+      width: 120px;
+      text-align: right;
+      padding-right: 8px;
+    }
+    .pair-price {
+      font-size: 14px;
+      font-weight: 500;
+      line-height: 20px;
+    }
+    .pair-price.up { color: #00b565; }
+    .pair-price.down { color: #ff2c40; }
+    .pair-price.neutral { color: #00b565; }
+    .pair-diff {
+      font-size: 10px;
+      font-weight: 400;
+      color: #7a8699;
+      text-align: right;
+    }
+    .change-badge {
+      width: 72px;
+      height: 28px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 500;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .change-badge.up { background: #00b565; }
+    .change-badge.down { background: #ff2c40; }
+    .change-badge.neutral { background: #00b565; }
+
+    .add-symbol-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 8px auto 0;
+      padding: 5px 12px;
+      cursor: pointer;
+    }
+    .add-symbol-btn span {
+      font-size: 12px;
+      font-weight: 500;
+      color: #0a36c7;
+    }
+
+    /* ── Section title ── */
+    .section-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 20px; margin-bottom: 16px;
+    }
+
+    /* ── News section (index-specific overrides) ── */
+    .news-section { padding-top: 20px; position: relative; z-index: 2; }
+    .news-item { padding: 0 20px 16px; margin-bottom: 0; }
+    .news-text { flex: 1; }
+    .news-headline {
+      font-size: 16px; font-weight: 600; color: #282d34;
+      line-height: 22px; margin-bottom: 4px;
+    }
+    .news-date { font-size: 10px; font-weight: 400; color: #c2c7d0; }
+    .news-thumb { border-radius: 8px; overflow: visible; background: transparent; display: flex; align-items: center; justify-content: center; }
+    .news-thumb img { width: 80px; height: 80px; object-fit: contain; }
+
+    /* ── Why VT Markets ── */
+    .why-section {
+      padding: 20px 20px 24px;
+      position: relative;
+      z-index: 2;
+    }
+    .why-card {
+      width: 353px;
+      height: 174px;
+      background: rgba(85,132,250,0.05);
+      backdrop-filter: blur(53px);
+      -webkit-backdrop-filter: blur(53px);
+      border: 0.7px solid rgba(0,0,0,0.09);
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 8px;
+    }
+    .why-card-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+    .why-card-bg img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.6;
+    }
+    .why-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      width: 119px;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+    .why-from {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0a36c7;
+      line-height: 26px;
+    }
+    .why-value {
+      font-size: 32px;
+      font-weight: 500;
+      color: #181818;
+      line-height: 26px;
+    }
+    .why-unit {
+      font-size: 16px;
+      font-weight: 700;
+      color: #0a36c7;
+      line-height: 26px;
+    }
+    .why-label {
+      font-size: 16px;
+      font-weight: 600;
+      color: #181818;
+      line-height: 26px;
+    }
+    .why-center-icon {
+      width: 108px;
+      height: 108px;
+      flex-shrink: 0;
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .why-center-icon img {
+      width: 127px;
+      height: 127px;
+      object-fit: contain;
+    }
+    .why-footnote {
+      font-size: 14px;
+      font-weight: 500;
+      color: #c2c7d0;
+      text-align: center;
+      margin-top: 16px;
+      line-height: 20px;
+    }
+
+    /* ── Section spacers ── */
+    .section-gap { height: 20px; }
+  </style>
+</head>
+<body>
+<div class="page-scroll">
+
+<!-- Decorative background blobs -->
+<div class="bg-blob-1"></div>
+<div class="bg-blob-2"></div>
+
+
+
+<!-- ─────────────── HERO SECTION ─────────────── -->
+<div class="hero-section">
+  <div class="hero-image-wrap">
+    <img src="images/Hero_image.png" alt="VT Markets coins">
+  </div>
+  <div class="hero-text">
+    <p class="hero-title">Welcome Back!</p>
+    <p class="hero-sub">More than 1000 assets<span class="cyan">.</span></p>
+  </div>
+  <div class="btn-login" onclick="location.href='login.html'" style="cursor:pointer;">
+    <span>Log In</span>
+  </div>
+</div>
+
+<!-- ─────────────── BANNER ─────────────── -->
+<div class="banner">
+  <div style="overflow:hidden;">
+    <div id="idxBannerTrack" style="display:flex;width:300%;transition:transform .35s cubic-bezier(.4,0,.2,1);">
+      <!-- Slide 1 -->
+      <div class="banner-inner" style="width:33.333%;flex-shrink:0;padding-bottom:8px;">
+        <div class="banner-icon"><img src="images/Shakeyourclaim_image.png" alt=""></div>
+        <div class="banner-content">
+          <p class="banner-label">Stake Your Claim</p>
+          <p class="banner-title">With a daily turnover of $7.5 trillion, the sheer size of the forex market impacts all...</p>
+        </div>
+      </div>
+      <!-- Slide 2 -->
+      <div class="banner-inner" style="width:33.333%;flex-shrink:0;padding-bottom:8px;">
+        <div class="banner-icon"><img src="images/copy-person2.png" alt=""></div>
+        <div class="banner-content">
+          <p class="banner-label">Expert Traders</p>
+          <p class="banner-title">Follow top-ranked traders and automatically mirror their strategies in real time...</p>
+        </div>
+      </div>
+      <!-- Slide 3 -->
+      <div class="banner-inner" style="width:33.333%;flex-shrink:0;padding-bottom:8px;">
+        <div class="banner-icon"><img src="images/copy-guide1.png" alt=""></div>
+        <div class="banner-content">
+          <p class="banner-label">Trading Guide</p>
+          <p class="banner-title">Access comprehensive guides to sharpen your trading skills and strategy...</p>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Shared footer: dots + arrow -->
+  <div class="banner-dots-row" style="padding-bottom:12px;">
+    <div class="banner-dots" id="idxBannerDots">
+      <div class="dot-active"></div><div class="dot"></div><div class="dot"></div>
+    </div>
+    <div class="banner-arrow" id="idxBannerArrow" style="cursor:pointer;">
+      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+        <line x1="1" y1="5" x2="8" y2="5" stroke="#282d34" stroke-width="1.4" stroke-linecap="round"/>
+        <path d="M5.5 2.5L8.5 5L5.5 7.5" stroke="#282d34" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────── MARKET CARD ─────────────── -->
+<div class="market-card-wrap">
+  <div class="market-card">
+    <p class="market-card-title">Trade 1,000+ CFD products</p>
+
+    <!-- Tabs -->
+    <div class="market-tabs">
+      <div class="market-tab active">Forex</div>
+      <div class="market-tab">Commodities</div>
+      <div class="market-tab">Indices</div>
+      <div class="market-tab">Metals</div>
+    </div>
+
+    <!-- Column headers -->
+    <div class="market-header">
+      <div class="mh-sell">Sell</div>
+      <div class="mh-buy">Buy</div>
+      <div class="mh-change">%Change</div>
+    </div>
+
+    <!-- EURUSD -->
+    <div class="symbol-row">
+      <div class="pair-icon">
+        <img src="images/86-EURUSD.png" alt="EURUSD" style="width:40px;height:32px;object-fit:contain;">
+      </div>
+      <div class="pair-info">
+        <div class="pair-name">EURUSD</div>
+        <div class="pair-full">Euro/US Dollar</div>
+      </div>
+      <div class="pair-price-col">
+        <div class="pair-price down">1.03814</div>
+        <div class="pair-diff" style="text-align:right">-0.2134</div>
+      </div>
+      <div class="change-badge down">-2.56%</div>
+    </div>
+
+    <!-- GBPUSD -->
+    <div class="symbol-row">
+      <div class="pair-icon">
+        <img src="images/93-GBPUSD.png" alt="GBPUSD" style="width:40px;height:32px;object-fit:contain;">
+      </div>
+      <div class="pair-info">
+        <div class="pair-name">GBPUSD</div>
+        <div class="pair-full">Great Britain Po...</div>
+      </div>
+      <div class="pair-price-col">
+        <div class="pair-price up">1.24759</div>
+        <div class="pair-diff" style="text-align:right">-0.2134</div>
+      </div>
+      <div class="change-badge up">+2.56%</div>
+    </div>
+
+    <!-- USDJPY -->
+    <div class="symbol-row">
+      <div class="pair-icon">
+        <img src="images/108-USDJPY.png" alt="USDJPY" style="width:40px;height:32px;object-fit:contain;">
+      </div>
+      <div class="pair-info">
+        <div class="pair-name">USDJPY</div>
+        <div class="pair-full">US Dollar/Jap...</div>
+      </div>
+      <div class="pair-price-col">
+        <div class="pair-price up">153.425</div>
+        <div class="pair-diff" style="text-align:right">+0</div>
+      </div>
+      <div class="change-badge neutral">+0.00%</div>
+    </div>
+
+    <!-- GBPJPY -->
+    <div class="symbol-row">
+      <div class="pair-icon">
+        <img src="images/90-GBPJPY.png" alt="GBPJPY" style="width:40px;height:32px;object-fit:contain;">
+      </div>
+      <div class="pair-info">
+        <div class="pair-name">GBPJPY</div>
+        <div class="pair-full">Great Britain Po...</div>
+      </div>
+      <div class="pair-price-col">
+        <div class="pair-price down">191.422</div>
+        <div class="pair-diff" style="text-align:right">-0.2134</div>
+      </div>
+      <div class="change-badge down">-2.56%</div>
+    </div>
+
+    <!-- USDCAD -->
+    <div class="symbol-row">
+      <div class="pair-icon">
+        <img src="images/101-USDCAD.png" alt="USDCAD" style="width:40px;height:32px;object-fit:contain;">
+      </div>
+      <div class="pair-info">
+        <div style="margin-bottom:2px"><span class="pair-status">Market Closed</span></div>
+        <div class="pair-name">USDCAD</div>
+        <div class="pair-full">US Dollar/Cana...</div>
+      </div>
+      <div class="pair-price-col">
+        <div class="pair-price up">1.43255</div>
+        <div class="pair-diff" style="text-align:right">-0.2134</div>
+      </div>
+      <div class="change-badge up">+2.56%</div>
+    </div>
+
+    <!-- Add Symbol -->
+    <div class="add-symbol-btn">
+      <span>View More</span>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────── TOP TRADER ─────────────── -->
+<div class="top-trader-section">
+  <div class="section-row" style="padding-left:0; padding-right:20px; margin-top:0;">
+    <span class="section-title">Top Trader</span>
+    <div class="arrow-right"><svg width="20" height="20" viewBox="0 0 20 20" fill="none"><line x1="3" y1="10" x2="16" y2="10" stroke="#282d34" stroke-width="1.8" stroke-linecap="round"/><path d="M11 5.5L16.5 10L11 14.5" stroke="#282d34" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+
+  <div class="trader-cards-row">
+    <!-- Trader 1 – Matteo Masino -->
+    <div class="trader-card">
+      <img class="trader-card-bg" src="images/0485bc50-fc5f-49e8-9068-eb3b146111c1.svg" alt="">
+      <div class="trader-divider"></div>
+      <div class="trader-avatar">
+        <img src="images/toptrader1.png" alt="Matteo Masino">
+      </div>
+      <div class="trader-rank rank-gold">1st</div>
+      <div class="trader-name">Matteo Masino</div>
+      <div class="trader-followers">
+        <img src="images/5b3cdfe7-d5ea-433b-b21c-19aaf782c889.svg" alt="">
+        <span>398</span>
+      </div>
+      <div class="trader-return-label">Return (1Y)</div>
+      <div class="trader-return-value">+550.56%</div>
+      <div class="trader-chart">
+        <img src="images/c171a03f-dcf1-4067-b716-1624bb15d0e0.svg" alt="chart">
+      </div>
+      <div class="trader-stats">
+        <div class="trader-stat">
+          <span class="trader-stat-value">0.10%</span>
+          <span class="trader-stat-label">Win Rate</span>
+        </div>
+        <div class="trader-stat">
+          <div class="risk-badge risk-low">1</div>
+          <span class="trader-stat-label">Risk Level</span>
+        </div>
+      </div>
+      <div class="trader-view-btn">View</div>
+    </div>
+
+    <!-- Trader 2 – Alice Masino -->
+    <div class="trader-card">
+      <div style="position:absolute;inset:0;overflow:hidden;border-radius:8px;">
+        <div style="position:absolute;bottom:-8px;left:50%;transform:translateX(-50%);width:136px;height:31px;background:radial-gradient(ellipse,rgba(85,132,250,0.15) 0%,transparent 70%);filter:blur(8px);"></div>
+        <div style="position:absolute;top:-8px;left:50%;transform:translateX(-50%);width:136px;height:31px;background:radial-gradient(ellipse,rgba(85,132,250,0.12) 0%,transparent 70%);filter:blur(8px);"></div>
+      </div>
+      <div class="trader-divider"></div>
+      <div class="trader-avatar">
+        <img src="images/toptrader2.png" alt="Alice Masino">
+      </div>
+      <div class="trader-rank rank-silver">2nd</div>
+      <div class="trader-name">Alice Masino</div>
+      <div class="trader-followers">
+        <img src="images/5b3cdfe7-d5ea-433b-b21c-19aaf782c889.svg" alt="">
+        <span>198</span>
+      </div>
+      <div class="trader-return-label">Return (1Y)</div>
+      <div class="trader-return-value">+250.56%</div>
+      <div class="trader-chart">
+        <img src="images/c171a03f-dcf1-4067-b716-1624bb15d0e0.svg" alt="chart">
+      </div>
+      <div class="trader-stats">
+        <div class="trader-stat">
+          <span class="trader-stat-value">2.00%</span>
+          <span class="trader-stat-label">Win Rate</span>
+        </div>
+        <div class="trader-stat">
+          <div class="risk-badge risk-med">3</div>
+          <span class="trader-stat-label">Risk Level</span>
+        </div>
+      </div>
+      <div class="trader-view-btn">View</div>
+    </div>
+
+    <!-- Trader 3 -->
+    <div class="trader-card" style="margin-right:20px;">
+      <img class="trader-card-bg" src="images/8a90fd8b-2f4a-4664-93b2-e6b552c9b569.svg" alt="">
+      <div class="trader-divider"></div>
+      <div class="trader-avatar">
+        <img src="images/toptrader2.png" alt="Alice Masino">
+      </div>
+      <div class="trader-rank rank-bronze">3rd</div>
+      <div class="trader-name">Alice Masino</div>
+      <div class="trader-followers">
+        <img src="images/5b3cdfe7-d5ea-433b-b21c-19aaf782c889.svg" alt="">
+        <span>198</span>
+      </div>
+      <div class="trader-return-label">Return (30d)</div>
+      <div class="trader-return-value">+250.56%</div>
+      <div class="trader-chart">
+        <img src="images/c171a03f-dcf1-4067-b716-1624bb15d0e0.svg" alt="chart">
+      </div>
+      <div class="trader-stats">
+        <div class="trader-stat">
+          <span class="trader-stat-value">2.00%</span>
+          <span class="trader-stat-label">Drawdown</span>
+        </div>
+        <div class="trader-stat">
+          <div class="risk-badge risk-med">3</div>
+          <span class="trader-stat-label">Risk Level</span>
+        </div>
+      </div>
+      <div class="trader-view-btn">View</div>
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────── NEWS ─────────────── -->
+<div class="news-section">
+  <div class="section-header">
+    <span class="section-title">News</span>
+    <div class="arrow-right"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="3" y1="10" x2="16" y2="10" stroke="#282d34" stroke-width="1.8" stroke-linecap="round"/><path d="M11 5.5L16.5 10L11 14.5" stroke="#282d34" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+
+  <div class="news-item">
+    <div class="news-text">
+      <p class="news-headline">GBP/USD: Likely to trade in a range between 1.344 and 1.352 - UOB Group</p>
+      <p class="news-sub">Long positions above 21175.00 with target...</p>
+      <p class="news-date">Today 09:05</p>
+    </div>
+    <div class="news-thumb">
+      <img src="images/news1.png" alt="news image">
+    </div>
+  </div>
+
+  <div class="news-item" style="margin-top:16px;">
+    <div class="news-text">
+      <p class="news-headline">GBP/USD: Likely to trade in a range between 1.344 and 1.352 - UOB Group</p>
+      <p class="news-sub">Long positions above 21175.00 with target...</p>
+      <p class="news-date">Today 09:05</p>
+    </div>
+    <div class="news-thumb">
+      <img src="images/news2.png" alt="news image">
+    </div>
+  </div>
+</div>
+
+<!-- ─────────────── WHY VT MARKETS ─────────────── -->
+<div class="why-section">
+  <div class="section-header" style="padding:0;margin-bottom:16px;">
+    <span class="section-title">Why VT Markets?</span>
+    <div class="arrow-right"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><line x1="3" y1="10" x2="16" y2="10" stroke="#282d34" stroke-width="1.8" stroke-linecap="round"/><path d="M11 5.5L16.5 10L11 14.5" stroke="#282d34" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  </div>
+
+  <div class="why-card">
+    <div class="why-card-bg"></div>
+    <div class="why-col">
+      <span class="why-from">From</span>
+      <span class="why-value">0.0</span>
+      <span class="why-unit">pips</span>
+      <span class="why-label">Spreads</span>
+    </div>
+    <div class="why-center-icon">
+      <img src="images/WhyVTmarkets.png" alt="0 fee">
+    </div>
+    <div class="why-col">
+      <span class="why-from">From</span>
+      <span class="why-value">$0</span>
+      <span class="why-unit">fees</span>
+      <span class="why-label">Deposit Fees*</span>
+    </div>
+  </div>
+  <p class="why-footnote">*Other fees may apply</p>
+</div>
+
+</div><!-- end page-scroll -->
+
+<!-- ─────────────── TAB BAR ─────────────── -->
+<!-- Banner carousel -->
+<script>
+(function() {
+  var track = document.getElementById('idxBannerTrack');
+  var dotsWrap = document.getElementById('idxBannerDots');
+  var arrow = document.getElementById('idxBannerArrow');
+  var total = 3, cur = 0;
+  function goTo(n) {
+    cur = (n + total) % total;
+    track.style.transform = 'translateX(-' + (cur * 33.333) + '%)';
+    var dots = dotsWrap.children;
+    for (var i = 0; i < dots.length; i++)
+      dots[i].className = i === cur ? 'dot-active' : 'dot';
+  }
+  arrow.addEventListener('click', function() { goTo(cur + 1); });
+  setInterval(function() { goTo(cur + 1); }, 4000);
+})();
+</script>
+<script src="top-nav.js"></script>
+<script>TopNav.init({ showSearch: true, rightIconSrc: 'images/1eb91ff7-c9b6-4cf5-9118-5938916d3a01.svg', menuHref: 'profile-prelogin.html' });</script>
+<script src="bottom-nav.js"></script>
+<script>BottomNav.init('home', 'prelogin');</script>
+</body>
+</html>
