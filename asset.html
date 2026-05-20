@@ -141,7 +141,7 @@
 
     /* Action buttons row */
     .asset-actions {
-      display: flex; align-items: center; width: 393px;
+      display: flex; align-items: center; width: 100%;
       padding: 12px 0;
     }
     .asset-action-item {
@@ -441,8 +441,9 @@
     }
     .acct-equity-label {
       display: flex; align-items: center; gap: 5px; margin-bottom: 8px;
+      position: relative;
     }
-    .acct-equity-label span {
+    .acct-equity-label > span {
       font-size: 14px; font-weight: 500; color: #7a8699;
       text-decoration: underline; text-decoration-style: dashed;
       text-underline-offset: 2px; text-decoration-color: #7a8699;
@@ -530,7 +531,7 @@
     .vcard-banner {
       display: flex; align-items: center; justify-content: space-between;
       padding: 12px 16px; margin: 16px 20px 0;
-      background: #fffbe6; border-radius: 8px;
+      background: #ebf2fe; border-radius: 8px;
     }
     .vcard-banner-left {
       display: flex; align-items: center; gap: 8px;
@@ -584,7 +585,7 @@
 
     /* VT-Wallet hero */
     .vtw-hero {
-      width: 393px; padding: 8px 18px 0;
+      width: 393px; padding: 16px 18px 0;
       background: linear-gradient(212deg, #fff 74%, #ebf2fe 127%);
     }
     .vtw-value-label {
@@ -963,9 +964,9 @@
       <div class="acct-equity-label">
         <span>Total Equity</span>
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#7a8699" stroke-width="1"/><circle cx="7" cy="5" r="0.8" fill="#7a8699"/><line x1="7" y1="7" x2="7" y2="10" stroke="#7a8699" stroke-width="1.2" stroke-linecap="round"/></svg>
-        <div class="acct-history-btn">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2" width="10" height="8" rx="1" stroke="#282d34" stroke-width="1"/><line x1="4" y1="0.5" x2="4" y2="3" stroke="#282d34" stroke-width="1" stroke-linecap="round"/><line x1="8" y1="0.5" x2="8" y2="3" stroke="#282d34" stroke-width="1" stroke-linecap="round"/></svg>
-          History
+        <div class="vtw-history-btn">
+          <img src="images/asset-icon-history.svg" alt="">
+          <span>History</span>
         </div>
       </div>
       <div class="acct-amount-row">
@@ -1007,10 +1008,23 @@
         <span class="acct-card-cta-left">Current Position : 0</span>
         <span class="acct-card-cta-right">Trade Now <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M3 1.5L6 4L3 6.5" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </div>
-      <div class="acct-card-buttons">
-        <button class="acct-card-btn">Transfer</button>
-        <button class="acct-card-btn">Withdraw</button>
-        <button class="acct-card-btn">Deposit</button>
+      <div class="asset-actions">
+        <div class="asset-action-item">
+          <img src="images/asset-icon-deposit.svg" alt="">
+          <span>Deposit</span>
+        </div>
+        <div class="asset-action-item">
+          <img src="images/asset-icon-transfer.svg" alt="">
+          <span>Transfer</span>
+        </div>
+        <div class="asset-action-item">
+          <img src="images/asset-icon-withdraw.svg" alt="">
+          <span>Withdraw</span>
+        </div>
+        <div class="asset-action-item">
+          <img src="images/asset-icon-convert.svg" alt="">
+          <span>Convert</span>
+        </div>
       </div>
     </div>
   </div>
@@ -1023,9 +1037,9 @@
       <div class="acct-equity-label">
         <span>Total Equity</span>
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#7a8699" stroke-width="1"/><circle cx="7" cy="5" r="0.8" fill="#7a8699"/><line x1="7" y1="7" x2="7" y2="10" stroke="#7a8699" stroke-width="1.2" stroke-linecap="round"/></svg>
-        <div class="acct-history-btn">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2" width="10" height="8" rx="1" stroke="#282d34" stroke-width="1"/><line x1="4" y1="0.5" x2="4" y2="3" stroke="#282d34" stroke-width="1" stroke-linecap="round"/><line x1="8" y1="0.5" x2="8" y2="3" stroke="#282d34" stroke-width="1" stroke-linecap="round"/></svg>
-          History
+        <div class="vtw-history-btn">
+          <img src="images/asset-icon-history.svg" alt="">
+          <span>History</span>
         </div>
       </div>
       <div class="acct-amount-row">
@@ -1067,126 +1081,22 @@
         <span class="acct-card-cta-left">Copying : 1 Trader</span>
         <span class="acct-card-cta-right">View All <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M3 1.5L6 4L3 6.5" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </div>
-      <div class="acct-card-buttons">
-        <button class="acct-card-btn">Transfer</button>
-        <button class="acct-card-btn">Withdraw</button>
-        <button class="acct-card-btn">Deposit</button>
-      </div>
-    </div>
-
-    <!-- Best Copy Trading Performers -->
-    <div class="fiat-performers">
-      <div class="fiat-performers-header">
-        <div class="fiat-performers-title-row">
-          <span class="fiat-performers-title">Best Performers</span>
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#7a8699" stroke-width="1"/><circle cx="7" cy="5" r="0.8" fill="#7a8699"/><line x1="7" y1="7" x2="7" y2="10" stroke="#7a8699" stroke-width="1.2" stroke-linecap="round"/></svg>
+      <div class="asset-actions">
+        <div class="asset-action-item">
+          <img src="images/asset-icon-deposit.svg" alt="">
+          <span>Deposit</span>
         </div>
-        <span class="arrow-right">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M5 3L9 7L5 11" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        </span>
-      </div>
-      <div class="fiat-performers-scroll">
-        <!-- Card 1 -->
-        <div class="fiat-performer-card">
-          <div class="fiat-performer-row">
-            <div class="fp-left">
-              <div class="fp-avatar"><img src="images/copy-avatar1.png" alt=""></div>
-              <div class="fp-info">
-                <span class="fp-name">testapp testchris</span>
-                <div class="fp-roi-row">
-                  <span class="fp-roi-label">ROI</span>
-                  <span class="fp-roi-value">+12.5%</span>
-                </div>
-              </div>
-            </div>
-            <div class="fp-right">
-              <span class="fp-copiers-count">326</span>
-              <span class="fp-copiers-label">Copiers</span>
-            </div>
-          </div>
-          <div class="fiat-performer-row">
-            <div class="fp-left">
-              <div class="fp-avatar"><img src="images/copy-avatar2.png" alt=""></div>
-              <div class="fp-info">
-                <span class="fp-name">VT Market Pro</span>
-                <div class="fp-roi-row">
-                  <span class="fp-roi-label">ROI</span>
-                  <span class="fp-roi-value">+8.3%</span>
-                </div>
-              </div>
-            </div>
-            <div class="fp-right">
-              <span class="fp-copiers-count">189</span>
-              <span class="fp-copiers-label">Copiers</span>
-            </div>
-          </div>
-          <div class="fiat-performer-row">
-            <div class="fp-left">
-              <div class="fp-avatar"><img src="images/copy-person.png" alt=""></div>
-              <div class="fp-info">
-                <span class="fp-name">Alpha Trader</span>
-                <div class="fp-roi-row">
-                  <span class="fp-roi-label">ROI</span>
-                  <span class="fp-roi-value">+6.1%</span>
-                </div>
-              </div>
-            </div>
-            <div class="fp-right">
-              <span class="fp-copiers-count">142</span>
-              <span class="fp-copiers-label">Copiers</span>
-            </div>
-          </div>
+        <div class="asset-action-item">
+          <img src="images/asset-icon-transfer.svg" alt="">
+          <span>Transfer</span>
         </div>
-        <!-- Card 2 -->
-        <div class="fiat-performer-card">
-          <div class="fiat-performer-row">
-            <div class="fp-left">
-              <div class="fp-avatar"><img src="images/copy-avatar-list3.png" alt=""></div>
-              <div class="fp-info">
-                <span class="fp-name">FX Master</span>
-                <div class="fp-roi-row">
-                  <span class="fp-roi-label">ROI</span>
-                  <span class="fp-roi-value">+15.8%</span>
-                </div>
-              </div>
-            </div>
-            <div class="fp-right">
-              <span class="fp-copiers-count">412</span>
-              <span class="fp-copiers-label">Copiers</span>
-            </div>
-          </div>
-          <div class="fiat-performer-row">
-            <div class="fp-left">
-              <div class="fp-avatar"><img src="images/copy-avatar-list4.png" alt=""></div>
-              <div class="fp-info">
-                <span class="fp-name">Gold Runner</span>
-                <div class="fp-roi-row">
-                  <span class="fp-roi-label">ROI</span>
-                  <span class="fp-roi-value">+9.7%</span>
-                </div>
-              </div>
-            </div>
-            <div class="fp-right">
-              <span class="fp-copiers-count">258</span>
-              <span class="fp-copiers-label">Copiers</span>
-            </div>
-          </div>
-          <div class="fiat-performer-row">
-            <div class="fp-left">
-              <div class="fp-avatar"><img src="images/copy-person2.png" alt=""></div>
-              <div class="fp-info">
-                <span class="fp-name">Swing Elite</span>
-                <div class="fp-roi-row">
-                  <span class="fp-roi-label">ROI</span>
-                  <span class="fp-roi-value">+5.4%</span>
-                </div>
-              </div>
-            </div>
-            <div class="fp-right">
-              <span class="fp-copiers-count">97</span>
-              <span class="fp-copiers-label">Copiers</span>
-            </div>
-          </div>
+        <div class="asset-action-item">
+          <img src="images/asset-icon-withdraw.svg" alt="">
+          <span>Withdraw</span>
+        </div>
+        <div class="asset-action-item">
+          <img src="images/asset-icon-convert.svg" alt="">
+          <span>Convert</span>
         </div>
       </div>
     </div>
@@ -1202,9 +1112,9 @@
       <div class="acct-equity-label">
         <span>Total Equity</span>
         <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#7a8699" stroke-width="1"/><circle cx="7" cy="5" r="0.8" fill="#7a8699"/><line x1="7" y1="7" x2="7" y2="10" stroke="#7a8699" stroke-width="1.2" stroke-linecap="round"/></svg>
-        <div class="acct-history-btn">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><rect x="1" y="2" width="10" height="8" rx="1" stroke="#282d34" stroke-width="1"/><line x1="4" y1="0.5" x2="4" y2="3" stroke="#282d34" stroke-width="1" stroke-linecap="round"/><line x1="8" y1="0.5" x2="8" y2="3" stroke="#282d34" stroke-width="1" stroke-linecap="round"/></svg>
-          History
+        <div class="vtw-history-btn">
+          <img src="images/asset-icon-history.svg" alt="">
+          <span>History</span>
         </div>
       </div>
       <div class="acct-amount-row">
@@ -1220,17 +1130,30 @@
     <!-- V-Card Banner -->
     <div class="vcard-banner">
       <div class="vcard-banner-left">
-        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="1" y="4" width="18" height="12" rx="2" stroke="#e44b4b" stroke-width="1.2"/><line x1="1" y1="8" x2="19" y2="8" stroke="#e44b4b" stroke-width="1.2"/><line x1="4" y1="12" x2="10" y2="12" stroke="#e44b4b" stroke-width="1.2" stroke-linecap="round"/></svg>
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><rect x="1" y="4" width="18" height="12" rx="2" stroke="#0a36c7" stroke-width="1.2"/><line x1="1" y1="8" x2="19" y2="8" stroke="#0a36c7" stroke-width="1.2"/><line x1="4" y1="12" x2="10" y2="12" stroke="#0a36c7" stroke-width="1.2" stroke-linecap="round"/></svg>
         <span class="vcard-banner-text">Apply for V-Card to enjoy global payments</span>
       </div>
-      <span class="vcard-banner-right">Apply <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M3 1.5L6 4L3 6.5" stroke="#e44b4b" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+      <span class="vcard-banner-right">Apply <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M3 1.5L6 4L3 6.5" stroke="#0a36c7" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
     </div>
 
     <!-- Action buttons -->
-    <div class="funding-actions">
-      <button class="funding-action-btn primary">Deposit</button>
-      <button class="funding-action-btn">Withdraw</button>
-      <button class="funding-action-btn">Transfer</button>
+    <div class="asset-actions">
+      <div class="asset-action-item">
+        <img src="images/asset-icon-deposit.svg" alt="">
+        <span>Deposit</span>
+      </div>
+      <div class="asset-action-item">
+        <img src="images/asset-icon-transfer.svg" alt="">
+        <span>Transfer</span>
+      </div>
+      <div class="asset-action-item">
+        <img src="images/asset-icon-withdraw.svg" alt="">
+        <span>Withdraw</span>
+      </div>
+      <div class="asset-action-item">
+        <img src="images/asset-icon-convert.svg" alt="">
+        <span>Convert</span>
+      </div>
     </div>
 
     <!-- Assets section -->
@@ -1304,13 +1227,6 @@
   </div>
 
   <div class="tab-earn">
-
-    <!-- Sub-tabs: Overview | Funding | Earn -->
-    <div class="vtw-subtabs">
-      <div class="vtw-subtab">Overview</div>
-      <div class="vtw-subtab">Funding</div>
-      <div class="vtw-subtab active">Earn</div>
-    </div>
 
     <!-- VTW Hero area -->
     <div class="vtw-hero">
@@ -1485,14 +1401,6 @@
   document.querySelectorAll('.fiat-subtab').forEach(function(tab) {
     tab.addEventListener('click', function() {
       document.querySelectorAll('.fiat-subtab').forEach(function(t) { t.classList.remove('active'); });
-      tab.classList.add('active');
-    });
-  });
-
-  // VT-Wallet sub-tab toggle
-  document.querySelectorAll('.vtw-subtab').forEach(function(tab) {
-    tab.addEventListener('click', function() {
-      document.querySelectorAll('.vtw-subtab').forEach(function(t) { t.classList.remove('active'); });
       tab.classList.add('active');
     });
   });
