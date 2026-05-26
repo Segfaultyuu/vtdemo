@@ -175,7 +175,7 @@
   </div>
   <div class="spotlight-wrap" id="spotlightWrap">
     <!-- Big card -->
-    <div class="spotlight-main" id="spotMain">
+    <div class="spotlight-main" id="spotMain" onclick="if(document.getElementById('spotMainSymbol').textContent.trim()==='BTCUSD') location.href=(window.location.hash==='#noWatchlist'?'kline-prelogin.html':'kline.html');" style="cursor:pointer;">
       <img class="spotlight-coin-icon" id="spotMainIcon" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" alt="">
       <div class="spotlight-symbol" id="spotMainSymbol">BTCUSD</div>
       <div class="spotlight-name" id="spotMainName">Bitcoin</div>
@@ -257,7 +257,7 @@
 
   <!-- Simple list view (right toggle) — default -->
   <div class="essentials-list list-simple">
-    <div class="e-row">
+    <div class="e-row" onclick="location.href=(window.location.hash==='#noWatchlist'?'kline-prelogin.html':'kline.html');" style="cursor:pointer;">
       <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" alt="">
       <div class="e-info"><div class="e-name">BTCUSD</div><div class="e-sub">Bitcoin</div></div>
       <div class="e-right"><span class="e-price">82,143.50</span><span class="e-chg up">+1.5%</span></div>
@@ -311,7 +311,7 @@
 
   <!-- Trading card view (left toggle) -->
   <div class="list-trade" style="display:none;">
-    <div class="t-card">
+    <div class="t-card" onclick="location.href=(window.location.hash==='#noWatchlist'?'kline-prelogin.html':'kline.html');" style="cursor:pointer;">
       <div class="t-card-header">
         <div class="t-card-name"><img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" alt=""><span class="t-symbol">BTCUSD</span></div>
         <span class="e-chg up">+1.5%</span>
@@ -458,7 +458,7 @@
     </div>
     <!-- Simple list view (left toggle) — default -->
     <div class="essentials-list list-simple">
-      <div class="e-row">
+      <div class="e-row" onclick="location.href=(window.location.hash==='#noWatchlist'?'kline-prelogin.html':'kline.html');" style="cursor:pointer;">
         <img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" alt="">
         <div class="e-info"><div class="e-name">BTCUSD</div><div class="e-sub">Bitcoin</div></div>
         <div class="e-right"><span class="e-price">82,143.50</span><span class="e-chg up">+1.5%</span></div>
@@ -486,7 +486,7 @@
     </div>
     <!-- Trading card view (right toggle) -->
     <div class="list-trade" style="display:none;">
-      <div class="t-card">
+      <div class="t-card" onclick="location.href=(window.location.hash==='#noWatchlist'?'kline-prelogin.html':'kline.html');" style="cursor:pointer;">
         <div class="t-card-header">
           <div class="t-card-name"><img class="e-coin" src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" alt=""><span class="t-symbol">BTCUSD</span></div>
           <span class="e-chg up">+1.5%</span>
@@ -739,7 +739,8 @@
         } else {
           iconHtml = '<img class="mini-coin" src="' + d.icon + '" alt="" style="' + d.iconStyle + '">';
         }
-        html += '<div class="mover-card">'
+        var clickAttr = d.symbol === 'BTCUSD' ? ' onclick="location.href=(window.location.hash===\'#noWatchlist\'?\'kline-prelogin.html\':\'kline.html\');" style="cursor:pointer;"' : '';
+        html += '<div class="mover-card"' + clickAttr + '>'
           + '<div class="mini-card-name">' + iconHtml
           + '<div><div class="mini-symbol">' + d.symbol + '</div><div class="mini-sub">' + d.name + '</div></div></div>'
           + '<div class="mover-chart">' + chart + '</div>'

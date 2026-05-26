@@ -1,0 +1,1005 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=393, initial-scale=1">
+  <title>BTCUSD – VT Markets</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="components.css">
+  <style>
+    body { background: #fff; }
+    .page-scroll { padding-bottom: 230px; }
+
+    /* Tabs row */
+    .kline-tabs {
+      display: flex; align-items: center; gap: 24px;
+      padding: 6px 20px 0; border-bottom: 1px solid #f4f5f6;
+      width: 393px; box-sizing: border-box;
+    }
+    .kline-tab {
+      font-size: 14px; font-weight: 500; color: #7a8699;
+      padding: 8px 0 12px; cursor: pointer; position: relative;
+    }
+    .kline-tab.active { color: #0a36c7; font-weight: 600; }
+    .kline-tab.active::after {
+      content: ''; position: absolute; left: 0; right: 0; bottom: -1px;
+      height: 2px; background: #0a36c7; border-radius: 2px;
+    }
+
+    /* Product details */
+    .pd-row {
+      display: flex; justify-content: space-between;
+      padding: 12px 20px 0;
+    }
+    .pd-left { display: flex; flex-direction: column; gap: 4px; }
+    .pd-price {
+      font-size: 28px; font-weight: 700; color: #00b565; line-height: 1;
+    }
+    .pd-change-pill {
+      display: inline-flex; align-items: center;
+      background: rgba(0,181,101,0.12);
+      padding: 2px 8px; border-radius: 4px;
+      font-size: 12px; font-weight: 500; color: #00b565;
+      width: fit-content;
+    }
+    .pd-trading {
+      font-size: 11px; font-weight: 400; color: #7a8699;
+    }
+    .pd-right {
+      display: grid; grid-template-columns: auto auto;
+      gap: 4px 12px; font-size: 12px; line-height: 16px;
+    }
+    .pd-right .lbl { color: #7a8699; }
+    .pd-right .val { color: #282d34; font-weight: 500; text-align: right; }
+
+    /* Time bar */
+    .tf-bar {
+      display: flex; align-items: center; gap: 0;
+      padding: 12px 20px; width: 393px; box-sizing: border-box;
+      border-bottom: 1px solid #f4f5f6;
+    }
+    .tf-item {
+      flex: 1; text-align: center;
+      font-size: 13px; font-weight: 500; color: #7a8699;
+      padding: 4px 0; cursor: pointer; border-radius: 4px;
+    }
+    .tf-item.active { color: #282d34; font-weight: 600; background: #f4f5f6; }
+    .tf-icons {
+      display: flex; align-items: center; gap: 12px; margin-left: 8px;
+    }
+    .tf-icons svg { width: 16px; height: 16px; cursor: pointer; }
+
+    /* MA legend */
+    .ma-legend {
+      display: flex; gap: 12px; padding: 8px 20px 4px;
+      font-size: 11px; font-weight: 500;
+    }
+    .ma-legend span:nth-child(1) { color: #ff8a00; }
+    .ma-legend span:nth-child(2) { color: #c64fff; }
+    .ma-legend span:nth-child(3) { color: #ff2c40; }
+    .ma-legend span:nth-child(4) { color: #00b8d4; }
+
+    /* Chart area */
+    .chart-area {
+      position: relative; width: 393px; height: 320px;
+      padding: 0 0 0 0;
+      touch-action: pan-y;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+    .chart-svg { width: 100%; height: 100%; display: block; }
+    .chart-tooltip { display: none; }
+    .chart-area.crosshair-on .chart-tooltip { display: block; }
+    .chart-watermark {
+      position: absolute; left: 12px; bottom: 64px;
+      display: flex; align-items: center; gap: 4px;
+      opacity: 0.5;
+    }
+    .chart-watermark svg { width: 18px; height: 14px; }
+    .chart-watermark span {
+      font-size: 11px; font-weight: 600; color: #7a8699;
+    }
+    .chart-tooltip {
+      position: absolute; left: 12px; top: 8px;
+      background: #fff; border: 1px solid #e8e9ea; border-radius: 4px;
+      padding: 6px 8px; font-size: 10px; line-height: 14px;
+      color: #282d34;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+    }
+    .chart-tooltip .tt-title {
+      font-weight: 600; margin-bottom: 2px;
+    }
+    .chart-tooltip .tt-row {
+      display: flex; gap: 8px; justify-content: space-between;
+    }
+    .chart-tooltip .tt-row .lbl { color: #7a8699; }
+
+    .chart-time-axis {
+      display: flex; justify-content: space-between;
+      padding: 4px 12px 0; font-size: 10px; color: #7a8699;
+    }
+    .axis-active {
+      background: #282d34; color: #fff;
+      padding: 1px 6px; border-radius: 3px;
+    }
+
+    /* VOL row */
+    .vol-legend {
+      display: flex; gap: 10px; padding: 8px 20px 0;
+      font-size: 10px; font-weight: 500;
+    }
+    .vol-legend .v0 { color: #282d34; font-weight: 600; }
+    .vol-legend .v1 { color: #00b8d4; }
+    .vol-legend .v2 { color: #ff8a00; }
+
+    /* Indicator strip */
+    .ind-strip {
+      display: flex; align-items: center; gap: 0;
+      padding: 12px 20px; border-top: 1px solid #f4f5f6;
+      border-bottom: 1px solid #f4f5f6; margin-top: 8px;
+    }
+    .ind-item {
+      flex: 1; text-align: center;
+      font-size: 12px; font-weight: 500; color: #7a8699;
+      cursor: pointer;
+    }
+    .ind-item.active { color: #282d34; font-weight: 600; }
+    .ind-divider {
+      width: 1px; height: 12px; background: #e8e9ea;
+      margin: 0 4px;
+    }
+    .ind-icon {
+      width: 18px; height: 18px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* Daily change ribbon */
+    .change-ribbon {
+      display: grid; grid-template-columns: 1fr 1fr 1fr auto;
+      align-items: center;
+      padding: 12px 20px; gap: 16px;
+    }
+    .cr-cell {
+      display: flex; flex-direction: column; gap: 2px;
+    }
+    .cr-period {
+      font-size: 11px; color: #7a8699;
+    }
+    .cr-value {
+      font-size: 13px; font-weight: 500;
+    }
+    .cr-up { color: #00b565; }
+    .cr-down { color: #ff2c40; }
+    .cr-more {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 12px; color: #7a8699; cursor: pointer;
+      justify-content: flex-end;
+    }
+    .cr-more svg { width: 8px; height: 8px; }
+
+    /* Range bars */
+    .range-section { padding: 8px 20px 12px; }
+    .range-head {
+      display: flex; justify-content: space-between;
+      font-size: 12px; color: #7a8699; padding: 8px 0;
+    }
+    .range-row { padding: 8px 0; }
+    .range-track {
+      position: relative; height: 4px; background: #f4f5f6;
+      border-radius: 2px;
+    }
+    .range-fill {
+      position: absolute; left: 0; top: 0; height: 4px;
+      background: linear-gradient(90deg, #00b565, #ff2c40);
+      border-radius: 2px;
+    }
+    .range-tri {
+      position: absolute; top: -8px;
+      width: 0; height: 0;
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 6px solid #282d34;
+      transform: translateX(-50%);
+    }
+    .range-data {
+      display: flex; justify-content: space-between;
+      align-items: center; padding-top: 4px;
+      font-size: 12px; color: #282d34;
+    }
+    .range-data .center {
+      font-size: 11px; font-weight: 600; color: #7a8699;
+    }
+
+    /* Sentiment */
+    .sent-section {
+      padding: 12px 20px 16px;
+      border-top: 8px solid #f4f5f6;
+    }
+    .sent-title {
+      display: flex; align-items: center; gap: 4px;
+      font-size: 16px; font-weight: 600; color: #282d34; margin-bottom: 12px;
+    }
+    .sent-title svg { width: 14px; height: 14px; }
+    .sent-bar {
+      display: flex; height: 8px; border-radius: 4px; overflow: hidden;
+    }
+    .sent-buy { background: #00b565; flex: 60; }
+    .sent-sell { background: #ff2c40; flex: 40; }
+    .sent-labels {
+      display: flex; justify-content: space-between;
+      padding-top: 8px; font-size: 12px; color: #282d34;
+    }
+    .sent-labels .b { color: #00b565; font-weight: 500; }
+    .sent-labels .s { color: #ff2c40; font-weight: 500; }
+
+    /* Bottom one-tap panel */
+    .ot-panel {
+      position: fixed; bottom: 0; left: 0;
+      width: 393px; background: #fff;
+      border-top: 1px solid #f4f5f6;
+      padding: 12px 16px 24px;
+      z-index: 50;
+    }
+    .ot-mode {
+      display: flex; justify-content: center; align-items: center;
+      gap: 4px; font-size: 14px; font-weight: 500; color: #282d34;
+      margin-bottom: 12px; cursor: pointer;
+    }
+    .ot-mode svg { width: 10px; height: 10px; }
+    .ot-lots-row {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
+    }
+    .ot-lots-label { font-size: 14px; color: #282d34; width: 28px; }
+    .ot-stepper {
+      flex: 1; display: flex; align-items: center;
+      background: #f4f5f6; border-radius: 8px; height: 40px;
+      padding: 0 12px;
+    }
+    .ot-step-btn {
+      width: 24px; height: 24px; display: flex;
+      align-items: center; justify-content: center; cursor: pointer;
+      color: #282d34;
+    }
+    .ot-step-input {
+      flex: 1; text-align: center; border: none; background: transparent;
+      font-size: 16px; font-weight: 500; color: #282d34;
+      font-family: 'Roboto', sans-serif; outline: none;
+    }
+    .ot-buttons-row {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 8px;
+    }
+    .ot-bs-btn {
+      flex: 1; height: 40px; border-radius: 8px; border: none;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; cursor: pointer;
+      color: #fff; font-family: 'Roboto', sans-serif;
+    }
+    .ot-bs-btn .px {
+      font-size: 13px; font-weight: 600; line-height: 16px;
+    }
+    .ot-bs-btn .lbl {
+      font-size: 11px; font-weight: 500; line-height: 14px;
+    }
+    .ot-bs-sell { background: #ff2c40; }
+    .ot-bs-buy { background: #00b565; }
+    .ot-spread {
+      font-size: 12px; color: #7a8699; min-width: 28px; text-align: center;
+    }
+    .ot-foot {
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 12px; color: #7a8699;
+    }
+    .ot-foot .risk {
+      display: flex; align-items: center; gap: 4px; color: #00b565; font-weight: 500;
+    }
+    .ot-foot .risk svg { width: 14px; height: 14px; }
+  </style>
+</head>
+<body>
+<div class="page-scroll">
+
+  <!-- Tabs -->
+  <div class="kline-tabs">
+    <div class="kline-tab active">Chart</div>
+    <div class="kline-tab">Copy</div>
+    <div class="kline-tab">Analysis</div>
+    <div class="kline-tab">Orders</div>
+    <div class="kline-tab">Info</div>
+  </div>
+
+  <!-- Product details -->
+  <div class="pd-row">
+    <div class="pd-left">
+      <div class="pd-price" id="pdPrice">--</div>
+      <span class="pd-change-pill" id="pdChange">--</span>
+      <div class="pd-trading" id="pdTrading">--</div>
+    </div>
+    <div class="pd-right">
+      <span class="lbl">High</span><span class="val" id="pdHigh">--</span>
+      <span class="lbl">Low</span><span class="val" id="pdLow">--</span>
+      <span class="lbl">Open</span><span class="val" id="pdOpen">--</span>
+      <span class="lbl">Close</span><span class="val" id="pdClose">--</span>
+    </div>
+  </div>
+
+  <!-- Time bar -->
+  <div class="tf-bar">
+    <div class="tf-item">Tick</div>
+    <div class="tf-item">1m</div>
+    <div class="tf-item active">15m</div>
+    <div class="tf-item">1h</div>
+    <div class="tf-item">1D</div>
+    <div class="tf-item">1W</div>
+    <div class="tf-item" style="display:flex;align-items:center;justify-content:center;gap:2px;">More
+      <svg width="8" height="6" viewBox="0 0 8 6" fill="none"><path d="M1 1L4 4L7 1" stroke="#7a8699" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </div>
+    <div class="tf-icons">
+      <svg viewBox="0 0 16 16" fill="none"><path d="M11.5 2L14 4.5L5 13.5L2 14L2.5 11L11.5 2Z" stroke="#282d34" stroke-width="1.2" stroke-linejoin="round"/></svg>
+      <svg viewBox="0 0 20 20" fill="none"><path d="M10 12.7a2.7 2.7 0 100-5.4 2.7 2.7 0 000 5.4z" stroke="#282d34" stroke-width="1.3" stroke-linejoin="round"/><path d="M16.1 12.4a1.3 1.3 0 00.27 1.46l.05.05a1.6 1.6 0 11-2.27 2.27l-.05-.05a1.3 1.3 0 00-1.46-.27 1.3 1.3 0 00-.8 1.2v.14a1.6 1.6 0 11-3.2 0v-.07a1.3 1.3 0 00-.86-1.2 1.3 1.3 0 00-1.46.27l-.05.05a1.6 1.6 0 11-2.27-2.27l.05-.05a1.3 1.3 0 00.27-1.46 1.3 1.3 0 00-1.2-.8h-.14a1.6 1.6 0 110-3.2h.07a1.3 1.3 0 001.2-.86 1.3 1.3 0 00-.27-1.46l-.05-.05a1.6 1.6 0 112.27-2.27l.05.05a1.3 1.3 0 001.46.27h.07a1.3 1.3 0 00.8-1.2v-.14a1.6 1.6 0 113.2 0v.07a1.3 1.3 0 00.8 1.2 1.3 1.3 0 001.46-.27l.05-.05a1.6 1.6 0 112.27 2.27l-.05.05a1.3 1.3 0 00-.27 1.46v.07a1.3 1.3 0 001.2.8h.14a1.6 1.6 0 110 3.2h-.07a1.3 1.3 0 00-1.2.8z" stroke="#282d34" stroke-width="1.3" stroke-linejoin="round"/></svg>
+    </div>
+  </div>
+
+  <!-- MA legend -->
+  <div class="ma-legend" id="maLegend">
+    <span>MA5: --</span>
+    <span>MA10: --</span>
+    <span>MA20: --</span>
+    <span>MA30: --</span>
+  </div>
+
+  <!-- Chart area -->
+  <div class="chart-area" id="chartArea">
+    <!-- Crosshair tooltip -->
+    <div class="chart-tooltip" id="chartTooltip">
+      <div class="tt-title" id="ttTitle"></div>
+      <div class="tt-row"><span class="lbl">Open</span><span id="ttOpen"></span></div>
+      <div class="tt-row"><span class="lbl">High</span><span id="ttHigh"></span></div>
+      <div class="tt-row"><span class="lbl">Low</span><span id="ttLow"></span></div>
+      <div class="tt-row"><span class="lbl">Close</span><span id="ttClose"></span></div>
+    </div>
+
+    <svg class="chart-svg" id="chartSvg" viewBox="0 0 393 320" preserveAspectRatio="none">
+      <!-- Grid lines -->
+      <g id="gridLines" stroke="#f4f5f6" stroke-width="0.5"></g>
+
+      <!-- Y-axis price labels -->
+      <g id="yAxisLabels" font-size="9" fill="#7a8699" font-family="Roboto" text-anchor="end"></g>
+
+      <!-- MA lines -->
+      <path id="ma5"  fill="none" stroke="#ff8a00" stroke-width="1.2" opacity="0.9"/>
+      <path id="ma10" fill="none" stroke="#c64fff" stroke-width="1.2" opacity="0.9"/>
+      <path id="ma20" fill="none" stroke="#ff2c40" stroke-width="1.2" opacity="0.9"/>
+      <path id="ma30" fill="none" stroke="#00b8d4" stroke-width="1.2" opacity="0.9"/>
+
+      <!-- Candles -->
+      <g id="candles"></g>
+
+      <!-- Volume bars -->
+      <g id="vol-bars"></g>
+
+      <!-- Right edge current-price tag -->
+      <g id="priceTag">
+        <rect id="priceTagRect" x="335" y="123" width="56" height="14" fill="#fff" stroke="#00b565" stroke-width="0.8" rx="2"/>
+        <text id="priceTagText" x="363" y="133" font-size="9" fill="#00b565" font-family="Roboto" font-weight="600" text-anchor="middle"></text>
+      </g>
+
+      <!-- Crosshair (hidden by default) -->
+      <g id="crosshair" style="display:none;">
+        <line id="chX" x1="0" y1="0" x2="0" y2="0" stroke="#7a8699" stroke-width="0.5" stroke-dasharray="2 2"/>
+        <line id="chY" x1="0" y1="0" x2="393" y2="0" stroke="#7a8699" stroke-width="0.5" stroke-dasharray="2 2"/>
+        <rect id="chPriceRect" x="335" y="0" width="56" height="14" fill="#282d34" rx="2"/>
+        <text id="chPriceText" x="363" y="0" font-size="9" fill="#fff" font-family="Roboto" font-weight="600" text-anchor="middle"></text>
+      </g>
+
+      <!-- VOL axis -->
+      <g id="volAxis" font-size="9" fill="#7a8699" font-family="Roboto" text-anchor="end"></g>
+    </svg>
+
+  </div>
+
+  <!-- Time axis -->
+  <div class="chart-time-axis" id="timeAxis"></div>
+
+  <!-- VOL legend -->
+  <div class="vol-legend" id="volLegend">
+    <span class="v0">VOL: --</span>
+    <span class="v1">MA5: --</span>
+    <span class="v2">MA10: --</span>
+  </div>
+
+  <!-- Indicator strip -->
+  <div class="ind-strip">
+    <div class="ind-item">MA</div>
+    <div class="ind-item">BOLL</div>
+    <div class="ind-item">MIKE</div>
+    <div class="ind-item">BBI</div>
+    <div class="ind-divider"></div>
+    <div class="ind-item">VOL</div>
+    <div class="ind-item active">MACD</div>
+    <div class="ind-item">KDJ</div>
+    <div class="ind-item">RSI</div>
+    <div class="ind-icon">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M2 11L5 8L8 10L13 4" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="13" cy="4" r="1.2" fill="#282d34"/></svg>
+    </div>
+  </div>
+
+  <!-- Daily change ribbon -->
+  <div class="change-ribbon" id="changeRibbon">
+    <div class="cr-cell">
+      <span class="cr-period">1D</span>
+      <span class="cr-value" data-period="1D">--</span>
+    </div>
+    <div class="cr-cell">
+      <span class="cr-period">1W</span>
+      <span class="cr-value" data-period="1W">--</span>
+    </div>
+    <div class="cr-cell">
+      <span class="cr-period">1M</span>
+      <span class="cr-value" data-period="1M">--</span>
+    </div>
+    <span class="cr-more">More
+      <svg viewBox="0 0 8 8" fill="none"><path d="M3 1.5L6 4L3 6.5" stroke="#7a8699" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </span>
+  </div>
+
+  <!-- Range bars -->
+  <div class="range-section">
+    <div class="range-head">
+      <span>Low</span>
+      <span>High</span>
+    </div>
+    <div class="range-row">
+      <div class="range-track">
+        <div class="range-fill" style="width:69%"></div>
+        <div class="range-tri" style="left:69%"></div>
+      </div>
+      <div class="range-data">
+        <span>113236.40</span>
+        <span class="center">1h</span>
+        <span>113240.34</span>
+      </div>
+    </div>
+    <div class="range-row">
+      <div class="range-track">
+        <div class="range-fill" style="width:66%"></div>
+        <div class="range-tri" style="left:66%"></div>
+      </div>
+      <div class="range-data">
+        <span>113236.40</span>
+        <span class="center">1D</span>
+        <span>113240.34</span>
+      </div>
+    </div>
+    <div class="range-row">
+      <div class="range-track">
+        <div class="range-fill" style="width:77%"></div>
+        <div class="range-tri" style="left:77%"></div>
+      </div>
+      <div class="range-data">
+        <span>113236.40</span>
+        <span class="center">1M</span>
+        <span>113240.34</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Traders' Sentiment -->
+  <div class="sent-section">
+    <div class="sent-title">Traders' Sentiment
+      <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#7a8699" stroke-width="1"/><circle cx="7" cy="5" r="0.8" fill="#7a8699"/><line x1="7" y1="7" x2="7" y2="10" stroke="#7a8699" stroke-width="1.2" stroke-linecap="round"/></svg>
+    </div>
+    <div class="sent-bar">
+      <div class="sent-buy" id="sentBuy"></div>
+      <div class="sent-sell" id="sentSell"></div>
+    </div>
+    <div class="sent-labels">
+      <span class="b" id="sentBuyLbl">B --</span>
+      <span class="s" id="sentSellLbl">S --</span>
+    </div>
+  </div>
+
+</div><!-- end page-scroll -->
+
+<!-- Bottom one-tap panel -->
+<div class="ot-panel">
+  <div class="ot-mode">One-Tap
+    <svg viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  </div>
+  <div class="ot-lots-row">
+    <span class="ot-lots-label">Lots</span>
+    <div class="ot-stepper">
+      <div class="ot-step-btn" id="otMinus">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="3" y1="7" x2="11" y2="7" stroke="#282d34" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </div>
+      <input class="ot-step-input" id="otLots" value="0.01" inputmode="decimal">
+      <div class="ot-step-btn" id="otPlus">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><line x1="3" y1="7" x2="11" y2="7" stroke="#282d34" stroke-width="1.4" stroke-linecap="round"/><line x1="7" y1="3" x2="7" y2="11" stroke="#282d34" stroke-width="1.4" stroke-linecap="round"/></svg>
+      </div>
+    </div>
+  </div>
+  <div class="ot-buttons-row">
+    <button class="ot-bs-btn ot-bs-sell" onclick="location.href='trade.html'">
+      <span class="px">40614.45</span>
+      <span class="lbl">SELL</span>
+    </button>
+    <span class="ot-spread" id="otSpread">--</span>
+    <button class="ot-bs-btn ot-bs-buy" onclick="location.href='trade.html'">
+      <span class="px">41030.85</span>
+      <span class="lbl">BUY</span>
+    </button>
+  </div>
+  <div class="ot-foot">
+    <span>Free Margin: <span id="otFreeMargin">--</span></span>
+    <span class="risk">
+      <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#00b565" stroke-width="1.2"/><path d="M4 8L7 5L10 8" stroke="#00b565" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span id="otRisk">--</span>
+    </span>
+  </div>
+</div>
+
+<script src="top-nav.js"></script>
+<script>
+  TopNav.init({
+    showTitle: true,
+    titleText: 'BTCUSD',
+    rightIconSvg:
+      '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="cursor:pointer;"><path d="M10 1.5L12.6 6.8L18.5 7.7L14.2 11.8L15.2 17.7L10 14.9L4.8 17.7L5.8 11.8L1.5 7.7L7.4 6.8L10 1.5Z" fill="#FFC700" stroke="#FFC700" stroke-width="1.2" stroke-linejoin="round"/></svg>' +
+      '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="cursor:pointer;"><path d="M4.17 15.83V7.5C4.17 4.28 6.78 1.67 10 1.67C13.22 1.67 15.83 4.28 15.83 7.5V15.83M1.67 15.83H18.33" stroke="#282d34" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M8 17.5C8.5 18.3 9.2 18.75 10 18.75C10.8 18.75 11.5 18.3 12 17.5" stroke="#282d34" stroke-width="1.4" stroke-linecap="round"/></svg>' +
+      '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" style="cursor:pointer;"><path d="M11 3H17V9" stroke="#282d34" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M17 3L9 11" stroke="#282d34" stroke-width="1.4" stroke-linecap="round"/><path d="M15 11.5V15.5C15 16.6 14.1 17.5 13 17.5H4.5C3.4 17.5 2.5 16.6 2.5 15.5V7C2.5 5.9 3.4 5 4.5 5H8.5" stroke="#282d34" stroke-width="1.4" stroke-linecap="round"/></svg>'
+  });
+</script>
+<script>
+  /* ── K-line chart engine ── */
+  var KLine = (function() {
+    var SVG_NS = 'http://www.w3.org/2000/svg';
+    var CHART_W = 393;
+    var PAD_L = 8, PAD_R = 60;             // leave room for right-edge price labels
+    var PRICE_TOP = 12, PRICE_BOT = 240;   // candle pane Y range
+    var VOL_TOP = 252, VOL_BOT = 312;      // volume pane Y range
+
+    var candleArea = { x: PAD_L, y: PRICE_TOP, w: CHART_W - PAD_L - PAD_R, h: PRICE_BOT - PRICE_TOP };
+    var volArea    = { x: PAD_L, y: VOL_TOP,   w: CHART_W - PAD_L - PAD_R, h: VOL_BOT - VOL_TOP };
+
+    /* Timeframe definitions: [interval-minutes, label] */
+    var TF_MIN = {
+      'Tick': 1, '1m': 1, '15m': 15, '1h': 60, '1D': 24*60, '1W': 7*24*60
+    };
+
+    var state = { tf: '15m', candles: [], minP: 0, maxP: 0, minV: 0, maxV: 0 };
+
+    /* Generate synthetic candle data based on tf */
+    function generateCandles(tf, n) {
+      var min = TF_MIN[tf] || 15;
+      var stepMs = min * 60 * 1000;
+      // anchor close to "now" so latest is right edge
+      var nowMs = Date.now();
+      var startMs = nowMs - (n - 1) * stepMs;
+      var px = 40850 + (Math.random() - 0.5) * 200;
+      var vol = 0.001;
+      var candles = [];
+      // volatility scales loosely with timeframe
+      var vola = Math.sqrt(min) * 80;
+      for (var i = 0; i < n; i++) {
+        var open = px;
+        var drift = (Math.random() - 0.5) * vola;
+        px = Math.max(30000, Math.min(60000, px + drift));
+        var close = px;
+        var high = Math.max(open, close) + Math.random() * vola * 0.4;
+        var low  = Math.min(open, close) - Math.random() * vola * 0.4;
+        var v = Math.max(0.0001, vol * (0.4 + Math.random() * 1.8));
+        candles.push({
+          t: startMs + i * stepMs,
+          o: open, h: high, l: low, c: close,
+          v: v
+        });
+      }
+      return candles;
+    }
+
+    function fmt(n, d) { d = d == null ? 2 : d;
+      var s = n.toFixed(d);
+      var parts = s.split('.');
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      return parts.join('.');
+    }
+
+    function fmtTime(ms) {
+      var d = new Date(ms);
+      var pad = function(x) { return x < 10 ? '0' + x : '' + x; };
+      var min = TF_MIN[state.tf] || 15;
+      if (min >= 24*60) {
+        return (d.getMonth()+1) + '/' + pad(d.getDate()) + '/' + d.getFullYear();
+      }
+      return pad(d.getMonth()+1) + '/' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+    }
+
+    function ma(arr, period, idx) {
+      if (idx < period - 1) return null;
+      var sum = 0;
+      for (var i = idx - period + 1; i <= idx; i++) sum += arr[i].c;
+      return sum / period;
+    }
+
+    /* Convert a price -> Y coord */
+    function yPrice(p) {
+      var range = state.maxP - state.minP || 1;
+      return candleArea.y + candleArea.h - ((p - state.minP) / range) * candleArea.h;
+    }
+    function yVol(v) {
+      var range = state.maxV - state.minV || 1;
+      return volArea.y + volArea.h - ((v - state.minV) / range) * volArea.h;
+    }
+    /* Convert candle index -> X coord (center of slot) */
+    function xCenter(i) {
+      var slot = candleArea.w / state.candles.length;
+      return candleArea.x + slot * (i + 0.5);
+    }
+    /* Convert pixel X -> nearest candle index */
+    function xToIndex(px) {
+      var slot = candleArea.w / state.candles.length;
+      var i = Math.floor((px - candleArea.x) / slot);
+      return Math.max(0, Math.min(state.candles.length - 1, i));
+    }
+
+    function buildPath(idxToVal) {
+      var d = '';
+      var moved = false;
+      for (var i = 0; i < state.candles.length; i++) {
+        var v = idxToVal(i);
+        if (v == null) continue;
+        var x = xCenter(i), y = yPrice(v);
+        d += (moved ? 'L' : 'M') + x.toFixed(1) + ' ' + y.toFixed(1);
+        moved = true;
+      }
+      return d;
+    }
+
+    function render() {
+      var c = state.candles;
+      // Compute price/vol ranges (with a little padding)
+      var minP = Infinity, maxP = -Infinity, maxV = 0;
+      for (var i = 0; i < c.length; i++) {
+        if (c[i].l < minP) minP = c[i].l;
+        if (c[i].h > maxP) maxP = c[i].h;
+        if (c[i].v > maxV) maxV = c[i].v;
+      }
+      var pad = (maxP - minP) * 0.08;
+      state.minP = minP - pad;
+      state.maxP = maxP + pad;
+      state.minV = 0;
+      state.maxV = maxV * 1.1;
+
+      /* Grid + Y-axis labels */
+      var grid = document.getElementById('gridLines');
+      var ya   = document.getElementById('yAxisLabels');
+      grid.innerHTML = ''; ya.innerHTML = '';
+      var lines = 4;
+      for (var k = 0; k <= lines; k++) {
+        var p = state.maxP - (state.maxP - state.minP) * (k / lines);
+        var y = yPrice(p);
+        grid.insertAdjacentHTML('beforeend',
+          '<line x1="0" y1="' + y.toFixed(1) + '" x2="' + (CHART_W - PAD_R) + '" y2="' + y.toFixed(1) + '"/>');
+        ya.insertAdjacentHTML('beforeend',
+          '<text x="' + (CHART_W - 4) + '" y="' + (y + 3).toFixed(1) + '">' + fmt(p) + '</text>');
+      }
+
+      /* Candles */
+      var g = document.getElementById('candles');
+      g.innerHTML = '';
+      var slot = candleArea.w / c.length;
+      var bw = Math.max(1.4, slot * 0.7);
+      for (var j = 0; j < c.length; j++) {
+        var k2 = c[j];
+        var up = k2.c >= k2.o;
+        var color = up ? '#00b565' : '#ff2c40';
+        var x = xCenter(j);
+        var yH = yPrice(k2.h), yL = yPrice(k2.l);
+        var yO = yPrice(k2.o), yC = yPrice(k2.c);
+        var bodyTop = Math.min(yO, yC);
+        var bodyH = Math.max(1, Math.abs(yO - yC));
+        g.insertAdjacentHTML('beforeend',
+          '<line x1="' + x.toFixed(1) + '" y1="' + yH.toFixed(1) +
+          '" x2="' + x.toFixed(1) + '" y2="' + yL.toFixed(1) +
+          '" stroke="' + color + '" stroke-width="0.8"/>' +
+          '<rect x="' + (x - bw/2).toFixed(1) + '" y="' + bodyTop.toFixed(1) +
+          '" width="' + bw.toFixed(1) + '" height="' + bodyH.toFixed(1) +
+          '" fill="' + color + '"/>');
+      }
+
+      /* MA paths */
+      document.getElementById('ma5').setAttribute('d',  buildPath(function(i){return ma(c, 5, i);}));
+      document.getElementById('ma10').setAttribute('d', buildPath(function(i){return ma(c, 10, i);}));
+      document.getElementById('ma20').setAttribute('d', buildPath(function(i){return ma(c, 20, i);}));
+      document.getElementById('ma30').setAttribute('d', buildPath(function(i){return ma(c, 30, i);}));
+
+      /* Volume bars */
+      var vg = document.getElementById('vol-bars');
+      vg.innerHTML = '';
+      for (var m = 0; m < c.length; m++) {
+        var ku = c[m].c >= c[m].o;
+        var fill = ku ? 'rgba(0,181,101,0.55)' : 'rgba(255,44,64,0.55)';
+        var vx = xCenter(m);
+        var vy = yVol(c[m].v);
+        var vh = (volArea.y + volArea.h) - vy;
+        vg.insertAdjacentHTML('beforeend',
+          '<rect x="' + (vx - bw/2).toFixed(1) + '" y="' + vy.toFixed(1) +
+          '" width="' + bw.toFixed(1) + '" height="' + Math.max(1, vh).toFixed(1) +
+          '" fill="' + fill + '"/>');
+      }
+
+      /* VOL axis */
+      var va = document.getElementById('volAxis');
+      va.innerHTML =
+        '<text x="' + (CHART_W - 4) + '" y="' + (volArea.y + 6) + '">' + fmt(state.maxV, 4) + '</text>' +
+        '<text x="' + (CHART_W - 4) + '" y="' + (volArea.y + volArea.h) + '">0</text>';
+
+      /* Latest price tag (right edge) */
+      var last = c[c.length - 1];
+      var prev = c[c.length - 2] || last;
+      var lastUp = last.c >= prev.c;
+      var lastColor = lastUp ? '#00b565' : '#ff2c40';
+      var lastY = yPrice(last.c);
+      var pr = document.getElementById('priceTagRect');
+      var pt = document.getElementById('priceTagText');
+      pr.setAttribute('y', (lastY - 7).toFixed(1));
+      pr.setAttribute('stroke', lastColor);
+      pt.setAttribute('y', (lastY + 3).toFixed(1));
+      pt.setAttribute('fill', lastColor);
+      pt.textContent = fmt(last.c);
+
+      /* MA legend (latest values) */
+      var mLegend = document.getElementById('maLegend');
+      var n = c.length - 1;
+      var v5 = ma(c, 5, n), v10 = ma(c, 10, n), v20 = ma(c, 20, n), v30 = ma(c, 30, n);
+      mLegend.children[0].textContent = 'MA5: '  + (v5  ? fmt(v5)  : '--');
+      mLegend.children[1].textContent = 'MA10: ' + (v10 ? fmt(v10) : '--');
+      mLegend.children[2].textContent = 'MA20: ' + (v20 ? fmt(v20) : '--');
+      mLegend.children[3].textContent = 'MA30: ' + (v30 ? fmt(v30) : '--');
+
+      /* VOL legend */
+      var vLeg = document.getElementById('volLegend');
+      vLeg.children[0].textContent = 'VOL: ' + fmt(last.v, 4);
+      vLeg.children[1].textContent = 'MA5: '  + fmt(volMA(c, 5,  n), 4);
+      vLeg.children[2].textContent = 'MA10: ' + fmt(volMA(c, 10, n), 4);
+
+      /* Time axis (4 ticks) */
+      var ta = document.getElementById('timeAxis');
+      ta.innerHTML = '';
+      var idxs = [0, Math.floor(c.length * 0.33), Math.floor(c.length * 0.66), c.length - 1];
+      for (var t = 0; t < idxs.length; t++) {
+        ta.insertAdjacentHTML('beforeend', '<span>' + fmtTime(c[idxs[t]].t) + '</span>');
+      }
+
+      /* Product details header */
+      var first = c[0];
+      var change = last.c - first.c;
+      var pct = (change / first.c) * 100;
+      var upChange = change >= 0;
+      var greenBg = 'rgba(0,181,101,0.12)', redBg = 'rgba(255,44,64,0.12)';
+      var pdPrice = document.getElementById('pdPrice');
+      var pdChange = document.getElementById('pdChange');
+      pdPrice.textContent = fmt(last.c);
+      pdPrice.style.color = upChange ? '#00b565' : '#ff2c40';
+      pdChange.textContent = (upChange ? '+' : '') + fmt(change) + ' (' + (upChange ? '+' : '') + pct.toFixed(2) + '%)';
+      pdChange.style.color = upChange ? '#00b565' : '#ff2c40';
+      pdChange.style.background = upChange ? greenBg : redBg;
+      document.getElementById('pdHigh').textContent  = fmt(last.h);
+      document.getElementById('pdLow').textContent   = fmt(last.l);
+      document.getElementById('pdOpen').textContent  = fmt(last.o);
+      document.getElementById('pdClose').textContent = fmt(last.c);
+      document.getElementById('pdTrading').textContent = 'Trading (' + fmtTime(last.t) + ')';
+
+      /* Range bars (1h / 1D / 1M based on last n candles) */
+      updateRangeBars(c);
+
+      /* Bottom one-tap prices */
+      var spread = Math.max(5, Math.round(last.c * 0.0004));
+      var sellPx = last.c - spread, buyPx = last.c + spread;
+      var sellEl = document.querySelector('.ot-bs-sell .px');
+      var buyEl  = document.querySelector('.ot-bs-buy .px');
+      if (sellEl) sellEl.textContent = fmt(sellPx);
+      if (buyEl)  buyEl.textContent  = fmt(buyPx);
+
+      /* Spread display (in points) */
+      var spreadEl = document.getElementById('otSpread');
+      if (spreadEl) spreadEl.textContent = fmt(spread * 100, 0);
+
+      /* Free margin & risk — derived deterministically from current price */
+      var freeMargin = 3000 + (last.c % 1000) + Math.abs(change);
+      var risk = Math.max(50, Math.round(120 + Math.abs(pct) * 25));
+      var fmEl = document.getElementById('otFreeMargin');
+      var rkEl = document.getElementById('otRisk');
+      if (fmEl) fmEl.textContent = '$' + fmt(freeMargin);
+      if (rkEl) rkEl.textContent = risk + '%';
+
+      /* Daily change ribbon (1D / 1W / 1M) */
+      updateChangeRibbon(c);
+
+      /* Sentiment (derived from how strongly bulls outnumbered bears recently) */
+      updateSentiment(c);
+    }
+
+    function updateChangeRibbon(c) {
+      var min = TF_MIN[state.tf] || 15;
+      var periods = { '1D': 24*60, '1W': 7*24*60, '1M': 30*24*60 };
+      var nodes = document.querySelectorAll('#changeRibbon .cr-value');
+      nodes.forEach(function(node) {
+        var key = node.getAttribute('data-period');
+        var bars = Math.max(2, Math.round(periods[key] / min));
+        var ref = c[Math.max(0, c.length - 1 - bars)];
+        var last = c[c.length - 1];
+        var pct = ((last.c - ref.c) / ref.c) * 100;
+        var up = pct >= 0;
+        node.textContent = (up ? '+' : '') + pct.toFixed(2) + '%';
+        node.classList.remove('cr-up', 'cr-down');
+        node.classList.add(up ? 'cr-up' : 'cr-down');
+      });
+    }
+
+    function updateSentiment(c) {
+      var look = Math.min(c.length, 30);
+      var ups = 0, downs = 0;
+      for (var i = c.length - look; i < c.length; i++) {
+        if (c[i].c >= c[i].o) ups++; else downs++;
+      }
+      var total = ups + downs || 1;
+      var bPct = Math.round((ups / total) * 100);
+      var sPct = 100 - bPct;
+      var buyBar = document.getElementById('sentBuy');
+      var sellBar = document.getElementById('sentSell');
+      if (buyBar)  buyBar.style.flex = bPct;
+      if (sellBar) sellBar.style.flex = sPct;
+      var bL = document.getElementById('sentBuyLbl');
+      var sL = document.getElementById('sentSellLbl');
+      if (bL) bL.textContent = 'B ' + bPct + '%';
+      if (sL) sL.textContent = 'S ' + sPct + '%';
+    }
+
+    function volMA(c, period, idx) {
+      if (idx < period - 1) return 0;
+      var s = 0;
+      for (var i = idx - period + 1; i <= idx; i++) s += c[i].v;
+      return s / period;
+    }
+
+    function updateRangeBars(c) {
+      var rows = document.querySelectorAll('.range-section .range-row');
+      var min = TF_MIN[state.tf] || 15;
+      var spans = [
+        Math.min(c.length, Math.max(2, Math.round(60 / min))),       // 1h
+        Math.min(c.length, Math.max(2, Math.round(24 * 60 / min))),  // 1D
+        Math.min(c.length, Math.max(2, Math.round(30 * 24 * 60 / min))) // 1M
+      ];
+      for (var r = 0; r < rows.length; r++) {
+        var slice = c.slice(c.length - spans[r]);
+        var lo = Infinity, hi = -Infinity;
+        for (var s2 = 0; s2 < slice.length; s2++) {
+          if (slice[s2].l < lo) lo = slice[s2].l;
+          if (slice[s2].h > hi) hi = slice[s2].h;
+        }
+        var last = c[c.length - 1].c;
+        var pct = hi === lo ? 0.5 : (last - lo) / (hi - lo);
+        pct = Math.max(0, Math.min(1, pct));
+        var fill = rows[r].querySelector('.range-fill');
+        var tri  = rows[r].querySelector('.range-tri');
+        var data = rows[r].querySelectorAll('.range-data span');
+        fill.style.width = (pct * 100).toFixed(1) + '%';
+        tri.style.left   = (pct * 100).toFixed(1) + '%';
+        data[0].textContent = fmt(lo);
+        data[2].textContent = fmt(hi);
+      }
+    }
+
+    /* Crosshair handling */
+    var crosshair = document.getElementById('crosshair');
+    var area = document.getElementById('chartArea');
+    var svg = document.getElementById('chartSvg');
+    var tooltip = document.getElementById('chartTooltip');
+
+    function showCrosshair(clientX, clientY) {
+      var rect = svg.getBoundingClientRect();
+      var px = ((clientX - rect.left) / rect.width) * CHART_W;
+      var py = ((clientY - rect.top) / rect.height) * 320;
+      if (px < candleArea.x || px > candleArea.x + candleArea.w) {
+        hideCrosshair(); return;
+      }
+      var i = xToIndex(px);
+      var k = state.candles[i];
+      var x = xCenter(i);
+      // Vertical line spans both panes
+      var chX = document.getElementById('chX');
+      chX.setAttribute('x1', x.toFixed(1));
+      chX.setAttribute('x2', x.toFixed(1));
+      chX.setAttribute('y1', PRICE_TOP);
+      chX.setAttribute('y2', VOL_BOT);
+      // Horizontal line follows cursor (clamped to candle pane)
+      var clampY = Math.max(candleArea.y, Math.min(candleArea.y + candleArea.h, py));
+      var chY = document.getElementById('chY');
+      chY.setAttribute('y1', clampY.toFixed(1));
+      chY.setAttribute('y2', clampY.toFixed(1));
+      // Right-edge price tag at cursor
+      var range = state.maxP - state.minP;
+      var pAtY = state.maxP - ((clampY - candleArea.y) / candleArea.h) * range;
+      var rect2 = document.getElementById('chPriceRect');
+      var text2 = document.getElementById('chPriceText');
+      rect2.setAttribute('y', (clampY - 7).toFixed(1));
+      text2.setAttribute('y', (clampY + 3).toFixed(1));
+      text2.textContent = fmt(pAtY);
+      crosshair.style.display = '';
+      // Tooltip data
+      document.getElementById('ttTitle').textContent = fmtTime(k.t);
+      document.getElementById('ttOpen').textContent  = fmt(k.o);
+      document.getElementById('ttHigh').textContent  = fmt(k.h);
+      document.getElementById('ttLow').textContent   = fmt(k.l);
+      document.getElementById('ttClose').textContent = fmt(k.c);
+      area.classList.add('crosshair-on');
+    }
+    function hideCrosshair() {
+      crosshair.style.display = 'none';
+      area.classList.remove('crosshair-on');
+    }
+
+    /* Mouse events */
+    area.addEventListener('mousemove', function(e) { showCrosshair(e.clientX, e.clientY); });
+    area.addEventListener('mouseleave', hideCrosshair);
+    /* Touch events (with a brief tap-and-drag pattern) */
+    area.addEventListener('touchstart', function(e) {
+      if (e.touches.length === 1) showCrosshair(e.touches[0].clientX, e.touches[0].clientY);
+    }, { passive: true });
+    area.addEventListener('touchmove', function(e) {
+      if (e.touches.length === 1) {
+        showCrosshair(e.touches[0].clientX, e.touches[0].clientY);
+        e.preventDefault();
+      }
+    }, { passive: false });
+    area.addEventListener('touchend', hideCrosshair);
+
+    function setTimeframe(tf) {
+      state.tf = tf;
+      // candle count: smaller TF = more bars; cap to keep readable
+      var counts = { 'Tick': 80, '1m': 80, '15m': 70, '1h': 60, '1D': 50, '1W': 40 };
+      state.candles = generateCandles(tf, counts[tf] || 60);
+      render();
+    }
+
+    return { setTimeframe: setTimeframe, render: render };
+  })();
+
+  KLine.setTimeframe('15m');
+
+  /* Lots stepper */
+  (function() {
+    var input = document.getElementById('otLots');
+    var minus = document.getElementById('otMinus');
+    var plus = document.getElementById('otPlus');
+    if (!input || !minus || !plus) return;
+    function step(delta) {
+      var v = parseFloat(input.value) || 0;
+      v = Math.max(0.01, +(v + delta).toFixed(2));
+      input.value = v.toFixed(2);
+    }
+    minus.addEventListener('click', function() { step(-0.01); });
+    plus.addEventListener('click', function() { step(0.01); });
+  })();
+
+  /* Tab switching (visual only) */
+  document.querySelectorAll('.kline-tab').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      document.querySelectorAll('.kline-tab').forEach(function(t) { t.classList.remove('active'); });
+      tab.classList.add('active');
+    });
+  });
+
+  /* Time-frame switching */
+  document.querySelectorAll('.tf-item').forEach(function(tab) {
+    tab.addEventListener('click', function() {
+      var label = (tab.textContent || '').trim().split(/\s+/)[0];
+      if (label === 'More') return;
+      document.querySelectorAll('.tf-item').forEach(function(t) { t.classList.remove('active'); });
+      tab.classList.add('active');
+      KLine.setTimeframe(label);
+    });
+  });
+</script>
+</body>
+</html>
