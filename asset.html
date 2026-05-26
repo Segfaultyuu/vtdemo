@@ -545,12 +545,15 @@
     }
     /* Funding action buttons */
     .funding-actions {
-      display: flex; gap: 12px; padding: 16px 20px;
+      display: flex; gap: 12px; padding: 16px 0;
+    }
+    .tab-funding .funding-actions {
+      padding: 16px 20px;
     }
     .funding-action-btn {
       flex: 1; height: 44px; border-radius: 8px;
       font-size: 14px; font-weight: 500; color: #282d34;
-      cursor: pointer; border: 1px solid #e8e9ea; background: #fff;
+      cursor: pointer; border: none; background: #f4f5f6;
       font-family: 'Roboto', sans-serif;
     }
     .funding-action-btn.primary {
@@ -637,20 +640,21 @@
 
     /* Action buttons for VTW */
     .vtw-buttons {
-      display: flex; gap: 16px; padding: 16px;
+      display: flex; gap: 12px; padding: 16px 20px;
       width: 393px;
     }
     .vtw-btn {
-      flex: 1; height: 48px; border-radius: 8px;
+      flex: 1; height: 44px; border-radius: 8px;
       display: flex; align-items: center; justify-content: center;
-      font-size: 16px; font-weight: 600; line-height: 24px;
+      font-size: 14px; font-weight: 500;
       cursor: pointer; border: none;
+      font-family: 'Roboto', sans-serif;
     }
     .vtw-btn-secondary {
-      background: #e8f1ff; color: #282d34;
+      background: #f4f5f6; color: #282d34;
     }
     .vtw-btn-primary {
-      background: #0a36c7; color: #fff;
+      background: #0a36c7; color: #fff; font-weight: 600;
     }
 
     /* VTW Asset list */
@@ -1008,23 +1012,10 @@
         <span class="acct-card-cta-left">Current Position : 0</span>
         <span class="acct-card-cta-right">Trade Now <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M3 1.5L6 4L3 6.5" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </div>
-      <div class="asset-actions">
-        <div class="asset-action-item">
-          <img src="images/asset-icon-deposit.svg" alt="">
-          <span>Deposit</span>
-        </div>
-        <div class="asset-action-item">
-          <img src="images/asset-icon-transfer.svg" alt="">
-          <span>Transfer</span>
-        </div>
-        <div class="asset-action-item">
-          <img src="images/asset-icon-withdraw.svg" alt="">
-          <span>Withdraw</span>
-        </div>
-        <div class="asset-action-item">
-          <img src="images/asset-icon-convert.svg" alt="">
-          <span>Convert</span>
-        </div>
+      <div class="funding-actions">
+        <button class="funding-action-btn primary">Deposit</button>
+        <button class="funding-action-btn">Transfer</button>
+        <button class="funding-action-btn">Withdraw</button>
       </div>
     </div>
   </div>
@@ -1081,23 +1072,10 @@
         <span class="acct-card-cta-left">Copying : 1 Trader</span>
         <span class="acct-card-cta-right">View All <svg width="8" height="8" viewBox="0 0 8 8" fill="none"><path d="M3 1.5L6 4L3 6.5" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
       </div>
-      <div class="asset-actions">
-        <div class="asset-action-item">
-          <img src="images/asset-icon-deposit.svg" alt="">
-          <span>Deposit</span>
-        </div>
-        <div class="asset-action-item">
-          <img src="images/asset-icon-transfer.svg" alt="">
-          <span>Transfer</span>
-        </div>
-        <div class="asset-action-item">
-          <img src="images/asset-icon-withdraw.svg" alt="">
-          <span>Withdraw</span>
-        </div>
-        <div class="asset-action-item">
-          <img src="images/asset-icon-convert.svg" alt="">
-          <span>Convert</span>
-        </div>
+      <div class="funding-actions">
+        <button class="funding-action-btn primary">Deposit</button>
+        <button class="funding-action-btn">Transfer</button>
+        <button class="funding-action-btn">Withdraw</button>
       </div>
     </div>
 
@@ -1137,23 +1115,10 @@
     </div>
 
     <!-- Action buttons -->
-    <div class="asset-actions">
-      <div class="asset-action-item">
-        <img src="images/asset-icon-deposit.svg" alt="">
-        <span>Deposit</span>
-      </div>
-      <div class="asset-action-item">
-        <img src="images/asset-icon-transfer.svg" alt="">
-        <span>Transfer</span>
-      </div>
-      <div class="asset-action-item">
-        <img src="images/asset-icon-withdraw.svg" alt="">
-        <span>Withdraw</span>
-      </div>
-      <div class="asset-action-item">
-        <img src="images/asset-icon-convert.svg" alt="">
-        <span>Convert</span>
-      </div>
+    <div class="funding-actions">
+      <button class="funding-action-btn primary">Deposit</button>
+      <button class="funding-action-btn">Transfer</button>
+      <button class="funding-action-btn">Withdraw</button>
     </div>
 
     <!-- Assets section -->
