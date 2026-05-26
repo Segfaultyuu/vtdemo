@@ -48,41 +48,40 @@
       transition: max-height 0.32s cubic-bezier(.32,1,.36,1);
       padding: 0 20px;
     }
-    .mini-chart-panel.open { max-height: 240px; }
+    .mini-chart-panel.open { max-height: 360px; }
     .mini-chart-card {
       margin-top: 8px;
-      background: #f9fafb;
+      background: #fff;
       border-radius: 12px;
-      padding: 12px;
-      display: flex; flex-direction: column; gap: 8px;
+      padding: 8px 0 8px;
+      display: flex; flex-direction: column; gap: 6px;
     }
-    .mini-chart-head {
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .mini-chart-title {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 13px; font-weight: 600; color: #282d34;
-    }
-    .mini-chart-price {
-      font-size: 14px; font-weight: 600; color: #282d34;
-    }
-    .mini-chart-pct {
-      font-size: 11px; font-weight: 500; color: #00b565;
-      background: rgba(0,181,101,0.08);
-      padding: 2px 6px; border-radius: 4px;
-    }
-    .mini-chart-svg-wrap { width: 100%; height: 120px; }
-    .mini-chart-svg-wrap svg { width: 100%; height: 100%; display: block; }
     .mini-chart-tf {
-      display: flex; gap: 8px;
+      display: flex; align-items: center; gap: 0;
+      padding: 0 8px;
     }
     .mini-chart-tf button {
+      flex: 1;
       border: none; background: transparent;
-      font-size: 11px; font-weight: 500; color: #7a8699;
-      padding: 2px 8px; border-radius: 10px; cursor: pointer;
+      font-size: 12px; font-weight: 500; color: #7a8699;
+      padding: 4px 0; border-radius: 6px; cursor: pointer;
     }
     .mini-chart-tf button.on {
-      background: #e6efff; color: #0a36c7;
+      background: #f4f5f6; color: #282d34; font-weight: 600;
+    }
+    .mini-chart-malegend {
+      display: flex; gap: 10px; padding: 0 12px;
+      font-size: 10px; font-weight: 500;
+    }
+    .mini-chart-malegend .ma5  { color: #ff8a00; }
+    .mini-chart-malegend .ma10 { color: #c64fff; }
+    .mini-chart-malegend .ma20 { color: #ff2c40; }
+    .mini-chart-malegend .ma30 { color: #00b8d4; }
+    .mini-chart-svg-wrap { width: 100%; height: 180px; }
+    .mini-chart-svg-wrap svg { width: 100%; height: 100%; display: block; }
+    .mini-chart-time-axis {
+      display: flex; justify-content: space-between;
+      padding: 2px 12px 0; font-size: 10px; color: #7a8699;
     }
 
     /* ── Sell / Buy price block ── */
@@ -523,7 +522,7 @@
     }
     .copy-pnl-label {
       font-size: 14px; font-weight: 500; color: #7a8699; line-height: 22px;
-      text-decoration: underline; text-underline-offset: 2px;
+      text-decoration: underline dashed; text-underline-offset: 2px;
     }
     .copy-pnl-value {
       font-size: 16px; font-weight: 500; color: #00b565; line-height: 24px;
@@ -914,7 +913,9 @@
         </div>
       </div>
       <div class="product-icons">
-        <img id="chartIcon" src="images/trade-icon-chart.svg" alt="chart">
+        <svg id="chartIcon" width="20" height="20" viewBox="0 0 18.125 18.8225" fill="none" xmlns="http://www.w3.org/2000/svg" style="cursor:pointer;display:block;">
+          <path d="M16.7308 2.09135H9.75962V0.697115C9.75962 0.512229 9.68617 0.334915 9.55544 0.20418C9.4247 0.0734458 9.24739 0 9.0625 0C8.87761 0 8.7003 0.0734458 8.56956 0.20418C8.43883 0.334915 8.36538 0.512229 8.36538 0.697115V2.09135H1.39423C1.02446 2.09135 0.66983 2.23824 0.408361 2.49971C0.146892 2.76118 0 3.1158 0 3.48558V13.9423C0 14.3121 0.146892 14.6667 0.408361 14.9282C0.66983 15.1896 1.02446 15.3365 1.39423 15.3365H4.82404L2.94096 17.6893C2.8254 17.8337 2.77196 18.0182 2.79239 18.202C2.81281 18.3859 2.90544 18.5541 3.04988 18.6696C3.19432 18.7852 3.37875 18.8386 3.5626 18.8182C3.74644 18.7978 3.91464 18.7051 4.0302 18.5607L6.60865 15.3365H11.5163L14.0948 18.5607C14.152 18.6322 14.2228 18.6918 14.303 18.7359C14.3832 18.7801 14.4714 18.8081 14.5624 18.8182C14.6534 18.8283 14.7456 18.8204 14.8335 18.7949C14.9215 18.7694 15.0036 18.7268 15.0751 18.6696C15.1466 18.6124 15.2062 18.5417 15.2504 18.4614C15.2946 18.3812 15.3225 18.2931 15.3326 18.202C15.3427 18.111 15.3348 18.0189 15.3093 17.9309C15.2838 17.8429 15.2413 17.7608 15.184 17.6893L13.301 15.3365H16.7308C17.1005 15.3365 17.4552 15.1896 17.7166 14.9282C17.9781 14.6667 18.125 14.3121 18.125 13.9423V3.48558C18.125 3.1158 17.9781 2.76118 17.7166 2.49971C17.4552 2.23824 17.1005 2.09135 16.7308 2.09135ZM16.7308 13.9423H1.39423V3.48558H16.7308V13.9423ZM6.97115 9.0625V11.1538C6.97115 11.3387 6.89771 11.516 6.76697 11.6468C6.63624 11.7775 6.45892 11.851 6.27404 11.851C6.08915 11.851 5.91184 11.7775 5.7811 11.6468C5.65037 11.516 5.57692 11.3387 5.57692 11.1538V9.0625C5.57692 8.87761 5.65037 8.7003 5.7811 8.56957C5.91184 8.43883 6.08915 8.36539 6.27404 8.36539C6.45892 8.36539 6.63624 8.43883 6.76697 8.56957C6.89771 8.7003 6.97115 8.87761 6.97115 9.0625ZM9.75962 7.66827V11.1538C9.75962 11.3387 9.68617 11.516 9.55544 11.6468C9.4247 11.7775 9.24739 11.851 9.0625 11.851C8.87761 11.851 8.7003 11.7775 8.56956 11.6468C8.43883 11.516 8.36538 11.3387 8.36538 11.1538V7.66827C8.36538 7.48338 8.43883 7.30607 8.56956 7.17534C8.7003 7.0446 8.87761 6.97115 9.0625 6.97115C9.24739 6.97115 9.4247 7.0446 9.55544 7.17534C9.68617 7.30607 9.75962 7.48338 9.75962 7.66827ZM12.5481 6.27404V11.1538C12.5481 11.3387 12.4746 11.516 12.3439 11.6468C12.2132 11.7775 12.0358 11.851 11.851 11.851C11.6661 11.851 11.4888 11.7775 11.358 11.6468C11.2273 11.516 11.1538 11.3387 11.1538 11.1538V6.27404C11.1538 6.08915 11.2273 5.91184 11.358 5.7811C11.4888 5.65037 11.6661 5.57692 11.851 5.57692C12.0358 5.57692 12.2132 5.65037 12.3439 5.7811C12.4746 5.91184 12.5481 6.08915 12.5481 6.27404Z" fill="#282D34"/>
+        </svg>
         <img src="images/trade-icon-viewchart.svg" alt="view chart" onclick="location.href='kline.html'">
         <svg id="expandIcon" width="20" height="20" viewBox="0 0 20 20" fill="none" style="cursor:pointer;transition:transform 0.3s ease;">
           <path d="M17.2922 1.25H5.62578C5.23901 1.25 4.86809 1.40364 4.59461 1.67713C4.32112 1.95061 4.16748 2.32153 4.16748 2.7083V7.0832C4.16748 7.27658 4.2443 7.46204 4.38104 7.59878C4.51779 7.73553 4.70325 7.81235 4.89663 7.81235C5.09001 7.81235 5.27547 7.73553 5.41222 7.59878C5.54896 7.46204 5.62578 7.27658 5.62578 7.0832V2.7083H17.2922V14.3747H12.9173C12.7239 14.3747 12.5384 14.4515 12.4017 14.5883C12.2649 14.725 12.1881 14.9105 12.1881 15.1038C12.1881 15.2972 12.2649 15.4827 12.4017 15.6194C12.5384 15.7562 12.7239 15.833 12.9173 15.833H17.2922C17.6789 15.833 18.0499 15.6794 18.3233 15.4059C18.5968 15.1324 18.7505 14.7615 18.7505 14.3747V2.7083C18.7505 2.32153 18.5968 1.95061 18.3233 1.67713C18.0499 1.40364 17.6789 1.25 17.2922 1.25Z" fill="#282D34"/>
@@ -926,35 +927,57 @@
     <!-- Mini chart panel (toggled by chart icon) -->
     <div class="mini-chart-panel" id="miniChartPanel">
       <div class="mini-chart-card">
-        <div class="mini-chart-head">
-          <div class="mini-chart-title">
-            <img src="https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png" alt="" style="width:16px;height:16px;">
-            <span>BTCUSD</span>
-          </div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <span class="mini-chart-price" id="miniChartPrice">82,302.00</span>
-            <span class="mini-chart-pct" id="miniChartPct">+1.50%</span>
-          </div>
-        </div>
-        <div class="mini-chart-svg-wrap">
-          <svg viewBox="0 0 320 120" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <linearGradient id="miniChartFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#00b565" stop-opacity="0.25"/>
-                <stop offset="100%" stop-color="#00b565" stop-opacity="0"/>
-              </linearGradient>
-            </defs>
-            <path id="miniChartArea" d="" fill="url(#miniChartFill)"/>
-            <path id="miniChartLine" d="" fill="none" stroke="#00b565" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
-        </div>
-        <div class="mini-chart-tf">
-          <button class="on">1H</button>
+        <div class="mini-chart-tf" id="miniChartTf">
+          <button class="on">Tick</button>
+          <button>1m</button>
+          <button>5m</button>
+          <button>15m</button>
+          <button>30m</button>
+          <button>1h</button>
+          <button>4h</button>
           <button>1D</button>
           <button>1W</button>
-          <button>1M</button>
-          <button>1Y</button>
         </div>
+        <div class="mini-chart-malegend" id="miniChartMaLegend">
+          <span class="ma5">MA5: --</span>
+          <span class="ma10">MA10: --</span>
+          <span class="ma20">MA20: --</span>
+          <span class="ma30">MA30: --</span>
+        </div>
+        <div class="mini-chart-svg-wrap">
+          <svg id="miniChartSvg" viewBox="0 0 360 180" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="miniChartFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#ff2c40" stop-opacity="0.25"/>
+                <stop offset="100%" stop-color="#ff2c40" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <!-- Grid lines -->
+            <g id="miniGridLines" stroke="#f4f5f6" stroke-width="0.5"></g>
+            <!-- Y-axis price labels -->
+            <g id="miniYAxis" font-size="9" fill="#7a8699" font-family="Roboto" text-anchor="end"></g>
+            <!-- MA lines -->
+            <path id="miniMa5"  fill="none" stroke="#ff8a00" stroke-width="1" opacity="0.9"/>
+            <path id="miniMa10" fill="none" stroke="#c64fff" stroke-width="1" opacity="0.9"/>
+            <path id="miniMa20" fill="none" stroke="#ff2c40" stroke-width="1" opacity="0.9"/>
+            <path id="miniMa30" fill="none" stroke="#00b8d4" stroke-width="1" opacity="0.9"/>
+            <!-- Price area + line -->
+            <path id="miniChartArea" d="" fill="url(#miniChartFill)"/>
+            <path id="miniChartLine" d="" fill="none" stroke="#ff2c40" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Last price marker dot -->
+            <circle id="miniLastDot" cx="0" cy="0" r="2" fill="#ff2c40"/>
+            <!-- Right edge: latest close + open tags -->
+            <g id="miniLastTag">
+              <rect id="miniLastRect" x="298" y="0" width="58" height="14" fill="#fff" stroke="#ff2c40" stroke-width="0.8" rx="2"/>
+              <text id="miniLastText" x="327" y="0" font-size="9" fill="#ff2c40" font-family="Roboto" font-weight="600" text-anchor="middle"></text>
+            </g>
+            <g id="miniOpenTag">
+              <rect id="miniOpenRect" x="298" y="0" width="58" height="14" fill="#fff" stroke="#00b565" stroke-width="0.8" rx="2"/>
+              <text id="miniOpenText" x="327" y="0" font-size="9" fill="#00b565" font-family="Roboto" font-weight="600" text-anchor="middle"></text>
+            </g>
+          </svg>
+        </div>
+        <div class="mini-chart-time-axis" id="miniTimeAxis"></div>
       </div>
     </div>
 
@@ -1952,65 +1975,190 @@
   (function() {
     var chartIcon = document.getElementById('chartIcon');
     var panel = document.getElementById('miniChartPanel');
-    var lineEl = document.getElementById('miniChartLine');
-    var areaEl = document.getElementById('miniChartArea');
-    var priceEl = document.getElementById('miniChartPrice');
-    var pctEl = document.getElementById('miniChartPct');
     if (!chartIcon || !panel) return;
     var open = false;
 
-    function buildPath() {
-      var pts = 40;
-      var W = 320, H = 120;
-      var values = [];
-      var v = 50 + Math.random() * 30;
-      for (var i = 0; i < pts; i++) {
-        v += (Math.random() - 0.45) * 8;
-        v = Math.max(15, Math.min(105, v));
-        values.push(v);
+    var W = 360, H = 180;
+    var PAD_L = 0, PAD_R = 60, PAD_T = 8, PAD_B = 16;
+    var plot = { x: PAD_L, y: PAD_T, w: W - PAD_L - PAD_R, h: H - PAD_T - PAD_B };
+    var TF_MIN = { 'Tick': 1, '1m': 1, '5m': 5, '15m': 15, '30m': 30, '1h': 60, '4h': 240, '1D': 24*60, '1W': 7*24*60 };
+
+    var state = { tf: 'Tick', values: [], opens: [] };
+
+    function fmt(n, d) { d = d == null ? 5 : d;
+      var s = n.toFixed(d);
+      var parts = s.split('.');
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      return parts.join('.');
+    }
+    function pad2(x) { return x < 10 ? '0' + x : '' + x; }
+    function fmtTime(ms) {
+      var d = new Date(ms);
+      return pad2(d.getMonth()+1) + '/' + pad2(d.getDate()) + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes());
+    }
+    function ma(arr, period, idx) {
+      if (idx < period - 1) return null;
+      var sum = 0;
+      for (var i = idx - period + 1; i <= idx; i++) sum += arr[i];
+      return sum / period;
+    }
+
+    function generate(tf, n) {
+      var min = TF_MIN[tf] || 1;
+      var stepMs = min * 60 * 1000;
+      var nowMs = Date.now();
+      var startMs = nowMs - (n - 1) * stepMs;
+      var price = 1.39080;
+      var times = [], values = [], opens = [];
+      var vola = Math.sqrt(min) * 0.0008;
+      for (var i = 0; i < n; i++) {
+        var open = price;
+        var drift = (Math.random() - 0.55) * vola;
+        price = Math.max(1.388, Math.min(1.394, price + drift));
+        times.push(startMs + i * stepMs);
+        values.push(price);
+        opens.push(open);
       }
-      var min = Math.min.apply(null, values);
-      var max = Math.max.apply(null, values);
-      var range = Math.max(1, max - min);
-      var d = '', dArea = '';
-      values.forEach(function(val, i) {
-        var x = (i / (pts - 1)) * W;
-        var y = H - 8 - ((val - min) / range) * (H - 16);
-        d += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1);
-        dArea += (i === 0 ? 'M' : 'L') + x.toFixed(1) + ' ' + y.toFixed(1);
+      return { times: times, values: values, opens: opens };
+    }
+
+    function build() {
+      var n = 60;
+      var data = generate(state.tf, n);
+      state.values = data.values;
+      state.opens = data.opens;
+      state.times = data.times;
+
+      var min = Infinity, max = -Infinity;
+      for (var i = 0; i < data.values.length; i++) {
+        if (data.values[i] < min) min = data.values[i];
+        if (data.values[i] > max) max = data.values[i];
+      }
+      var pad = (max - min) * 0.15 || 0.0002;
+      min -= pad; max += pad;
+      var range = max - min || 1;
+
+      function xAt(i) { return plot.x + (i / (n - 1)) * plot.w; }
+      function yAt(v) { return plot.y + plot.h - ((v - min) / range) * plot.h; }
+
+      // Grid + Y-axis labels
+      var grid = document.getElementById('miniGridLines');
+      var ya   = document.getElementById('miniYAxis');
+      grid.innerHTML = ''; ya.innerHTML = '';
+      var lines = 4;
+      for (var k = 0; k <= lines; k++) {
+        var p = max - range * (k / lines);
+        var y = yAt(p);
+        grid.insertAdjacentHTML('beforeend',
+          '<line x1="0" y1="' + y.toFixed(1) + '" x2="' + (W - PAD_R) + '" y2="' + y.toFixed(1) + '"/>');
+        ya.insertAdjacentHTML('beforeend',
+          '<text x="' + (W - 4) + '" y="' + (y + 3).toFixed(1) + '">' + fmt(p) + '</text>');
+      }
+
+      // Build paths
+      var lineD = '', areaD = '';
+      data.values.forEach(function(v, i) {
+        var xx = xAt(i), yy = yAt(v);
+        lineD += (i === 0 ? 'M' : 'L') + xx.toFixed(1) + ' ' + yy.toFixed(1);
+        areaD += (i === 0 ? 'M' : 'L') + xx.toFixed(1) + ' ' + yy.toFixed(1);
       });
-      dArea += 'L' + W + ' ' + H + 'L0 ' + H + 'Z';
-      lineEl.setAttribute('d', d);
-      areaEl.setAttribute('d', dArea);
-      // Trend coloring based on first vs last value
-      var isUp = values[values.length - 1] >= values[0];
+      areaD += 'L' + xAt(n - 1).toFixed(1) + ' ' + (plot.y + plot.h) + 'L' + xAt(0).toFixed(1) + ' ' + (plot.y + plot.h) + 'Z';
+
+      var first = data.values[0], last = data.values[data.values.length - 1];
+      var isUp = last >= first;
       var color = isUp ? '#00b565' : '#ff2c40';
+
+      var lineEl = document.getElementById('miniChartLine');
+      var areaEl = document.getElementById('miniChartArea');
+      lineEl.setAttribute('d', lineD);
       lineEl.setAttribute('stroke', color);
-      // Update gradient fill stop colors
+      areaEl.setAttribute('d', areaD);
       var stops = panel.querySelectorAll('#miniChartFill stop');
       if (stops.length) {
         stops[0].setAttribute('stop-color', color);
         stops[1].setAttribute('stop-color', color);
       }
-      // Update price/pct (mocked)
-      var basePrice = 82302;
-      var newPrice = basePrice * (1 + (values[values.length - 1] - values[0]) / 1000);
-      priceEl.textContent = newPrice.toFixed(2).replace(/\B(?=(\d{3})+\.)/g, ',');
-      var pct = ((values[values.length - 1] - values[0]) / values[0]) * 100;
-      pctEl.textContent = (pct >= 0 ? '+' : '') + pct.toFixed(2) + '%';
-      pctEl.style.color = color;
-      pctEl.style.background = isUp ? 'rgba(0,181,101,0.08)' : 'rgba(255,44,64,0.08)';
+
+      // MA lines
+      function buildMa(period) {
+        var d = '', moved = false;
+        for (var i = 0; i < data.values.length; i++) {
+          var v = ma(data.values, period, i);
+          if (v == null) continue;
+          var xx = xAt(i), yy = yAt(v);
+          d += (moved ? 'L' : 'M') + xx.toFixed(1) + ' ' + yy.toFixed(1);
+          moved = true;
+        }
+        return d;
+      }
+      document.getElementById('miniMa5').setAttribute('d',  buildMa(5));
+      document.getElementById('miniMa10').setAttribute('d', buildMa(10));
+      document.getElementById('miniMa20').setAttribute('d', buildMa(20));
+      document.getElementById('miniMa30').setAttribute('d', buildMa(30));
+
+      // Last-point dot
+      var lastX = xAt(n - 1), lastY = yAt(last);
+      var dot = document.getElementById('miniLastDot');
+      dot.setAttribute('cx', lastX.toFixed(1));
+      dot.setAttribute('cy', lastY.toFixed(1));
+      dot.setAttribute('fill', color);
+
+      // Right-edge price tags (close + open of last bar, separated vertically)
+      var openV = data.opens[data.opens.length - 1];
+      var openY = yAt(openV);
+      // Avoid overlap: if too close, push apart
+      if (Math.abs(openY - lastY) < 14) {
+        if (openY > lastY) openY = lastY + 14;
+        else openY = lastY - 14;
+      }
+      var lastRect = document.getElementById('miniLastRect');
+      var lastText = document.getElementById('miniLastText');
+      lastRect.setAttribute('y', (lastY - 7).toFixed(1));
+      lastRect.setAttribute('stroke', color);
+      lastText.setAttribute('y', (lastY + 3).toFixed(1));
+      lastText.setAttribute('fill', color);
+      lastText.textContent = fmt(last);
+
+      var openColor = openV <= last ? '#00b565' : '#ff2c40';
+      var openRect = document.getElementById('miniOpenRect');
+      var openText = document.getElementById('miniOpenText');
+      openRect.setAttribute('y', (openY - 7).toFixed(1));
+      openRect.setAttribute('stroke', openColor);
+      openText.setAttribute('y', (openY + 3).toFixed(1));
+      openText.setAttribute('fill', openColor);
+      openText.textContent = fmt(openV);
+
+      // MA legend (latest values)
+      var legend = document.getElementById('miniChartMaLegend');
+      var idx = data.values.length - 1;
+      var v5 = ma(data.values, 5, idx),
+          v10 = ma(data.values, 10, idx),
+          v20 = ma(data.values, 20, idx),
+          v30 = ma(data.values, 30, idx);
+      legend.children[0].textContent = 'MA5 5:'  + (v5  ? (v5  * 1000).toFixed(2) : '--');
+      legend.children[1].textContent = 'MA 10:'  + (v10 ? (v10 * 1000).toFixed(2) : '--');
+      legend.children[2].textContent = 'MA 20:'  + (v20 ? (v20 * 1000).toFixed(2) : '--');
+      legend.children[3].textContent = 'MA 30:'  + (v30 ? (v30 * 1000).toFixed(2) : '--');
+
+      // Time axis (3 ticks)
+      var ta = document.getElementById('miniTimeAxis');
+      ta.innerHTML = '';
+      var idxs = [0, Math.floor((n - 1) / 2), n - 1];
+      for (var t = 0; t < idxs.length; t++) {
+        ta.insertAdjacentHTML('beforeend', '<span>' + fmtTime(data.times[idxs[t]]) + '</span>');
+      }
     }
 
     chartIcon.addEventListener('click', function() {
       open = !open;
+      var path = chartIcon.querySelector('path');
       if (open) {
-        buildPath();
+        build();
         panel.classList.add('open');
-        chartIcon.style.opacity = '0.6';
+        if (path) path.setAttribute('fill', '#0a36c7');
       } else {
         panel.classList.remove('open');
-        chartIcon.style.opacity = '';
+        if (path) path.setAttribute('fill', '#282D34');
       }
     });
 
@@ -2019,7 +2167,8 @@
       b.addEventListener('click', function() {
         panel.querySelectorAll('.mini-chart-tf button').forEach(function(x) { x.classList.remove('on'); });
         b.classList.add('on');
-        buildPath();
+        state.tf = (b.textContent || '').trim();
+        build();
       });
     });
   })();

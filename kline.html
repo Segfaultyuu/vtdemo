@@ -241,11 +241,47 @@
       z-index: 50;
     }
     .ot-mode {
+      position: relative;
       display: flex; justify-content: center; align-items: center;
       gap: 4px; font-size: 14px; font-weight: 500; color: #282d34;
       margin-bottom: 12px; cursor: pointer;
     }
-    .ot-mode svg { width: 10px; height: 10px; }
+    .ot-mode svg { width: 10px; height: 10px; transition: transform 0.2s ease; }
+    .ot-mode.open svg { transform: rotate(180deg); }
+
+    /* Mode dropdown */
+    .ot-mode-dropdown {
+      position: absolute; left: 50%; bottom: calc(100% + 6px);
+      transform: translateX(-50%) translateY(6px);
+      background: #fff;
+      border: 1px solid #f4f5f6;
+      border-radius: 8px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+      min-width: 140px;
+      padding: 4px 0;
+      opacity: 0; pointer-events: none;
+      transition: opacity 0.18s ease, transform 0.18s ease;
+      z-index: 60;
+    }
+    .ot-mode-dropdown.open {
+      opacity: 1; pointer-events: auto;
+      transform: translateX(-50%) translateY(0);
+    }
+    .ot-mode-dropdown::after {
+      content: ''; position: absolute; left: 50%; top: 100%;
+      transform: translateX(-50%);
+      border: 6px solid transparent;
+      border-top-color: #fff;
+    }
+    .ot-mode-option {
+      display: flex; align-items: center; justify-content: center;
+      padding: 10px 14px; cursor: pointer;
+      font-size: 14px; color: #282d34;
+      white-space: nowrap;
+    }
+    .ot-mode-option:hover { background: #f9fafb; }
+    .ot-mode-option.active { color: #0a36c7; font-weight: 600; }
+    .ot-mode-option .check { display: none; }
     .ot-lots-row {
       display: flex; align-items: center; gap: 12px; margin-bottom: 12px;
     }
@@ -293,6 +329,50 @@
       display: flex; align-items: center; gap: 4px; color: #00b565; font-weight: 500;
     }
     .ot-foot .risk svg { width: 14px; height: 14px; }
+
+    /* Order-filled alert */
+    .order-alert {
+      position: fixed; top: 56px; left: 0; right: 0;
+      width: 393px; margin: 0 auto;
+      background: #e8fff2;
+      padding: 8px 12px;
+      display: flex; align-items: flex-start; gap: 8px;
+      z-index: 200;
+      transform: translateY(-120%);
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transition:
+        transform 0.5s cubic-bezier(.4, 0, .2, 1),
+        opacity   0.45s ease,
+        visibility 0s linear 0.5s;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+    }
+    .order-alert.show {
+      transform: translateY(0);
+      opacity: 1;
+      visibility: visible;
+      transition:
+        transform 0.32s cubic-bezier(.32, 1, .36, 1),
+        opacity   0.22s ease,
+        visibility 0s linear 0s;
+    }
+    .order-alert .alert-icon {
+      width: 16px; height: 16px; flex-shrink: 0;
+      margin-top: 3px;
+    }
+    .order-alert .alert-body {
+      display: flex; flex-direction: column; gap: 0;
+      color: #282d34; min-width: 0;
+    }
+    .order-alert .alert-title {
+      font-size: 14px; font-weight: 500; line-height: 22px;
+      font-family: 'Roboto', sans-serif;
+    }
+    .order-alert .alert-msg {
+      font-size: 12px; font-weight: 400; line-height: 18px;
+      font-family: 'Roboto', sans-serif;
+    }
   </style>
 </head>
 <body>
@@ -502,8 +582,18 @@
 
 <!-- Bottom one-tap panel -->
 <div class="ot-panel">
-  <div class="ot-mode">One-Tap
+  <div class="ot-mode" id="otMode"><span id="otModeLabel">One-Tap</span>
     <svg viewBox="0 0 10 6" fill="none"><path d="M1 1L5 5L9 1" stroke="#282d34" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <div class="ot-mode-dropdown" id="otModeDropdown">
+      <div class="ot-mode-option active" data-mode="One-Tap">
+        <span>One-Tap</span>
+        <svg class="check" viewBox="0 0 14 14" fill="none"><path d="M2 7L6 11L12 4" stroke="#00b565" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+      <div class="ot-mode-option" data-mode="Standard">
+        <span>Standard</span>
+        <svg class="check" viewBox="0 0 14 14" fill="none"><path d="M2 7L6 11L12 4" stroke="#00b565" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
   </div>
   <div class="ot-lots-row">
     <span class="ot-lots-label">Lots</span>
@@ -518,12 +608,12 @@
     </div>
   </div>
   <div class="ot-buttons-row">
-    <button class="ot-bs-btn ot-bs-sell" onclick="location.href='trade.html'">
+    <button class="ot-bs-btn ot-bs-sell" id="otSellBtn">
       <span class="px">40614.45</span>
       <span class="lbl">SELL</span>
     </button>
     <span class="ot-spread" id="otSpread">--</span>
-    <button class="ot-bs-btn ot-bs-buy" onclick="location.href='trade.html'">
+    <button class="ot-bs-btn ot-bs-buy" id="otBuyBtn">
       <span class="px">41030.85</span>
       <span class="lbl">BUY</span>
     </button>
@@ -534,6 +624,18 @@
       <svg viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#00b565" stroke-width="1.2"/><path d="M4 8L7 5L10 8" stroke="#00b565" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
       <span id="otRisk">--</span>
     </span>
+  </div>
+</div>
+
+<!-- Order filled alert -->
+<div class="order-alert" id="orderAlert">
+  <svg class="alert-icon" viewBox="0 0 16 16" fill="none">
+    <circle cx="8" cy="8" r="7" fill="#00b565"/>
+    <path d="M5 8.2L7 10.2L11 6" stroke="#fff" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+  </svg>
+  <div class="alert-body">
+    <div class="alert-title">Order Filled</div>
+    <div class="alert-msg" id="orderAlertMsg">Sell 1 lots BTCUSD, at 106,000.00.</div>
   </div>
 </div>
 
@@ -962,10 +1064,24 @@
       render();
     }
 
-    return { setTimeframe: setTimeframe, render: render };
+    function tickRange() {
+      var c = state.candles;
+      if (!c || !c.length) return;
+      var last = c[c.length - 1];
+      // Nudge last close to drive frequent range updates
+      var vola = Math.max(2, (state.maxP - state.minP) * 0.003);
+      var drift = (Math.random() - 0.5) * vola;
+      last.c = last.c + drift;
+      if (last.c > last.h) last.h = last.c;
+      if (last.c < last.l) last.l = last.c;
+      updateRangeBars(c);
+    }
+
+    return { setTimeframe: setTimeframe, render: render, tickRange: tickRange };
   })();
 
   KLine.setTimeframe('15m');
+  setInterval(function() { KLine.tickRange(); }, 600);
 
   /* Lots stepper */
   (function() {
@@ -980,6 +1096,75 @@
     }
     minus.addEventListener('click', function() { step(-0.01); });
     plus.addEventListener('click', function() { step(0.01); });
+  })();
+
+  /* SELL / BUY actions (mode-aware) */
+  (function() {
+    var sellBtn = document.getElementById('otSellBtn');
+    var buyBtn  = document.getElementById('otBuyBtn');
+    var alertEl = document.getElementById('orderAlert');
+    var alertMsg = document.getElementById('orderAlertMsg');
+    var label = document.getElementById('otModeLabel');
+    var lotsInput = document.getElementById('otLots');
+    var alertTimer;
+    function getMode() { return (label && label.textContent) || 'One-Tap'; }
+    function fmt(n) {
+      var s = n.toFixed(2);
+      var parts = s.split('.');
+      parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+      return parts.join('.');
+    }
+    function showAlert(side) {
+      var pxEl = document.querySelector(side === 'Sell' ? '.ot-bs-sell .px' : '.ot-bs-buy .px');
+      var price = pxEl ? pxEl.textContent : '0.00';
+      var lots = lotsInput ? lotsInput.value : '0.01';
+      alertMsg.textContent = side + ' ' + lots + ' lots BTCUSD, at ' + price + '.';
+      alertEl.classList.add('show');
+      clearTimeout(alertTimer);
+      alertTimer = setTimeout(function() { alertEl.classList.remove('show'); }, 2000);
+    }
+    function handle(side) {
+      if (getMode() === 'Standard') {
+        location.href = 'trade.html';
+      } else {
+        showAlert(side);
+      }
+    }
+    if (sellBtn) sellBtn.addEventListener('click', function() { handle('Sell'); });
+    if (buyBtn)  buyBtn.addEventListener('click',  function() { handle('Buy');  });
+  })();
+
+  /* Trading-mode dropdown */
+  (function() {
+    var trigger = document.getElementById('otMode');
+    var dropdown = document.getElementById('otModeDropdown');
+    var label = document.getElementById('otModeLabel');
+    var lotsRow = document.querySelector('.ot-lots-row');
+    if (!trigger || !dropdown) return;
+    trigger.addEventListener('click', function(e) {
+      e.stopPropagation();
+      var willOpen = !dropdown.classList.contains('open');
+      dropdown.classList.toggle('open', willOpen);
+      trigger.classList.toggle('open', willOpen);
+    });
+    dropdown.querySelectorAll('.ot-mode-option').forEach(function(opt) {
+      opt.addEventListener('click', function(e) {
+        e.stopPropagation();
+        dropdown.querySelectorAll('.ot-mode-option').forEach(function(o) { o.classList.remove('active'); });
+        opt.classList.add('active');
+        var mode = opt.getAttribute('data-mode');
+        if (label) label.textContent = mode;
+        if (lotsRow) lotsRow.style.display = (mode === 'Standard') ? 'none' : '';
+        dropdown.classList.remove('open');
+        trigger.classList.remove('open');
+      });
+    });
+    document.addEventListener('click', function(e) {
+      if (!trigger.contains(e.target)) {
+        dropdown.classList.remove('open');
+        trigger.classList.remove('open');
+      }
+    });
   })();
 
   /* Tab switching (visual only) */

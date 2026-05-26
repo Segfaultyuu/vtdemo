@@ -867,10 +867,23 @@
       render();
     }
 
-    return { setTimeframe: setTimeframe, render: render };
+    function tickRange() {
+      var c = state.candles;
+      if (!c || !c.length) return;
+      var last = c[c.length - 1];
+      var vola = Math.max(2, (state.maxP - state.minP) * 0.003);
+      var drift = (Math.random() - 0.5) * vola;
+      last.c = last.c + drift;
+      if (last.c > last.h) last.h = last.c;
+      if (last.c < last.l) last.l = last.c;
+      updateRangeBars(c);
+    }
+
+    return { setTimeframe: setTimeframe, render: render, tickRange: tickRange };
   })();
 
   KLine.setTimeframe('15m');
+  setInterval(function() { KLine.tickRange(); }, 600);
 
   /* Tab switching (visual only) */
   document.querySelectorAll('.kline-tab').forEach(function(tab) {
